@@ -1,17 +1,30 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import mark from "@/assets/brand/praszo-mark.png";
 import { gsap } from "@/components/motion/gsap";
 import { getLenis } from "@/components/motion/smooth-scroll";
 import { prefersReducedMotion } from "@/lib/motion";
 import { SPLASH_EVENT, splashActive } from "@/lib/splash";
 
-/** Shortest time the splash stays up, and the longest it waits for the page to finish loading. */
-const MIN_MS = 1100;
+/** The Praszo mark traced from src/assets/brand/praszo-mark.png (256 × 240), in its exact coral. */
+const MARK = {
+  width: 256,
+  height: 240,
+  color: "#f46a4a",
+  // Top wedge running into the diagonal stroke, and the bottom triangle.
+  paths: ["M22 0H211L167 64L42 240H0L125 64Z", "M119 157L255 240H59Z"],
+  // A point deep inside the top wedge and its distance to the nearest edge (mark units).
+  // Scaled up around this point, the solid part of the "Z" covers the whole screen.
+  focus: { x: 117, y: 26, clearance: 26 },
+  center: { x: 128, y: 120 },
+};
+
+/** Height the mark settles at in the middle of the screen before it moves to the header. */
+const REST_HEIGHT = 96;
+/** Shortest time the coral screen stays up, and the longest it waits for the page to finish loading. */
+const MIN_MS = 900;
 const MAX_MS = 4000;
-const MARK_HEIGHT = 72;
 
 const pageLoaded = () =>
   new Promise<void>((resolve) => {
@@ -21,31 +34,30 @@ const pageLoaded = () =>
 
 /** The visible header logo mark to land on, if there is one at this width. */
 function headerMark() {
-  const marks = Array.from(document.querySelectorAll<HTMLElement>("header [data-logo-mark]"));
-  return marks.find((node) => {
+  return Array.from(document.querySelectorAll<HTMLElement>("header [data-logo-mark]")).find((node) => {
     const rect = node.getBoundingClientRect();
     return rect.width > 0 && rect.height > 0;
   });
 }
 
 /**
- * First-load splash: a coral screen with the white Praszo mark. The mark
- * draws in and breathes while the page loads, then flies into the header
- * logo, turning coral, while the screen collapses into it. Plays on every
- * full page load; under reduced motion the mark simply fades in and the
- * screen fades out.
+ * First-load splash. The screen opens in the Praszo icon color: it is the mark
+ * itself, scaled up around a point inside its solid wedge so it covers the
+ * viewport. Once the page has loaded, the coral contracts into the mark
+ * (revealing the site around it), then the mark settles into the header logo
+ * and hands over to it. One vector shape, transformed by GSAP; Lenis is paused
+ * until the site starts. Under reduced motion the coral screen simply fades.
  */
 export function Splash() {
-  const overlayRef = useRef<HTMLDivElement | null>(null);
-  const markRef = useRef<HTMLDivElement | null>(null);
+  const svgRef = useRef<SVGSVGElement | null>(null);
+  const groupRef = useRef<SVGGElement | null>(null);
   const [gone, setGone] = useState(false);
 
   useEffect(() => {
-    const overlay = overlayRef.current;
-    const flyer = markRef.current;
-    if (!overlay || !flyer) return;
+    const svg = svgRef.current;
+    const group = groupRef.current;
+    if (!svg || !group) return;
     if (!splashActive()) {
-      // No splash this load (attribute never set): drop the nodes.
       const frame = requestAnimationFrame(() => setGone(true));
       return () => cancelAnimationFrame(frame);
     }
@@ -54,95 +66,102 @@ export function Splash() {
     const lenis = getLenis();
     lenis?.stop();
     let cancelled = false;
-    const accent = getComputedStyle(root).getPropertyValue("--accent").trim() || "#f55d48";
+    let started = false;
 
-    const reduced = prefersReducedMotion();
-    const intro = gsap.timeline();
-    if (reduced) intro.fromTo(flyer, { opacity: 0 }, { opacity: 1, duration: 0.3 });
-    else
-      intro
-        .fromTo(flyer, { opacity: 0, scale: 0.55, rotate: -120 }, { opacity: 1, scale: 1, rotate: 0, duration: 0.8, ease: "back.out(1.6)" })
-        .to(flyer, { scale: 1.08, duration: 0.7, ease: "sine.inOut", yoyo: true, repeat: -1 });
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    svg.setAttribute("viewBox", `0 0 ${vw} ${vh}`);
 
-    const finish = () => {
-      if (cancelled) return;
-      root.dataset.splash = "done";
+    // The mark is placed by: screen point (x, y) shows mark point (fx, fy) at scale s.
+    const state = {
+      x: vw / 2,
+      y: vh / 2,
+      fx: MARK.focus.x,
+      fy: MARK.focus.y,
+      s: (Math.hypot(vw, vh) / 2 / MARK.focus.clearance) * 1.15,
+    };
+    const render = () => {
+      group.setAttribute("transform", `translate(${state.x} ${state.y}) scale(${state.s}) translate(${-state.fx} ${-state.fy})`);
+    };
+    render();
+
+    const startSite = () => {
+      if (started) return;
+      started = true;
+      // Pointer events pass through from here, and the hero entrance plays under the landing mark.
+      root.dataset.splash = "landing";
       lenis?.start();
       window.dispatchEvent(new Event(SPLASH_EVENT));
+    };
+    const finish = () => {
+      if (cancelled) return;
+      startSite();
+      root.dataset.splash = "done";
       setGone(true);
     };
 
     const outro = () => {
       if (cancelled) return;
-      intro.kill();
-      if (reduced) {
-        root.dataset.splash = "landing";
-        gsap.to([overlay, flyer], { opacity: 0, duration: 0.35, ease: "power1.out", onComplete: finish });
+      if (prefersReducedMotion()) {
+        startSite();
+        gsap.to(svg, { opacity: 0, duration: 0.4, ease: "power1.out", onComplete: finish });
         return;
       }
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      const target = headerMark();
-      const rect = target?.getBoundingClientRect();
-      const tx = rect ? rect.left + rect.width / 2 : vw / 2;
-      const ty = rect ? rect.top + rect.height / 2 : vh / 2;
-      const scale = rect ? rect.height / MARK_HEIGHT : 0.2;
-      const radius = Math.hypot(vw, vh);
-
-      const tl = gsap.timeline({ onComplete: finish });
-      tl.to(flyer, { scale: 1, rotate: 0, duration: 0.25, ease: "power2.out" })
+      const target = headerMark()?.getBoundingClientRect();
+      const rest = REST_HEIGHT / MARK.height;
+      const tl = gsap.timeline({ onUpdate: render, onComplete: finish });
+      // 1. The coral screen contracts into the mark, centered.
+      tl.to(state, { s: rest, fx: MARK.center.x, fy: MARK.center.y, duration: 1.25, ease: "expo.inOut" })
+        .add(startSite, "-=0.35")
+        // 2. The mark settles into the header logo (or bows out where there is none).
         .to(
-          flyer,
-          { x: tx - vw / 2, y: ty - vh / 2, scale, backgroundColor: accent, opacity: rect ? 1 : 0, duration: 1, ease: "expo.inOut" },
-          "fly",
-        )
-        .fromTo(
-          overlay,
-          { clipPath: `circle(${radius}px at ${vw / 2}px ${vh / 2}px)` },
-          { clipPath: `circle(0px at ${tx}px ${ty}px)`, duration: 1, ease: "expo.inOut" },
-          "fly",
-        )
-        // Hand over to the real logo, then let the flying copy go.
-        .add(() => {
-          root.dataset.splash = "landing";
-        })
-        .to(flyer, { opacity: 0, duration: 0.15 });
+          state,
+          target
+            ? {
+                x: target.left + target.width / 2,
+                y: target.top + target.height / 2,
+                s: target.height / MARK.height,
+                duration: 0.85,
+                ease: "power3.inOut",
+              }
+            : { s: rest * 0.6, duration: 0.5, ease: "power2.in" },
+          "+=0.12",
+        );
+      if (!target) tl.to(svg, { opacity: 0, duration: 0.3 }, "<0.2");
+      // 3. The real logo takes over underneath, then the copy fades.
+      else
+        tl.add(() => {
+          root.dataset.splash = "landed";
+        }).to(svg, { opacity: 0, duration: 0.2 });
     };
 
-    const started = performance.now();
-    const ready = Promise.race([Promise.all([pageLoaded(), document.fonts?.ready]), new Promise((r) => setTimeout(r, MAX_MS))]);
+    const begin = performance.now();
+    const ready = Promise.race([Promise.all([pageLoaded(), document.fonts?.ready]), new Promise((resolve) => setTimeout(resolve, MAX_MS))]);
     void ready.then(() => {
-      const wait = Math.max(0, MIN_MS - (performance.now() - started));
-      gsap.delayedCall(wait / 1000, outro);
+      gsap.delayedCall(Math.max(0, MIN_MS - (performance.now() - begin)) / 1000, outro);
     });
 
     return () => {
       cancelled = true;
-      intro.kill();
-      gsap.killTweensOf([flyer, overlay]);
-      if (root.dataset.splash === "on" || root.dataset.splash === "landing") {
+      gsap.killTweensOf([state, svg]);
+      if (root.dataset.splash !== "done") {
+        startSite();
         root.dataset.splash = "done";
-        lenis?.start();
-        window.dispatchEvent(new Event(SPLASH_EVENT));
       }
     };
   }, []);
 
   if (gone) return null;
 
-  const width = (MARK_HEIGHT * mark.width) / mark.height;
-  const maskStyle = {
-    "--splash-w": `${width}px`,
-    width,
-    height: MARK_HEIGHT,
-    WebkitMaskImage: `url(${mark.src})`,
-    maskImage: `url(${mark.src})`,
-  } as CSSProperties;
-
   return (
     <div aria-hidden className="splash">
-      <div ref={overlayRef} className="splash-screen" />
-      <div ref={markRef} className="splash-mark" style={maskStyle} />
+      <svg ref={svgRef} className="splash-art" preserveAspectRatio="none" focusable="false">
+        <g ref={groupRef} fill={MARK.color}>
+          {MARK.paths.map((d) => (
+            <path key={d} d={d} />
+          ))}
+        </g>
+      </svg>
     </div>
   );
 }

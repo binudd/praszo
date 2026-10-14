@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useRef } from "react";
 
 import { useHeroEntrance } from "@/components/motion/hero-entrance";
+import { HeroTitle } from "@/components/motion/hero-title";
 import { Magnetic } from "@/components/motion/magnetic";
 import { scrollToTarget } from "@/components/motion/smooth-scroll";
 import { ProductShowcase } from "@/components/product/product-showcase";
@@ -17,20 +18,6 @@ import type { Product } from "@/data/products";
 
 /** Hero CTAs: compact on phones (both fit one row), regular on tablets, large on desktop. */
 const heroButton = "max-sm:h-10 max-sm:px-4 max-sm:text-sm lg:h-12 lg:px-6 lg:text-base";
-
-/** Keeps hyphenated words such as "Purpose-built" on one line; the giant type otherwise breaks at the hyphen. */
-function Headline({ text }: { text: string }) {
-  return (
-    <>
-      {text.split(" ").map((word, index) => (
-        <span key={`${word}-${index}`}>
-          {index > 0 ? " " : null}
-          {word.includes("-") ? <span className="whitespace-nowrap">{word}</span> : word}
-        </span>
-      ))}
-    </>
-  );
-}
 
 export function ProductHero({ product }: { product: Product }) {
   const rootRef = useRef<HTMLElement | null>(null);
@@ -80,11 +67,7 @@ export function ProductHero({ product }: { product: Product }) {
       visual={<ProductShowcase product={product} />}
       title={
         <h1 id={`${product.slug}-hero-title`} className="display-hero max-w-[16ch] text-ink lg:max-w-[24ch] lg:text-[min(5.9rem,6.2vw,9.5svh)]">
-          <span className="mask-reveal block pb-[0.08em]">
-            <span data-hero="headline" className="block">
-              <Headline text={product.hero.headline} />
-            </span>
-          </span>
+          <HeroTitle text={product.hero.headline} />
         </h1>
       }
       aside={

@@ -4,6 +4,7 @@ import { ArrowRight, Play } from "lucide-react";
 import { useRef } from "react";
 
 import { useHeroEntrance } from "@/components/motion/hero-entrance";
+import { HeroTitle } from "@/components/motion/hero-title";
 import { Magnetic } from "@/components/motion/magnetic";
 import { scrollToTarget } from "@/components/motion/smooth-scroll";
 import { HeroShell } from "@/components/sections/hero-shell";
@@ -16,20 +17,7 @@ import { home } from "@/data/home";
 /** Hero CTAs: compact on phones (both fit one row), regular on tablets, large on desktop. */
 const heroButton = "max-sm:h-10 max-sm:px-4 max-sm:text-sm lg:h-12 lg:px-6 lg:text-base";
 
-const headline = ["Run it on Praszo."];
 const opener = "Simplify your practice management.";
-
-function HeadlineLine({ line }: { line: string }) {
-  const index = line.indexOf("Praszo");
-  if (index === -1) return <>{line}</>;
-  return (
-    <>
-      {line.slice(0, index)}
-      <span className="text-brand">Praszo</span>
-      {line.slice(index + "Praszo".length)}
-    </>
-  );
-}
 
 export function CorporateHero() {
   const rootRef = useRef<HTMLElement | null>(null);
@@ -70,13 +58,7 @@ export function CorporateHero() {
       visual={<HeroShowcase />}
       title={
         <h1 id="home-hero-title" className="display-lg text-ink">
-          {headline.map((line) => (
-            <span key={line} className="mask-reveal block pb-[0.08em]">
-              <span data-hero="headline" className="block">
-                <HeadlineLine line={line} />
-              </span>
-            </span>
-          ))}
+          <HeroTitle text="Run it on Praszo." highlight="Praszo" />
         </h1>
       }
       aside={

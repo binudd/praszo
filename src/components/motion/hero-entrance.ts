@@ -56,6 +56,13 @@ export function useHeroEntrance(rootRef: RefObject<HTMLElement | null>, key: str
 
       step('[data-hero="eyebrow"]', { y: 10, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4 });
       step('[data-hero="headline"]', { y: "112%" }, { y: "0%", duration: 0.8, stagger: 0.09 }, "-=0.2");
+      // Word-split titles (HeroTitle): each word rises from its mask, un-tilts and comes into focus.
+      step(
+        '[data-hero="word"]',
+        { y: 0, yPercent: 115, rotate: 7, opacity: 0, filter: "blur(12px)" },
+        { y: 0, yPercent: 0, rotate: 0, opacity: 1, filter: "blur(0px)", duration: 1.15, ease: "expo.out", stagger: 0.075, clearProps: "filter" },
+        "-=0.25",
+      );
       step('[data-hero="copy"]', { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5 }, "-=0.5");
       step('[data-hero="cta"]', { y: 12, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4 }, "-=0.3");
       step(

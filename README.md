@@ -29,7 +29,7 @@ Images are static imports from `src/assets/` (brand marks, client logos, product
 
 ### First-load splash
 
-On the first page load in a browser tab, a coral screen shows the white Praszo mark while the page loads, then the mark flies into the header logo (turning coral) as the screen collapses into it. An inline boot script in `src/app/layout.tsx` (from `src/lib/splash.ts`) sets `<html data-splash>` before first paint, so repeat loads in the same tab, reduced-motion users and no-JS visitors never see it. The overlay lives in `src/components/layout/splash.tsx`; the hero entrance waits for it via `onSplashDone()`. Header marks that the splash can land on carry `data-logo-mark`.
+Every full page load opens on a screen in the Praszo icon color. That screen is the mark itself: a vector traced from `src/assets/brand/praszo-mark.png`, scaled up around a point inside its solid wedge so it covers the viewport. Once the page and fonts have loaded, GSAP contracts it into the "Z" (revealing the site around it), starts Lenis and the hero entrance, and settles the mark onto the header logo. Under reduced motion the coral screen simply fades. An inline boot script in `src/app/layout.tsx` (from `src/lib/splash.ts`) sets `<html data-splash>` before first paint; client-side navigation never replays it, and visitors without JS never see it. The overlay lives in `src/components/layout/splash.tsx`; header marks it can land on carry `data-logo-mark`.
 
 ## Development
 

@@ -288,7 +288,8 @@ section[data-theme="dark"] {
   opacity: 0;
 }
 
-[data-entrance]:not(.is-ready):not(.is-static) [data-hero="headline"] {
+[data-entrance]:not(.is-ready):not(.is-static) [data-hero="headline"],
+[data-entrance]:not(.is-ready):not(.is-static) [data-hero="word"] {
   transform: translateY(110%);
 }
 
@@ -637,7 +638,9 @@ details[open] .faq-chevron {
 
 /* First-load splash ------------------------------------------------------------
    <html data-splash> is set before first paint by the boot script in the root
-   layout: "on" shows the splash, "skip" hides it, "landing"/"done" after it. */
+   layout on every full load. "on": coral screen, page locked. "landing": the
+   mark is shrinking/flying while the page runs underneath. "landed": the mark
+   sits on the header logo and fades. "done": gone. */
 .splash {
   position: fixed;
   inset: 0;
@@ -647,7 +650,8 @@ details[open] .faq-chevron {
 }
 
 [data-splash="on"] .splash,
-[data-splash="landing"] .splash {
+[data-splash="landing"] .splash,
+[data-splash="landed"] .splash {
   display: block;
 }
 
@@ -660,29 +664,22 @@ details[open] .faq-chevron {
   overflow: hidden;
 }
 
-.splash-screen {
+/* The coral mark, scaled to cover the screen and then contracted into the logo. */
+.splash-art {
   position: absolute;
   inset: 0;
-  background: var(--accent);
-  will-change: clip-path;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
 }
 
-.splash-mark {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  margin: -36px 0 0 calc(var(--splash-w, 77px) / -2);
-  background: #ffffff;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
-  -webkit-mask-size: contain;
-  mask-size: contain;
-  -webkit-mask-position: center;
-  mask-position: center;
-  will-change: transform;
+/* Until the script places the vector, a solid coral screen guarantees full coverage. */
+[data-splash="on"] .splash:not(:has(.splash-art g[transform])) {
+  background: #f46a4a;
 }
 
-/* The header mark stays hidden until the flying copy lands on it. */
-[data-splash="on"] header [data-logo-mark] {
+/* The header mark stays hidden until the coral mark lands on it. */
+[data-splash="on"] header [data-logo-mark],
+[data-splash="landing"] header [data-logo-mark] {
   visibility: hidden;
 }
