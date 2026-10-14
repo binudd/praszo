@@ -82,7 +82,8 @@ export function SmoothScroll() {
     };
   }, []);
 
-  // Re-measure ScrollTriggers after each navigation and honor deep links.
+  // Re-measure ScrollTriggers after each navigation (again once the route has
+  // settled, since preserved routes swap in and out) and honor deep links.
   useEffect(() => {
     const frame = requestAnimationFrame(() => {
       ScrollTrigger.refresh();
@@ -91,7 +92,11 @@ export function SmoothScroll() {
         window.setTimeout(() => scrollToTarget(hash), 120);
       }
     });
-    return () => cancelAnimationFrame(frame);
+    const settled = window.setTimeout(() => ScrollTrigger.refresh(), 700);
+    return () => {
+      cancelAnimationFrame(frame);
+      window.clearTimeout(settled);
+    };
   }, [pathname]);
 
   return null;

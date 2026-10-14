@@ -3,18 +3,15 @@
 import { ArrowRight, Play } from "lucide-react";
 import { useRef } from "react";
 
-import { OsConsole } from "@/components/mockups/os-console";
+import { HeroShowcase } from "@/components/sections/hero-showcase";
 import { useHeroEntrance } from "@/components/motion/hero-entrance";
 import { Magnetic } from "@/components/motion/magnetic";
 import { scrollToTarget } from "@/components/motion/smooth-scroll";
-import { Tilt } from "@/components/motion/tilt";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Eyebrow } from "@/components/ui/eyebrow";
-import { ProductGlyph } from "@/components/ui/product-glyph";
 import { company } from "@/data/company";
 import { home } from "@/data/home";
-import { productList } from "@/data/products";
 
 const headline = ["Run it on Praszo."];
 const opener = "Simplify your practice management.";
@@ -78,9 +75,7 @@ export function CorporateHero() {
           </div>
         </div>
         <div data-hero="visual" className="relative lg:col-span-7">
-          <Tilt>
-            <OsConsole />
-          </Tilt>
+          <HeroShowcase />
         </div>
       </Container>
 
@@ -94,17 +89,10 @@ export function CorporateHero() {
             </span>
           ))}
         </h1>
-        <div data-hero="cta" className="flex items-center gap-4 lg:pb-3">
-          <span className="flex -space-x-2">
-            {productList.map((product) => (
-              <ProductGlyph key={product.slug} slug={product.slug} size={40} className="ring-2 ring-bg" />
-            ))}
-          </span>
-          <span className="text-sm leading-tight font-semibold text-ink">
-            Praszo OS
-            <span className="block font-medium text-ink-3">{home.ecosystem.title}</span>
-          </span>
-        </div>
+        <p data-hero="cta" className="text-sm leading-tight font-semibold text-ink lg:pb-3 lg:text-right">
+          Praszo OS
+          <span className="block font-medium text-ink-3">{home.ecosystem.title}</span>
+        </p>
       </Container>
     </section>
   );

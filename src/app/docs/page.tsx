@@ -5,6 +5,7 @@ import { ProductFeatureGrid } from "@/components/product/product-feature-grid";
 import { ProductHero } from "@/components/product/product-hero";
 import { ProductHighlights } from "@/components/product/product-highlights";
 import { ProductPage } from "@/components/product/product-page";
+import { ProductPreview } from "@/components/product/product-preview";
 import { ProductWorkflow } from "@/components/product/product-workflow";
 import { getProduct } from "@/data/products";
 import { buildMetadata } from "@/lib/metadata";
@@ -17,6 +18,7 @@ export default function DocsPage() {
   return (
     <ProductPage product={product}>
       <ProductHero product={product} />
+      <ProductPreview product={product} />
       <ProductHighlights product={product} />
       <ProductFeatureGrid product={product} section={product.featureSections[0]} />
       <ProductWorkflow product={product} />

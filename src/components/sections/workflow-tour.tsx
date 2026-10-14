@@ -11,33 +11,14 @@ import { Container } from "@/components/ui/container";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { ProductLockup } from "@/components/ui/product-lockup";
 import { home } from "@/data/home";
-import { workflowProducts, type Product } from "@/data/products";
+import { workflowSteps, type WorkflowStep } from "@/data/workflow";
 import { cn } from "@/lib/cn";
 import { prefersReducedMotion } from "@/lib/motion";
 
-type Step = {
-  id: string;
-  index: number;
-  label: string;
-  body: string;
-  product?: Product;
-  badge?: string;
-};
-
-const steps: Step[] = [
-  { id: "raw-data", index: 0, label: home.workflow.start.label, body: home.workflow.start.body, badge: home.workflow.start.badge },
-  ...workflowProducts.map((product, index) => ({
-    id: product.slug,
-    index: index + 1,
-    label: product.workflowStep.label,
-    body: product.workflowStep.body,
-    product,
-  })),
-];
-
+const steps = workflowSteps;
 const STEP_COUNT = steps.length;
 
-function StepCopy({ step, className }: { step: Step; className?: string }) {
+function StepCopy({ step, className }: { step: WorkflowStep; className?: string }) {
   return (
     <article className={className}>
       <p className="label inline-flex items-center gap-3 text-ink-3">

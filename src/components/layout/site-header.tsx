@@ -108,7 +108,13 @@ export function SiteHeader() {
   );
 
   return (
-    <header style={productStyle} className="site-header fixed inset-x-0 top-1 z-50">
+    <header
+      style={productStyle}
+      className={cn(
+        "site-header fixed inset-x-0 top-1 z-50 transition-[background-color,border-color] duration-300",
+        scrolled && "max-lg:border-b max-lg:border-line max-lg:bg-bg/85 max-lg:backdrop-blur-md",
+      )}
+    >
       <div className="mx-auto flex h-[4.5rem] w-full max-w-wide items-center justify-between gap-4 px-5 md:px-8 lg:px-10">
         {product ? (
           <Link

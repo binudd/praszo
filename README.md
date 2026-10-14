@@ -24,7 +24,7 @@ All copy lives in `src/data/`:
 - `products.ts` — the five products (hero, highlights, spotlights, feature sections, workflow, audience, FAQ, CTA). Each product page in `src/app/<slug>/page.tsx` composes shared sections from `src/components/product/` and adds product-specific ones.
 - `home.ts` — homepage copy, client logos, testimonials, FAQ.
 
-Images are static imports from `src/assets/` (brand marks, client logos, product screenshots). Hand-built UI mockups live in `src/components/mockups/`.
+Images are static imports from `src/assets/` (brand marks, client logos, product screenshots). Hand-built UI mockups live in `src/components/mockups/`. The hero visual (`src/components/sections/hero-showcase.tsx`) is the Praszo Practice engagement board (`src/components/mockups/kanban-board.tsx`, content in `src/data/kanban.ts`): audit tasks glide between columns in a GSAP Flip loop that plays forward then back, static under reduced motion; `ProductIconNav` (`src/components/ui/product-icon-nav.tsx`) is a reusable product menu with a GSAP sliding highlight and tooltips that routes to each product overview and, in the hero, acts as tabs for that loop.
 
 ## Development
 
@@ -42,7 +42,11 @@ npm run build && npm start
 
 The visual language borrows from editorial "type as graphic" sites: giant Manrope display titles (`.display-xl/-lg/-hero/-md/-sm` in `src/app/globals.css`) that overlap the content below them, a fixed 100×150px grid texture with a thin teal→coral brand bar, and alternating light/dark **scenes**. A section opts into the dark scene with `data-theme="dark"`; the token set in `src/app/tokens.css` flips automatically and `ThemeObserver` mirrors the scene crossing the viewport middle onto `<html>`, so the floating pill nav and the background crossfade with it. Praszo's brand colors stay the primaries: teal for actions, coral for the mark, one color per product.
 
-Reusable motion primitives live in `src/components/motion/`: `useScene` (sticky, scroll-scrubbed step scenes used by the product ecosystem, the workflow tour and product spotlights), `WordReveal` (statements that light up word by word), `DragRail` (draggable card rails), `Tilt` (pointer-following 3D tilt on hero visuals) and the GSAP `RevealHeading`/`RevealGroup` helpers. Every scene renders a stacked fallback for mobile, reduced motion and no-JS.
+Reusable motion primitives live in `src/components/motion/`: `useScene` (sticky, scroll-scrubbed step scenes used by the product ecosystem, the workflow tour and product spotlights), `WordReveal` (statements that light up word by word), `HorizontalScroll` (see below), `Tilt` (pointer-following 3D tilt on hero visuals) and the GSAP `RevealHeading`/`RevealGroup` helpers. Every scene renders a stacked fallback for mobile, reduced motion and no-JS.
+
+### Horizontal scroll carousel
+
+`HorizontalScroll` (`src/components/motion/horizontal-scroll.tsx`) pins a section and translates its card track horizontally as the visitor scrolls vertically. The travel distance is measured from the track (`scrollWidth - viewport width`), so scrolling maps 1:1 to movement, reverses naturally and releases the pin at both ends. It reuses the single Lenis instance and GSAP ticker from `SmoothScroll` (ScrollTrigger is already bound to Lenis), adds no wheel listeners, re-measures on resize and image load, and reverts the pin on unmount. Below 768px and under reduced motion the same markup becomes a native horizontal scroll region with scroll snapping. Content stays outside the component: pass any cards as children (wrap them in `HorizontalCard` so keyboard focus scrolls them into view) and an optional `header`. It powers Why Praszo, the testimonials and the single-group feature rails on product pages.
 
 ## Motion
 

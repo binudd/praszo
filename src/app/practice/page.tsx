@@ -5,6 +5,7 @@ import { ProductCta } from "@/components/product/product-cta";
 import { ProductFeatureGrid } from "@/components/product/product-feature-grid";
 import { ProductHero } from "@/components/product/product-hero";
 import { ProductPage } from "@/components/product/product-page";
+import { ProductPreview } from "@/components/product/product-preview";
 import { ProductProblem } from "@/components/product/product-problem";
 import { getProduct } from "@/data/products";
 import { buildMetadata } from "@/lib/metadata";
@@ -17,6 +18,7 @@ export default function PracticePage() {
   return (
     <ProductPage product={product}>
       <ProductHero product={product} />
+      <ProductPreview product={product} />
       <ProductProblem product={product} />
       <ProductFeatureGrid product={product} section={product.featureSections[0]} />
       <PracticeMobileSection />

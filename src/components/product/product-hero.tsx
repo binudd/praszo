@@ -7,8 +7,7 @@ import { useRef } from "react";
 import { useHeroEntrance } from "@/components/motion/hero-entrance";
 import { Magnetic } from "@/components/motion/magnetic";
 import { scrollToTarget } from "@/components/motion/smooth-scroll";
-import { Tilt } from "@/components/motion/tilt";
-import { ProductVisual } from "@/components/product/product-visual";
+import { ProductShowcase } from "@/components/product/product-showcase";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
@@ -64,9 +63,7 @@ export function ProductHero({ product }: { product: Product }) {
           </div>
         </div>
         <div data-hero="visual" className="relative lg:col-span-7">
-          <Tilt>
-            <ProductVisual visual={product.hero.visual} eager className="shadow-stage" />
-          </Tilt>
+          <ProductShowcase product={product} className="ml-auto w-full max-w-[calc(50svh*1.3846+1.5rem)]" />
         </div>
       </Container>
 

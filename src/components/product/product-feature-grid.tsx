@@ -1,29 +1,20 @@
-import { ChevronRight } from "lucide-react";
-
-import { DragRail } from "@/components/motion/drag-rail";
+import { HorizontalCard, HorizontalScroll } from "@/components/motion/horizontal-scroll";
 import { RevealGroup, RevealHeading } from "@/components/motion/reveal";
 import { Container } from "@/components/ui/container";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { Icon } from "@/components/ui/icon";
 import type { FeatureGroup, FeatureSection, Product } from "@/data/products";
 
-const railPadding = { paddingLeft: "max(1.25rem, calc((100vw - 86rem) / 2 + 2.5rem))", paddingRight: "2.5rem" };
-
 function RailCard({ item, index }: { item: FeatureGroup["items"][number]; index: number }) {
   return (
-    <li className="flex min-h-[21rem] w-[18rem] flex-col rounded-card border border-line bg-surface p-5 transition-colors duration-500 hover:bg-elevated md:w-[20rem]">
+    <HorizontalCard className="flex min-h-[19rem] w-[min(19rem,80vw)] flex-col rounded-card border border-line bg-surface p-5 transition-colors duration-500 hover:bg-elevated md:w-[21rem]">
       <div className="flex h-28 items-center justify-center rounded-sm bg-elevated text-product">
         <Icon name={item.icon} size={38} strokeWidth={1.5} aria-hidden />
       </div>
       <p className="label mt-5 text-ink-3">{String(index + 1).padStart(2, "0")}</p>
       <h3 className="mt-1.5 text-lg text-ink">{item.name}</h3>
       {item.description ? <p className="mt-2 text-[14.5px] leading-relaxed text-ink-2">{item.description}</p> : null}
-      <div className="mt-auto flex justify-end pt-5">
-        <span className="inline-flex h-8 w-8 items-center justify-center rounded-full border border-line text-ink-3">
-          <ChevronRight size={14} aria-hidden />
-        </span>
-      </div>
-    </li>
+    </HorizontalCard>
   );
 }
 
@@ -86,26 +77,26 @@ export function ProductFeatureGrid({ product, section }: { product: Product; sec
 
   if (single) {
     return (
-      <section id={id} data-theme="dark" aria-labelledby={`${id}-title`} className="relative overflow-hidden py-24 md:py-32">
-        <Container wide>
+      <HorizontalScroll
+        id={id}
+        theme="dark"
+        label={section.title}
+        header={
           <div className="mx-auto max-w-3xl text-center">
             <Eyebrow tone="product" className="justify-center">
               {section.eyebrow}
             </Eyebrow>
+            <h2 id={`${id}-title`} className="display-md mt-4 text-ink">
+              <RevealHeading>{section.title}</RevealHeading>
+            </h2>
             {section.description ? <p className="lede mt-5">{section.description}</p> : null}
           </div>
-          <h2 id={`${id}-title`} className="display-lg mx-auto mt-10 max-w-[16ch] text-center text-ink">
-            <RevealHeading>{section.title}</RevealHeading>
-          </h2>
-        </Container>
-        <DragRail className="relative z-10 mt-[-0.45em] pb-6" style={railPadding} aria-label={section.title}>
-          <ul className="contents">
-            {section.groups[0].items.map((item, index) => (
-              <RailCard key={item.name} item={item} index={index} />
-            ))}
-          </ul>
-        </DragRail>
-      </section>
+        }
+      >
+        {section.groups[0].items.map((item, index) => (
+          <RailCard key={item.name} item={item} index={index} />
+        ))}
+      </HorizontalScroll>
     );
   }
 
