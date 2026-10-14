@@ -1,5 +1,5 @@
 export const EASE = "power3.out";
-export const ANCHOR_OFFSET = -72;
+export const ANCHOR_OFFSET = 0;
 
 export function prefersReducedMotion() {
   if (typeof window === "undefined") return true;

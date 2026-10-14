@@ -1,16 +1,13 @@
 "use client";
 
-import { useGSAP } from "@gsap/react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
+import { usePathname } from "next/navigation";
 import { useEffect } from "react";
 
+import { gsap, ScrollTrigger } from "@/components/motion/gsap";
 import { ANCHOR_OFFSET } from "@/lib/motion";
 
 import "lenis/dist/lenis.css";
-
-gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 let lenisInstance: Lenis | null = null;
 
@@ -18,7 +15,38 @@ export function getLenis() {
   return lenisInstance;
 }
 
+/**
+ * Preserved routes stay in the DOM (hidden) under React Activity, so ids can
+ * repeat. Resolve selectors to the element that is actually rendered.
+ */
+export function findVisible(selector: string): HTMLElement | null {
+  if (typeof document === "undefined") return null;
+  const nodes = document.querySelectorAll<HTMLElement>(selector);
+  for (const node of nodes) {
+    if (node.getClientRects().length > 0) return node;
+  }
+  return null;
+}
+
+export function scrollToTarget(target: string | HTMLElement | number, offset = ANCHOR_OFFSET) {
+  const lenis = getLenis();
+  if (typeof target === "number") {
+    if (lenis) lenis.scrollTo(target, { offset: 0 });
+    else window.scrollTo({ top: target, behavior: "smooth" });
+    return;
+  }
+  const node = typeof target === "string" ? findVisible(target) : target;
+  if (!node) return;
+  if (lenis) {
+    lenis.scrollTo(node, { offset });
+  } else {
+    node.scrollIntoView({ block: "start" });
+  }
+}
+
 export function SmoothScroll() {
+  const pathname = usePathname();
+
   useEffect(() => {
     const lenis = new Lenis({
       anchors: { offset: ANCHOR_OFFSET },
@@ -39,17 +67,32 @@ export function SmoothScroll() {
 
     const onStop = () => lenis.stop();
     const onStart = () => lenis.start();
+    const onLoad = () => ScrollTrigger.refresh();
     window.addEventListener("lenis:stop", onStop);
     window.addEventListener("lenis:start", onStart);
+    window.addEventListener("load", onLoad);
 
     return () => {
       window.removeEventListener("lenis:stop", onStop);
       window.removeEventListener("lenis:start", onStart);
+      window.removeEventListener("load", onLoad);
       gsap.ticker.remove(onTick);
       lenis.destroy();
       lenisInstance = null;
     };
   }, []);
+
+  // Re-measure ScrollTriggers after each navigation and honor deep links.
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      ScrollTrigger.refresh();
+      const hash = window.location.hash;
+      if (hash && hash.length > 1) {
+        window.setTimeout(() => scrollToTarget(hash), 120);
+      }
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [pathname]);
 
   return null;
 }

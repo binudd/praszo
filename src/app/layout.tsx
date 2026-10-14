@@ -1,58 +1,39 @@
 import type { Metadata, Viewport } from "next";
 
+import { BackgroundGrid } from "@/components/layout/background-grid";
 import { BackToTop } from "@/components/layout/back-to-top";
 import { PointerField } from "@/components/layout/pointer-field";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
+import { SkipLink } from "@/components/layout/skip-link";
+import { ThemeObserver } from "@/components/layout/theme-observer";
 import { SmoothScroll } from "@/components/motion/smooth-scroll";
-import { site } from "@/content/site";
-import { robotoFlex } from "@/lib/fonts";
+import { company, siteUrl } from "@/data/company";
+import { manrope } from "@/lib/fonts";
+import { jsonLd } from "@/lib/json-ld";
 
 import "./globals.css";
-import "./tokens.css";
-
-const title = `${site.name} — ${site.title}`;
-const description = site.summary;
 
 export const metadata: Metadata = {
-  metadataBase: new URL(site.siteUrl),
+  metadataBase: new URL(siteUrl),
   title: {
-    default: title,
-    template: `%s — ${site.name}`,
+    default: "Praszo | Secure Practice Management Tools for Audit Firms",
+    template: "%s | Praszo",
   },
-  description,
-  applicationName: `${site.name} Portfolio`,
-  authors: [{ name: site.legalName, url: site.linkedin }],
-  creator: site.legalName,
+  description: company.description,
+  applicationName: "Praszo",
+  creator: "Praszo",
+  publisher: "Difinity Digital LLP",
   keywords: [
-    "Design-minded Frontend Engineer",
-    "UI/UX designer",
-    "frontend engineer",
-    "product engineering",
-    "React",
-    "TypeScript",
-    "DifinityDigital",
+    "practice management software for audit firms",
+    "on-premise audit software",
+    "AI financial statement validation",
+    "AI purchase vouching",
+    "engagement letter automation",
+    "document management for auditors",
+    "Praszo OS",
   ],
-  alternates: {
-    canonical: "/",
-  },
-  openGraph: {
-    type: "website",
-    locale: "en_IN",
-    url: "/",
-    siteName: `${site.name} Portfolio`,
-    title,
-    description,
-  },
-  twitter: {
-    card: "summary_large_image",
-    title,
-    description,
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
+  robots: { index: true, follow: true },
 };
 
 export const viewport: Viewport = {
@@ -61,44 +42,37 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
-const personJsonLd = {
+const organizationJsonLd = {
   "@context": "https://schema.org",
-  "@type": "Person",
-  name: site.name,
-  alternateName: site.legalName,
-  jobTitle: "Design-minded Frontend Engineer",
-  description: site.summary,
-  worksFor: {
-    "@type": "Organization",
-    name: site.company,
+  "@type": "Organization",
+  name: company.name,
+  alternateName: company.platform,
+  url: siteUrl,
+  logo: `${siteUrl}/apple-icon.png`,
+  description: company.description,
+  telephone: company.phone.display,
+  email: company.emails.demo,
+  address: {
+    "@type": "PostalAddress",
+    streetAddress: company.address.lines[0],
+    addressLocality: company.address.locality,
+    addressCountry: company.address.country,
   },
-  url: site.siteUrl,
-  sameAs: [site.linkedin, site.github, site.behance],
+  sameAs: company.social.map((item) => item.href),
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="en"
-      className={`${robotoFlex.variable} h-full antialiased`}
-    >
-      <body className="relative min-h-full bg-bg font-sans text-ink">
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(personJsonLd) }}
-        />
+    <html lang="en" data-theme="light" className={`${manrope.variable} h-full antialiased`}>
+      <body className="relative min-h-full font-sans text-ink">
+        <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(organizationJsonLd) }} />
         <noscript>
-          <style>
-            {`.hero [data-hero],.site-header [data-nav],[data-graph-node],[data-pms-meta]{opacity:1}`}
-          </style>
+          <style>{`[data-entrance] [data-hero]{opacity:1;transform:none}.scene-stack{display:block}.word-reveal .word{color:var(--ink)}`}</style>
         </noscript>
-        <a
-          href="#main"
-          className="fixed left-4 top-4 z-[80] -translate-y-16 bg-accent px-3 py-2 text-sm font-medium text-accent-ink focus:translate-y-0"
-        >
-          Skip to content
-        </a>
-        <div aria-hidden className="grain" />
+        <SkipLink />
+        <div aria-hidden className="brand-bar" />
+        <BackgroundGrid />
+        <ThemeObserver />
         <PointerField />
         <SmoothScroll />
         <SiteHeader />

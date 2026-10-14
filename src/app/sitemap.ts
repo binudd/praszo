@@ -1,20 +1,12 @@
 import type { MetadataRoute } from "next";
 
-import { site } from "@/content/site";
+import { contentLastModified, routes, siteUrl } from "@/data/company";
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  return [
-    {
-      url: site.siteUrl,
-      lastModified: "2026-10-09",
-      changeFrequency: "monthly",
-      priority: 1,
-    },
-    {
-      url: `${site.siteUrl}/story`,
-      lastModified: "2026-10-09",
-      changeFrequency: "monthly",
-      priority: 0.8,
-    },
-  ];
+  return routes.map((route) => ({
+    url: `${siteUrl}${route.path === "/" ? "" : route.path}`,
+    lastModified: contentLastModified,
+    changeFrequency: route.changeFrequency,
+    priority: route.priority,
+  }));
 }

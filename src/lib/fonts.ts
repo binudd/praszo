@@ -1,7 +1,7 @@
-import { Roboto_Flex } from "next/font/google";
+import { Manrope } from "next/font/google";
 
-export const robotoFlex = Roboto_Flex({
+export const manrope = Manrope({
   subsets: ["latin"],
-  variable: "--font-roboto",
+  variable: "--font-manrope",
   display: "swap",
 });

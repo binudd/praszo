@@ -1,84 +1,74 @@
 "use client";
 
-import * as Dialog from "@radix-ui/react-dialog";
-import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { Menu, X } from "lucide-react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
+import { House } from "lucide-react";
+import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState, type MouseEvent } from "react";
+import { usePathname } from "next/navigation";
+import { useEffect, useState, type CSSProperties, type MouseEvent } from "react";
 
-import { getLenis } from "@/components/motion/smooth-scroll";
-import { navItems, site } from "@/content/site";
+import { MobileMenu } from "@/components/layout/mobile-menu";
+import { navLinkClass } from "@/components/layout/nav-styles";
+import { ProductsMenu } from "@/components/layout/products-menu";
+import { findVisible, scrollToTarget } from "@/components/motion/smooth-scroll";
+import { Button } from "@/components/ui/button";
+import { Logo } from "@/components/ui/logo";
+import { ProductLockup } from "@/components/ui/product-lockup";
+import { demoCta, primaryNav } from "@/data/company";
+import { productSections } from "@/data/product-sections";
+import { productList, type Product } from "@/data/products";
 import { cn } from "@/lib/cn";
-import { ANCHOR_OFFSET } from "@/lib/motion";
 
-const hashIds = navItems.filter((item) => item.href.includes("#")).map((item) => item.id);
+const homeSectionIds = primaryNav
+  .filter((item) => item.href.startsWith("/#"))
+  .map((item) => item.href.slice(2));
 
+export function productForPath(pathname: string): Product | undefined {
+  return productList.find((product) => pathname === `/${product.slug}`);
+}
+
+/** The sliding highlight behind the current pill item. */
+function Follower({ active, reduced }: { active: boolean; reduced: boolean | null }) {
+  if (!active) return null;
+  return (
+    <motion.span
+      layoutId="nav-follower"
+      aria-hidden
+      transition={reduced ? { duration: 0 } : { type: "spring", stiffness: 420, damping: 38, mass: 0.6 }}
+      className="absolute inset-0 -z-10 rounded-full bg-bg shadow-[0_1px_2px_rgba(0,0,0,0.06)] dark:bg-elevated"
+    />
+  );
+}
+
+/**
+ * One floating header for the whole site. On a product page it takes on the
+ * product identity: the lockup replaces the logo and the pill lists that page's
+ * sections with a "Praszo home" link. Colors follow the document theme.
+ */
 export function SiteHeader() {
   const pathname = usePathname();
-  const router = useRouter();
-  const [open, setOpen] = useState(false);
-  const [section, setSection] = useState("work");
   const reduced = useReducedMotion();
-  const active = pathname === "/story" ? "story" : section;
+  const [scrolled, setScrolled] = useState(false);
+  const [section, setSection] = useState<string | null>(null);
+  const product = productForPath(pathname);
+  const isHome = pathname === "/";
+  const spyIds = product ? productSections[product.slug].map((item) => item.id) : isHome ? homeSectionIds : [];
+  const spyKey = spyIds.join("|");
 
   useEffect(() => {
-    const root = document.querySelector(".site-header");
-    if (reduced) {
-      root?.classList.add("is-static");
-      return;
-    }
-    const fallback = window.setTimeout(() => root?.classList.add("is-ready"), 900);
-    return () => window.clearTimeout(fallback);
-  }, [reduced]);
+    const onScroll = () => setScrolled(window.scrollY > 24);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   useEffect(() => {
-    window.dispatchEvent(new Event(open ? "lenis:stop" : "lenis:start"));
-  }, [open]);
-
-  const goToHash = (href: string) => {
-    const hash = href.includes("#") ? `#${href.split("#")[1]}` : href;
-    setOpen(false);
-    window.setTimeout(() => {
-      const lenis = getLenis();
-      if (lenis) {
-        lenis.start();
-        lenis.scrollTo(hash, { offset: ANCHOR_OFFSET });
-      } else {
-        document.querySelector(hash)?.scrollIntoView();
-      }
-    }, 80);
-  };
-
-  useEffect(() => {
-    if (pathname !== "/") return;
-    const hash = window.location.hash;
-    if (hash) {
-      const timer = window.setTimeout(() => goToHash(hash), 160);
-      return () => window.clearTimeout(timer);
-    }
-  }, [pathname]);
-
-  useEffect(() => {
-    if (pathname !== "/") return;
-    const syncHash = () => {
-      const id = window.location.hash.replace("#", "");
-      const known = hashIds.find((item) => item === id);
-      if (known) setSection(known);
-    };
-    syncHash();
-    window.addEventListener("hashchange", syncHash);
-    return () => window.removeEventListener("hashchange", syncHash);
-  }, [pathname]);
-
-  useEffect(() => {
-    if (pathname !== "/") return;
-    const nodes = hashIds
-      .map((id) => document.getElementById(id))
+    if (!spyKey) return;
+    const root = findVisible("main") ?? document;
+    const nodes = spyKey
+      .split("|")
+      .map((id) => root.querySelector<HTMLElement>(`#${CSS.escape(id)}`))
       .filter((node): node is HTMLElement => Boolean(node));
     if (nodes.length === 0) return;
-
     const observer = new IntersectionObserver(
       (entries) => {
         const visible = entries
@@ -86,120 +76,115 @@ export function SiteHeader() {
           .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
         if (visible?.target.id) setSection(visible.target.id);
       },
-      { rootMargin: "-35% 0px -50% 0px", threshold: [0.1, 0.3, 0.6] },
+      { rootMargin: "-30% 0px -55% 0px", threshold: [0.05, 0.25, 0.5] },
     );
-
     nodes.forEach((node) => observer.observe(node));
     return () => observer.disconnect();
-  }, [pathname]);
+  }, [spyKey, pathname]);
 
-  const onNavClick = (event: MouseEvent<HTMLAnchorElement>, href: string) => {
-    if (!href.includes("#") || href.endsWith(".pdf")) return;
+  const onHomeHashClick = (event: MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (!isHome || !href.startsWith("/#")) return;
     event.preventDefault();
-    const id = href.split("#")[1];
-    const hash = `#${id}`;
-    const known = hashIds.find((item) => item === id);
-    if (known) setSection(known);
-    if (pathname !== "/") {
-      router.push(`/#${id}`);
-      return;
-    }
+    const hash = href.slice(1);
     history.pushState(null, "", hash);
-    goToHash(href);
+    scrollToTarget(hash);
   };
 
-  const linkHref = (href: string) => {
-    if (!href.includes("#") || href.endsWith(".pdf")) return href;
-    return { pathname: "/" as const, hash: href.split("#")[1] };
+  const onSectionClick = (event: MouseEvent<HTMLAnchorElement>, id: string) => {
+    event.preventDefault();
+    const node = findVisible("main")?.querySelector<HTMLElement>(`#${CSS.escape(id)}`);
+    if (!node) return;
+    history.replaceState(null, "", `#${id}`);
+    scrollToTarget(node);
   };
+
+  const productStyle = product
+    ? ({ "--product": product.color, "--product-deep": product.colorDeep } as CSSProperties)
+    : undefined;
+
+  const pillClass = cn(
+    "hidden items-center gap-0.5 rounded-full p-1.5 transition-[background-color,box-shadow,border-color] duration-500 lg:flex",
+    scrolled ? "glass shadow-card" : "border border-transparent bg-surface/70",
+  );
 
   return (
-    <header className="site-header pointer-events-none fixed inset-x-0 top-0 z-50">
-      <div className="mx-auto flex max-w-6xl items-start justify-between px-5 pt-4 md:px-10 md:pt-5">
-        <Link
-          href={linkHref("/#top")}
-          data-nav
-          className="pointer-events-auto inline-flex h-11 items-center rounded-full bg-white px-6 text-base text-ink shadow-[0_8px_24px_rgba(18,19,23,0.08)]"
-          onClick={(event) => onNavClick(event, "/#top")}
-        >
-          {site.name}
-        </Link>
-        <nav
-          aria-label="Primary"
-          className="pointer-events-auto hidden items-center gap-0 rounded-full bg-white p-1.5 shadow-[0_8px_24px_rgba(18,19,23,0.08)] md:flex"
-        >
-          {navItems.map((item) => {
-            const current = item.id === active;
-            const resume = item.href.endsWith(".pdf");
-            return (
-              <Link
-                key={item.href}
-                href={linkHref(item.href)}
-                data-nav
-                className={cn(
-                  "inline-flex h-11 items-center rounded-full px-6 text-base transition-colors",
-                  resume
-                    ? "bg-accent text-accent-ink"
-                    : current
-                      ? "bg-surface text-ink"
-                      : "text-ink hover:bg-surface",
-                )}
-                {...(resume ? { target: "_blank", rel: "noreferrer" } : {})}
-                onClick={(event) => onNavClick(event, item.href)}
-              >
-                {item.label}
-              </Link>
-            );
-          })}
-        </nav>
-        <Dialog.Root open={open} onOpenChange={setOpen}>
-          <Dialog.Trigger
-            className="pointer-events-auto inline-flex h-11 w-11 items-center justify-center rounded-full bg-white text-ink shadow-[0_8px_24px_rgba(18,19,23,0.08)] md:hidden"
-            aria-label="Open menu"
+    <header style={productStyle} className="site-header fixed inset-x-0 top-1 z-50">
+      <div className="mx-auto flex h-[4.5rem] w-full max-w-wide items-center justify-between gap-4 px-5 md:px-8 lg:px-10">
+        {product ? (
+          <Link
+            href={`/${product.slug}`}
+            aria-label={`${product.fullName} overview`}
+            className="inline-flex items-center"
+            onClick={(event) => {
+              event.preventDefault();
+              scrollToTarget(0);
+            }}
           >
-            <Menu size={20} />
-          </Dialog.Trigger>
-          <Dialog.Portal>
-            <Dialog.Overlay className="fixed inset-0 z-50 bg-bg/80" />
-            <Dialog.Content
-              data-lenis-prevent
-              className="fixed inset-y-0 right-0 z-50 flex w-[min(100%,20rem)] flex-col bg-bg p-6 shadow-xl"
-            >
-              <VisuallyHidden>
-                <Dialog.Title>Site navigation</Dialog.Title>
-              </VisuallyHidden>
-              <div className="mb-10 flex items-center justify-between">
-                <span className="font-mono text-[12px] tracking-[0.22em] text-ink-3 uppercase">
-                  {site.eyebrow}
-                </span>
-                <Dialog.Close
-                  className="inline-flex h-11 w-11 items-center justify-center"
-                  aria-label="Close menu"
-                >
-                  <X size={20} />
-                </Dialog.Close>
-              </div>
-              <nav className="flex flex-col gap-5" aria-label="Mobile">
-                <AnimatePresence>
-                  {navItems.map((item, index) => (
-                    <Dialog.Close key={item.href} asChild>
-                      <motion.a
-                        href={item.href.includes("#") ? `/#${item.href.split("#")[1]}` : item.href}
-                        className="font-serif text-3xl text-ink"
-                        initial={reduced ? false : { opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: index * 0.04, duration: 0.35 }}
-                        onClick={(event) => onNavClick(event, item.href)}
-                      >
-                        {item.label}
-                      </motion.a>
-                    </Dialog.Close>
-                  ))}
-                </AnimatePresence>
-              </nav>
-            </Dialog.Content>
-          </Dialog.Portal>
-        </Dialog.Root>
+            <ProductLockup product={product} size="sm" />
+          </Link>
+        ) : (
+          <Link href="/" aria-label="Praszo home" className="inline-flex items-center">
+            <Logo />
+          </Link>
+        )}
+
+        <nav aria-label="Primary" className={pillClass}>
+          {product ? (
+            <>
+              <Link href="/" className={cn(navLinkClass, "text-ink")}>
+                <House size={15} aria-hidden />
+                Praszo home
+              </Link>
+              {productSections[product.slug].map((item) => {
+                const current = section === item.id;
+                return (
+                  <a
+                    key={item.id}
+                    href={`#${item.id}`}
+                    aria-current={current ? "location" : undefined}
+                    className={cn(navLinkClass, current && "text-product-deep dark:text-ink")}
+                    onClick={(event) => onSectionClick(event, item.id)}
+                  >
+                    <Follower active={current} reduced={reduced} />
+                    {item.label}
+                  </a>
+                );
+              })}
+            </>
+          ) : (
+            <>
+              <ProductsMenu />
+              {primaryNav.map((item) => {
+                const id = item.href.startsWith("/#") ? item.href.slice(2) : null;
+                const current = id ? isHome && section === id : pathname === item.href;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    aria-current={current || undefined}
+                    className={navLinkClass}
+                    onClick={(event) => onHomeHashClick(event, item.href)}
+                  >
+                    <Follower active={Boolean(current)} reduced={reduced} />
+                    {item.label}
+                  </Link>
+                );
+              })}
+            </>
+          )}
+        </nav>
+
+        <div className="flex items-center gap-3">
+          {product ? (
+            <div className="hidden xl:block">
+              <ProductsMenu />
+            </div>
+          ) : null}
+          <Button href={demoCta.href} size="sm" variant={product ? "product" : "primary"} className="hidden sm:inline-flex">
+            {demoCta.label}
+          </Button>
+          <MobileMenu product={product} />
+        </div>
       </div>
     </header>
   );

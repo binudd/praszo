@@ -1,14 +1,75 @@
+/* Praszo design tokens — single source of truth for colors, radii, shadows and easing. */
 :root {
   --bg: #ffffff;
-  --surface: #f8f9fc;
-  --elevated: #eef1f6;
+  --surface: #f6f8fa;
+  --elevated: #eef2f5;
   --ink: #121317;
-  --ink-2: #5f666d;
-  --ink-3: #5f6368;
-  --line: #e4e7ec;
-  --accent: #217bfe;
-  --accent-ink: #ffffff;
-  --void: #000000;
-  --paper: #f8f9fc;
-  --paper-ink: #121317;
+  --ink-2: #4b5563;
+  --ink-3: #6b7280;
+  --line: #e3e8ee;
+  --line-strong: #cbd5e1;
+
+  /* Brand: teal is the primary action color on praszo.com, coral is the logo accent. */
+  --brand: #0c8080;
+  --brand-strong: #0a6a6a;
+  --brand-soft: #e3f3f2;
+  --brand-ink: #ffffff;
+  --accent: #f55d48;
+  --accent-soft: #ffe4df;
+  --success: #16a34a;
+  --warning: #d97706;
+
+  /* Product color set. Overridden per product via inline style on the page wrapper. */
+  --product: var(--brand);
+  --product-deep: var(--brand-strong);
+  --product-soft: color-mix(in srgb, var(--product) 10%, var(--bg));
+  --product-ink: #ffffff;
+
+  --radius-sm: 0.75rem;
+  --radius-card: 1.5rem;
+  --radius-panel: 2rem;
+  --radius-media: 3rem;
+  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 12px 32px -16px rgba(15, 23, 42, 0.16);
+  --shadow-float: 0 24px 64px -24px rgba(15, 23, 42, 0.28), 0 2px 8px rgba(15, 23, 42, 0.06);
+  --shadow-stage:
+    -1.5rem 1.125rem 2.5rem rgba(0, 0, 0, 0.1),
+    -2rem 4.5rem 4.5rem rgba(0, 0, 0, 0.08),
+    -2.5rem 10rem 6rem rgba(0, 0, 0, 0.05);
+
+  --ease-out: cubic-bezier(0.4, 1, 0.7, 1);
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-nav: cubic-bezier(0.22, 0.31, 0, 1);
+
+  --header-h: 4.5rem;
+
+  /* Pointer-field coordinates (set by PointerField). */
+  --mx: 50%;
+  --my: 30%;
+}
+
+/*
+ * Dark scenes. Any section (or the document root, driven by ThemeObserver)
+ * with data-theme="dark" flips the token set, so every component restyles itself.
+ */
+[data-theme="dark"] {
+  --bg: #0f1316;
+  --surface: #161c20;
+  --elevated: #1d2529;
+  --ink: #ffffff;
+  --ink-2: #b4bec6;
+  --ink-3: #8b969f;
+  --line: rgba(255, 255, 255, 0.1);
+  --line-strong: rgba(255, 255, 255, 0.2);
+  --brand: #22b8a8;
+  --brand-strong: #19a494;
+  --brand-soft: rgba(34, 184, 168, 0.14);
+  --accent: #ff7d68;
+  --accent-soft: rgba(255, 125, 104, 0.16);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 32px -16px rgba(0, 0, 0, 0.6);
+  --shadow-float: 0 24px 64px -24px rgba(0, 0, 0, 0.7), 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-stage:
+    -1.5rem 1.125rem 2.5rem rgba(0, 0, 0, 0.35),
+    -2rem 4.5rem 4.5rem rgba(0, 0, 0, 0.3),
+    -2.5rem 10rem 6rem rgba(0, 0, 0, 0.2);
+  color-scheme: dark;
 }
