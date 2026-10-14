@@ -7,7 +7,7 @@ import { home } from "@/data/home";
 export function PlatformPillars() {
   return (
     <section aria-labelledby="pillars-title" className="relative py-24 md:py-32">
-      <Container wide>
+      <Container>
         <div className="mx-auto max-w-2xl text-center">
           <Eyebrow className="justify-center">{home.pillars.eyebrow}</Eyebrow>
           <p className="lede mt-5">{home.pillars.description}</p>

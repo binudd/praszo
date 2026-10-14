@@ -29,7 +29,7 @@ export function FaqSection({ id, eyebrow = "FAQs", title, description, items, to
   return (
     <section id={id} aria-labelledby={`${id}-title`} className={cn("border-t border-line py-24 md:py-32", className)}>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(faqJsonLd) }} />
-      <Container wide>
+      <Container>
         <div className="grid gap-10 lg:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] lg:gap-20">
           <SectionHeader
             eyebrow={eyebrow}

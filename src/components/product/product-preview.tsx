@@ -66,7 +66,7 @@ export function ProductPreview({ product }: { product: Product }) {
   if (screens.length < 2) {
     return (
       <section id={id} aria-labelledby={`${id}-title`} className="pb-24 md:pb-32">
-        <Container wide>
+        <Container>
           <RevealBlock className="mx-auto max-w-2xl text-center">
             <Eyebrow tone="product" className="justify-center">
               Interface

@@ -157,7 +157,7 @@ The data layer drives the pages, and content edits should rarely need component 
 - **Ecosystem posters** must reach AA (4.5:1) for every text layer: white on the product colour when it passes (Practice 7.06, Docs 4.88), else white on `colorDeep` when that passes (Modifi #1f5fd6, 5.73), else ink on the product colour (Verifi 7.29, Match 8.34). Text is full opacity; the badge uses `bg-black/15` (white text) or `bg-black/10` (ink).
 
 ### Layout utilities
-- **`Container`** has two widths: `--container-site 72rem`, or `wide` at `--container-wide 86rem`.
+- **`Container`** has one width, `--container-wide` (86rem), with the same gutters as the header, so the logo, every section and the footer share one left and right edge. The old narrow `--container-site` and the `wide` prop were removed. For a narrow reading column, constrain the content inside the container (e.g. `max-w-3xl`), never the container itself.
 - **`.fit-box` / `.fit-frame`.** The hero visual box fills its area. Below 640px the frame is free-form. From 640px it is capped to a 720:520 window and centered (`.fit-box-end` bottom-aligns it for the home caption row).
 - **`.screen-rail`.** Screenshot rail cards share a height `--screen-h`, capped so a pinned rail fits the viewport, and take their width from their aspect ratio.
 

@@ -42,7 +42,7 @@ export function ProductWorkflow({ product }: { product: Product }) {
 
   return (
     <section ref={rootRef} id={id} aria-labelledby={`${id}-title`} className="border-t border-line py-24 md:py-32">
-      <Container wide>
+      <Container>
         <SectionHeader eyebrow="How it works" title={workflow.title} description={workflow.description} tone="product" size="lg" titleId={`${id}-title`} />
         <div className="relative mt-16">
           <div className="absolute top-[2.9rem] right-0 left-0 hidden h-px bg-line lg:block" aria-hidden>

@@ -11,7 +11,7 @@ export function ProductAudience({ product }: { product: Product }) {
   const id = `${product.slug}-audience`;
   return (
     <section id={id} aria-labelledby={`${id}-title`} className="border-t border-line py-24 md:py-32">
-      <Container wide>
+      <Container>
         <SectionHeader eyebrow="Who it is for" title={audience.title} description={audience.description} tone="product" size="lg" titleId={`${id}-title`} />
         <RevealGroup className={cn("mt-14 grid gap-x-10 gap-y-12 md:mt-20", audience.items.length > 2 ? "md:grid-cols-3" : "md:grid-cols-2")}>
           {audience.items.map((item, index) => (

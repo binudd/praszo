@@ -73,7 +73,7 @@ export function ProductSpotlights({ product }: { product: Product }) {
     <section ref={rootRef} id={`${product.slug}-spotlights`} aria-label={`${product.fullName} in detail`} className="scene relative">
       <div data-scene-track className="scene-track" style={{ height: `${count * 110 + 40}svh` }}>
         <div ref={stageRef} data-scene-stage className="scene-stage">
-          <Container wide className="w-full">
+          <Container className="w-full">
             <div className="flex justify-center">
               <ol className="scene-tabs" aria-label="Spotlights">
                 {product.spotlights.map((spotlight, index) => (
@@ -110,7 +110,7 @@ export function ProductSpotlights({ product }: { product: Product }) {
       </div>
 
       <div className="scene-stack py-20 md:py-28">
-        <Container wide>
+        <Container>
           <div className="flex flex-col gap-20 md:gap-28">
             {product.spotlights.map((spotlight, index) => {
               const flip = index % 2 === 1;

@@ -8,7 +8,7 @@ import { otherProducts, type Product } from "@/data/products";
 export function RelatedProducts({ product }: { product: Product }) {
   return (
     <section aria-labelledby="related-title" className="border-t border-line py-16 md:py-20">
-      <Container wide>
+      <Container>
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="label text-ink-3">Part of Praszo OS</p>

@@ -37,7 +37,6 @@ export function HeroShell({ id, labelledBy, rootRef, lede, visual, title, aside 
       className="relative h-[100svh] min-h-[36rem] overflow-hidden"
     >
       <Container
-        wide
         className="grid h-full grid-cols-1 grid-rows-[auto_minmax(0,1fr)] gap-y-6 pt-[calc(var(--header-h)+2.5rem)] pb-6 md:gap-y-10 md:pb-8 lg:pt-[calc(var(--header-h)+clamp(1.5rem,7svh,4rem))]"
       >
         <div data-hero-depth="title" className="flex flex-col gap-4 will-change-transform lg:flex-row lg:items-end lg:justify-between lg:gap-10">

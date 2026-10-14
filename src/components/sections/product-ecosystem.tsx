@@ -120,7 +120,7 @@ export function ProductEcosystem() {
       {/* Sticky scene: desktop + motion allowed */}
       <div data-scene-track className="scene-track" style={{ height: "520svh" }}>
         <div ref={stageRef} data-scene-stage className="scene-stage">
-          <Container wide>
+          <Container>
             <Eyebrow className="justify-center">{home.ecosystem.eyebrow}</Eyebrow>
             <h2 id="products-title" className="display-lg mt-4 text-center text-ink">
               {home.ecosystem.title}

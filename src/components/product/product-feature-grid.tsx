@@ -65,7 +65,7 @@ export function ProductFeatureGrid({ product, section }: { product: Product; sec
 
   return (
     <section id={id} aria-labelledby={`${id}-title`} className="py-24 md:py-32">
-      <Container wide>
+      <Container>
         <div className="max-w-3xl">
           <Eyebrow tone="product">{section.eyebrow}</Eyebrow>
           <h2 id={`${id}-title`} className="display-md mt-4 text-ink">

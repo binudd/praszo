@@ -158,7 +158,7 @@ export function WorkflowTour() {
       {/* Scroll-driven stage (desktop, motion allowed) */}
       <div data-scene-track className="scene-track" style={{ height: "440svh" }}>
         <div data-scene-stage className="scene-stage">
-          <Container wide className="w-full">
+          <Container className="w-full">
             <div className="flex justify-center">
               <ol className="scene-tabs" aria-label="Workflow steps">
                 {steps.map((step, index) => (

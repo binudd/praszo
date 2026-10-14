@@ -7,7 +7,7 @@ export function TrustedBy() {
   const logos = home.trustedBy.logos;
   return (
     <section aria-labelledby="trusted-title" className="border-y border-line py-10 md:py-12">
-      <Container wide>
+      <Container>
         <p id="trusted-title" className="label text-center text-ink-3">
           {home.trustedBy.title}
         </p>

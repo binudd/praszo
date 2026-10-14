@@ -162,13 +162,13 @@ export function Segments() {
 
   return (
     <section ref={rootRef} aria-labelledby="segments-title" className="scene relative pt-24 md:pt-32">
-      <Container wide>
+      <Container>
         <SectionHeader eyebrow={home.segments.eyebrow} title={home.segments.title} titleId="segments-title" align="center" size="lg" />
       </Container>
 
       <div data-scene-track className="scene-track" style={{ height: `${count * 130 + 40}svh` }}>
         <div ref={stageRef} data-scene-stage className="scene-stage pt-[var(--header-h)]">
-          <Container wide className="w-full">
+          <Container className="w-full">
             <div className="flex justify-center">
               <ol className="scene-tabs" aria-label="Firm size">
                 {segments.map((segment, index) => (
@@ -195,7 +195,7 @@ export function Segments() {
       </div>
 
       <div className="scene-stack pt-12 pb-24 md:pb-32">
-        <Container wide>
+        <Container>
           <div className="flex flex-col">
             {segments.map((segment) => (
               <SegmentPanel key={segment.title} segment={segment} />
