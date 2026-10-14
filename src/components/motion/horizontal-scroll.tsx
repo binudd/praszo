@@ -38,7 +38,8 @@ const DEFAULT_INSET = "max(1.25rem, calc((100vw - 86rem) / 2 + 2.5rem))";
  * and GSAP ticker configured in SmoothScroll (ScrollTrigger.update is already
  * bound to Lenis), so there is no second animation loop and no wheel listener.
  *
- * Mobile and reduced motion: the track is a native horizontal scroll region.
+ * Touch devices, narrow screens and reduced motion: the track is a native,
+ * swipeable horizontal scroll region with snapping.
  */
 export function HorizontalScroll({
   children,
@@ -47,7 +48,9 @@ export function HorizontalScroll({
   label,
   id,
   theme,
-  pinMedia = "(min-width: 768px)",
+  // Pin only where it helps: wide screens driven by a mouse or trackpad (Lenis is active there).
+  // Touch tablets and phones get the native swipeable rail instead of a pinned, scroll-jacked one.
+  pinMedia = "(min-width: 1024px) and (hover: hover) and (pointer: fine)",
   inset = DEFAULT_INSET,
   gapClassName = "gap-4 md:gap-5",
   className,

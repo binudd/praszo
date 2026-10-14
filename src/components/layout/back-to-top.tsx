@@ -4,17 +4,22 @@ import { ArrowUp } from "lucide-react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
 
+import { ScrollTrigger } from "@/components/motion/gsap";
 import { scrollToTarget } from "@/components/motion/smooth-scroll";
 
 export function BackToTop() {
   const [visible, setVisible] = useState(false);
   const reduced = useReducedMotion();
 
+  // Shown once the page is scrolled past 900px. A ScrollTrigger (on the shared Lenis loop) toggles
+  // state only when that threshold is crossed, not on every scroll event.
   useEffect(() => {
-    const onScroll = () => setVisible(window.scrollY > 900);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    const trigger = ScrollTrigger.create({ start: 900, end: "max", onToggle: (self) => setVisible(self.isActive) });
+    const frame = requestAnimationFrame(() => setVisible(trigger.isActive));
+    return () => {
+      cancelAnimationFrame(frame);
+      trigger.kill();
+    };
   }, []);
 
   return (

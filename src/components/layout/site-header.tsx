@@ -8,6 +8,7 @@ import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from
 import { MobileMenu } from "@/components/layout/mobile-menu";
 import { navLinkClass } from "@/components/layout/nav-styles";
 import { ProductsMenu } from "@/components/layout/products-menu";
+import { ScrollTrigger } from "@/components/motion/gsap";
 import { findVisible, scrollToTarget } from "@/components/motion/smooth-scroll";
 import { useHeaderReveal } from "@/components/motion/use-header-reveal";
 import { Button } from "@/components/ui/button";
@@ -57,35 +58,34 @@ export function SiteHeader() {
   const spyKey = spyIds.join("|");
   const activeSection = spyKey ? section : null;
 
-  // Scroll-spy: the section covering a line 40% down the viewport is current.
-  // (Works for pinned and multi-screen sections, unlike intersection ratios.)
+  // Scroll-spy: the section covering a line 40% down the viewport is current (the last such
+  // section in page order wins). One ScrollTrigger per section, driven by the shared Lenis loop,
+  // fires only when a section crosses that line; no per-frame measuring. Works for pinned and
+  // multi-screen sections, unlike intersection ratios.
   useEffect(() => {
     if (!spyKey) return;
     const root = findVisible("main") ?? document;
-    const ids = spyKey.split("|");
-    let frame = 0;
+    const entries = spyKey
+      .split("|")
+      .map((id) => ({ id, node: root.querySelector<HTMLElement>(`#${CSS.escape(id)}`) }))
+      .filter((entry): entry is { id: string; node: HTMLElement } => Boolean(entry.node));
+
+    // Declared before the triggers exist: ScrollTrigger can fire onToggle synchronously inside create().
+    let triggers: ScrollTrigger[] = [];
     const update = () => {
-      frame = 0;
-      const line = window.innerHeight * 0.4;
       let current: string | null = null;
-      for (const id of ids) {
-        const node = root.querySelector<HTMLElement>(`#${CSS.escape(id)}`);
-        if (!node) continue;
-        const rect = node.getBoundingClientRect();
-        if (rect.top <= line && rect.bottom > line * 0.5) current = id;
-      }
+      triggers.forEach((trigger, index) => {
+        if (trigger.isActive) current = entries[index].id;
+      });
       setSection((previous) => (previous === current ? previous : current));
     };
-    const schedule = () => {
-      if (!frame) frame = requestAnimationFrame(update);
-    };
-    schedule();
-    window.addEventListener("scroll", schedule, { passive: true });
-    window.addEventListener("resize", schedule);
+    triggers = entries.map(({ node }) =>
+      ScrollTrigger.create({ trigger: node, start: "top 40%", end: "bottom 20%", refreshPriority: -1, onToggle: update }),
+    );
+    const frame = requestAnimationFrame(update);
     return () => {
-      if (frame) cancelAnimationFrame(frame);
-      window.removeEventListener("scroll", schedule);
-      window.removeEventListener("resize", schedule);
+      cancelAnimationFrame(frame);
+      triggers.forEach((trigger) => trigger.kill());
     };
   }, [spyKey, pathname]);
 

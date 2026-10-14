@@ -564,7 +564,6 @@ details[open] .faq-chevron {
   overflow-x: auto;
   overflow-y: hidden;
   overscroll-behavior-x: contain;
-  scroll-snap-type: x proximity;
   /* Snap cards to the page gutter, not the screen edge (otherwise the first card loads flush left). */
   scroll-padding-inline: var(--hscroll-inset);
   scrollbar-width: none;
@@ -586,6 +585,15 @@ details[open] .faq-chevron {
 .hscroll-card {
   scroll-snap-align: start;
   flex-shrink: 0;
+}
+
+/* Snap one card at a time only on phones, where a card fills most of the screen. On tablets several
+   cards are visible and proximity snapping pulled any drag shorter than half a card back to the start,
+   so wider screens scroll freely. */
+@media (max-width: 639px) {
+  .hscroll-viewport {
+    scroll-snap-type: x proximity;
+  }
 }
 
 .hscroll-end {
