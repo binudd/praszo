@@ -6,8 +6,8 @@ import { useRef } from "react";
 import { gsap } from "@/components/motion/gsap";
 import { scrollToTarget } from "@/components/motion/smooth-scroll";
 import { useScene } from "@/components/motion/use-scene";
+import { FirmCutout } from "@/components/illustrations/firm-cutout";
 import { Container } from "@/components/ui/container";
-import { Icon } from "@/components/ui/icon";
 import { SectionHeader } from "@/components/ui/section-header";
 import { home } from "@/data/home";
 import { cn } from "@/lib/cn";
@@ -34,10 +34,10 @@ function SegmentPanel({ segment, scene = false }: { segment: Segment; scene?: bo
       )}
     >
       <div className="flex flex-col">
-        <span data-seg-icon className="inline-flex h-12 w-12 items-center justify-center rounded-sm bg-brand-soft text-brand">
-          <Icon name={segment.icon} size={24} aria-hidden />
-        </span>
-        <h3 data-seg-part className="display-sm mt-6 text-ink">
+        <div data-seg-icon className="w-48 origin-bottom-left sm:w-60 lg:w-[min(18rem,24svh*1.53)]">
+          <FirmCutout size={segment.art} />
+        </div>
+        <h3 data-seg-part className="display-sm mt-5 text-ink">
           {segment.title}
         </h3>
         <p data-seg-part className="mt-3 text-[15px] font-semibold text-brand">
@@ -83,8 +83,8 @@ function away(s: number, order: number, total: number, leaving: boolean) {
 
 /**
  * "Who it is for" as a sticky scroll scene. The card stays put and its content
- * is choreographed by scroll: the outgoing firm size lifts out (icon spins and
- * shrinks, copy rises, points slide left, each staggered), then the incoming
+ * is choreographed by scroll: the outgoing firm size lifts out (its cutout
+ * illustration tilts and shrinks, copy rises, points slide left, each staggered), then the incoming
  * one builds in from below and the right. A progress rule along the card
  * tracks the scene. Everything is GSAP transforms scrubbed by ScrollTrigger on
  * the shared Lenis loop. Tabs jump to their step. Below lg, under reduced
@@ -120,7 +120,8 @@ export function Segments() {
         const icon = item.querySelector<HTMLElement>("[data-seg-icon]");
         if (icon) {
           const e = away(s, 0, parts.length + 1, leaving);
-          gsap.set(icon, { opacity: 1 - e, scale: 1 - e * 0.45, rotate: dir * e * 60 });
+          // The cutout pops like a paper piece: drops, shrinks and tilts slightly from its base.
+          gsap.set(icon, { opacity: 1 - e, scale: 1 - e * 0.25, y: dir * e * 36, rotate: dir * e * 6 });
         }
         parts.forEach((el, k) => {
           const e = away(s, k + 1, parts.length + 1, leaving);

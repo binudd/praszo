@@ -125,6 +125,8 @@ export const home = {
         ],
         href: "https://praszo.com/large-firms/",
         icon: "Building" satisfies IconName,
+        /** Cutout illustration shown in the "Who it is for" section. */
+        art: "large",
       },
       {
         title: "Mid-sized audit firms",
@@ -139,6 +141,7 @@ export const home = {
         ],
         href: "https://praszo.com/mid-sized-business/",
         icon: "TrendingUp" satisfies IconName,
+        art: "mid",
       },
     ],
   },
