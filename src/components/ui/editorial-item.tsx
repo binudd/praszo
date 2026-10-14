@@ -15,7 +15,7 @@ type Props = {
    * "heading": rails, lists and dense grids (heading title, copy body).
    */
   size?: "display" | "heading";
-  /** Icon colour: brand teal, or the current product colour. */
+  /** Icon colour: brand coral, or the current product colour. */
   tone?: "brand" | "product";
   as?: "article" | "li" | "div";
   titleAs?: "h2" | "h3" | "h4";

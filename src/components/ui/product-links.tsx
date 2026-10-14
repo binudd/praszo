@@ -25,7 +25,7 @@ export function ProductLinks({
           <Link href={`/${product.slug}`} className="group flex h-full items-start gap-4 border-t border-line-strong pt-5 pb-3">
             <ProductGlyph slug={product.slug} size={36} />
             <span className="min-w-0 flex-1">
-              <span className="heading flex items-center gap-1.5 text-ink transition-colors group-hover:text-brand">
+              <span className="heading flex items-center gap-1.5 text-ink transition-colors group-hover:text-brand-strong">
                 Praszo {product.name}
                 <ArrowUpRight size={16} className="shrink-0 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden />
               </span>

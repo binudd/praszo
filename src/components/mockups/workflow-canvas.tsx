@@ -42,7 +42,7 @@ export function WorkflowCanvas({ activeLayer, className }: Props) {
         data-tour-path
         d="M60 460 C 160 460, 150 300, 250 300 S 400 120, 520 160 S 660 320, 660 80"
         fill="none"
-        stroke="#0c8080"
+        stroke="#f46a4a"
         strokeWidth="2"
         strokeDasharray="6 8"
         opacity="0.35"

@@ -49,16 +49,16 @@ export default function ContactPage() {
 
             <RevealGroup className="grid content-start gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-1">
               <EditorialItem reveal icon="Phone" titleAs="h2" title="Call">
-                <a href={company.phone.href} className="copy mt-2 block font-semibold text-ink hover:text-brand">
+                <a href={company.phone.href} className="copy mt-2 block font-semibold text-ink hover:text-brand-strong">
                   {company.phone.display}
                 </a>
               </EditorialItem>
               <EditorialItem reveal icon="Mail" titleAs="h2" title="Email">
-                <a href={`mailto:${company.emails.demo}`} className="copy mt-2 block font-semibold text-ink hover:text-brand">
+                <a href={`mailto:${company.emails.demo}`} className="copy mt-2 block font-semibold text-ink hover:text-brand-strong">
                   {company.emails.demo}
                 </a>
                 <p className="label mt-1 text-ink-3">Demos and sales</p>
-                <a href={`mailto:${company.emails.support}`} className="copy mt-3 block font-semibold text-ink hover:text-brand">
+                <a href={`mailto:${company.emails.support}`} className="copy mt-3 block font-semibold text-ink hover:text-brand-strong">
                   {company.emails.support}
                 </a>
                 <p className="label mt-1 text-ink-3">Existing customers</p>
@@ -105,7 +105,7 @@ export default function ContactPage() {
           <ProductLinks products={productList} detail="category" className="mt-8 sm:grid-cols-2 lg:grid-cols-3" />
           <p className="copy mt-8 text-ink-3">
             Looking for articles and resources?{" "}
-            <a href={company.external.insights} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-semibold text-ink hover:text-brand">
+            <a href={company.external.insights} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-semibold text-ink hover:text-brand-strong">
               Visit Insights on praszo.com <ArrowUpRight size={14} aria-hidden />
             </a>
           </p>

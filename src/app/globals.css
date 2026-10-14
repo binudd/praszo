@@ -15,6 +15,7 @@
   --color-brand: var(--brand);
   --color-brand-strong: var(--brand-strong);
   --color-brand-soft: var(--brand-soft);
+  --color-brand-hover: var(--brand-hover);
   --color-brand-ink: var(--brand-ink);
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);
@@ -247,7 +248,7 @@
   top: 0;
   height: 4px;
   z-index: 70;
-  background: linear-gradient(90deg, #0c8080 0%, #0c8080 58%, #22b8a8 72%, #f55d48 100%);
+  background: linear-gradient(90deg, var(--brand) 0%, var(--brand) 62%, #ff9a80 100%);
 }
 
 .background-grid {
@@ -387,7 +388,7 @@ section[data-theme="dark"] {
 }
 
 .word-reveal .word.is-on[data-highlight] {
-  color: var(--brand);
+  color: var(--brand-strong);
 }
 
 .word-reveal.is-static .word {
@@ -395,7 +396,7 @@ section[data-theme="dark"] {
 }
 
 .word-reveal.is-static .word[data-highlight] {
-  color: var(--brand);
+  color: var(--brand-strong);
 }
 
 /* Native accordion ---------------------------------------------------------- */

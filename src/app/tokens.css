@@ -9,10 +9,18 @@
   --line: #e3e8ee;
   --line-strong: #cbd5e1;
 
-  /* Brand: teal is the primary action color on praszo.com, coral is the logo accent. */
-  --brand: #0c8080;
-  --brand-strong: #0a6a6a;
-  --brand-soft: #e3f3f2;
+  /*
+   * Brand: the coral of the Praszo logo mark is the primary color.
+   * --brand is the exact logo color, for fills, rules, icons and large display text
+   * (3.0:1 on white, enough for graphics and large text).
+   * --brand-strong is the same coral deepened for small text: 5.3:1 on white, 4.7:1 on --brand-soft.
+   * --brand-ink is the label color on --brand fills: white, matching the product page buttons
+   * (chosen by the user on 2026-10-15; 3.0:1, below AA 4.5:1 for normal-size text).
+   */
+  --brand: #f46a4a;
+  --brand-strong: #b04c35;
+  --brand-hover: #e2583a;
+  --brand-soft: #fef0ed;
   --brand-ink: #ffffff;
   --accent: #f55d48;
   --accent-soft: #ffe4df;
@@ -64,9 +72,11 @@
   --ink-3: #8b969f;
   --line: rgba(255, 255, 255, 0.1);
   --line-strong: rgba(255, 255, 255, 0.2);
-  --brand: #22b8a8;
-  --brand-strong: #19a494;
-  --brand-soft: rgba(34, 184, 168, 0.14);
+  /* Logo coral reads at 6.2:1 on the dark background, so text can use it too. */
+  --brand: #f46a4a;
+  --brand-strong: #ff8a70;
+  --brand-hover: #e2583a;
+  --brand-soft: rgba(244, 106, 74, 0.14);
   --accent: #ff7d68;
   --accent-soft: rgba(255, 125, 104, 0.16);
   --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 32px -16px rgba(0, 0, 0, 0.6);

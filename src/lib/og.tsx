@@ -10,7 +10,7 @@ type OgProps = {
   title: string;
   subtitle: string;
   kicker?: string;
-  /** Accent color (product color or brand teal). */
+  /** Accent color (product color or the logo coral). */
   color?: string;
   /** Optional glyph image file under src/assets/brand. */
   glyph?: string;
@@ -40,7 +40,7 @@ async function loadImage(file: string) {
 }
 
 /** Shared Open Graph template: brand mark, kicker, title, subtitle, accent bar. */
-export async function renderOg({ title, subtitle, kicker = "Praszo OS", color = "#0c8080", glyph }: OgProps) {
+export async function renderOg({ title, subtitle, kicker = "Praszo OS", color = "#f46a4a", glyph }: OgProps) {
   const [bold, medium, mark, glyphSrc] = await Promise.all([
     loadFont("Manrope-Bold.woff"),
     loadFont("Manrope-Medium.woff"),

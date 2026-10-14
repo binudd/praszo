@@ -46,7 +46,7 @@ function SegmentPanel({ segment, scene = false }: { segment: Segment; scene?: bo
         <h3 data-seg-part className="display-sm mt-5 text-ink">
           {segment.title}
         </h3>
-        <p data-seg-part className="label mt-4 leading-relaxed text-brand">
+        <p data-seg-part className="label mt-4 leading-relaxed text-brand-strong">
           {segment.subtitle}
         </p>
         <p data-seg-part className="copy mt-4">
@@ -57,7 +57,7 @@ function SegmentPanel({ segment, scene = false }: { segment: Segment; scene?: bo
           href={segment.href}
           target="_blank"
           rel="noreferrer"
-          className="label group mt-6 inline-flex w-fit items-center gap-1.5 text-ink transition-colors hover:text-brand"
+          className="label group mt-6 inline-flex w-fit items-center gap-1.5 text-ink transition-colors hover:text-brand-strong"
         >
           Read more on praszo.com
           <ArrowUpRight size={14} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden />

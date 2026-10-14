@@ -19,7 +19,7 @@ export function FinalCta({ title, subtitle, body, bullets, tone = "brand" }: Pro
     <section data-theme="dark" aria-labelledby="final-cta-title" className="relative overflow-hidden py-28 md:py-40">
       <div className="dot-field" aria-hidden />
       <Container className="relative text-center">
-        {subtitle ? <p className="label text-brand">{subtitle}</p> : null}
+        {subtitle ? <p className="label text-brand-strong">{subtitle}</p> : null}
         <h2 id="final-cta-title" className="display-lg mx-auto mt-5 max-w-[14ch] text-ink">
           <RevealHeading>{title}</RevealHeading>
         </h2>

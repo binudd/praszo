@@ -10,13 +10,13 @@ The corporate site for **Praszo** (praszo.com), an on-premise practice-managemen
 
 | Route | Page | Product color |
 |---|---|---|
-| `/` | Corporate homepage | Brand teal `#0c8080` |
+| `/` | Corporate homepage | Brand coral `#f46a4a` (logo) |
 | `/practice` | Praszo Practice (practice management, the core engine) | `#5539d9` |
 | `/verifi` | Praszo Verifi (AI financial statement validation) | `#17b978` |
 | `/match` | Praszo Match (AI purchase vouching, 3-way matching) | `#fb9528` |
 | `/modifi` | Praszo Modifi (engagement letter automation) | `#2874ff` |
 | `/docs` | Praszo Docs (on-premise document management) | `#d72d2d` |
-| `/contact` | Contact and "Book a demo" | Brand teal |
+| `/contact` | Contact and "Book a demo" | Brand coral |
 
 About, Solutions, Insights and Privacy link out to praszo.com. Every "Book a demo" goes to `/contact` (the header button is the site's persistent one, visible at every width; hero sections show only their secondary action), which offers `tel:` and a pre-filled `mailto:pms@praszo.com`. There is no form backend.
 
@@ -131,7 +131,7 @@ The data layer drives the pages, and content edits should rarely need component 
 
 ### Tokens (`src/app/tokens.css`)
 - **Neutrals:** `--bg`, `--surface`, `--elevated`, `--ink`, `--ink-2`, `--ink-3`, `--line`, `--line-strong`.
-- **Brand:** `--brand #0c8080` (teal, actions), `--brand-strong`, `--brand-soft`, `--accent #f55d48` (coral, logo), `--accent-soft`, `--success`, `--warning`.
+- **Brand:** the logo coral is the primary color. `--brand #f46a4a` (exact logo color: fills, rules, icons, large display text; 3.0:1 on white), `--brand-strong` (#b04c35 light / #ff8a70 dark: **all small brand text**, 5.3:1 on white), `--brand-hover`, `--brand-soft`, `--brand-ink` (white on coral fills, matching the product buttons; the user's choice, 3.0:1, below AA for normal text), hover darkens to `--brand-hover`. `--accent #f55d48` stays for warning flags in mockups. Use `text-brand` only for icons or text ≥24px; use `text-brand-strong` for anything smaller.
 - **Product:** `--product`, `--product-deep`, `--product-soft` (defaults to brand).
 - **Radii:** `--radius-sm .75rem`, `--radius-card 1.5rem`, `--radius-panel 2rem`, `--radius-media 3rem`.
 - **Shadows:** `--shadow-card`, `--shadow-float`, `--shadow-stage` (big layered stage shadow), `--shadow-menu`.
@@ -166,7 +166,7 @@ The data layer drives the pages, and content edits should rarely need component 
 1. `.background-grid` (z 0). A 100×150px grid texture, light and dark layers crossfading with the theme.
 2. `.pointer-field` (z 1). A soft radial glow following `--mx` and `--my`, set by `PointerField` on fine pointers only.
 3. `main` (z 10), then the header (fixed, transparent, pointer-events only on its children).
-4. `.brand-bar` (z 70). A 4px teal-to-coral bar at the very top.
+4. `.brand-bar` (z 70). A 4px coral bar at the very top.
 5. `.splash` (z 200). The first-load splash.
 
 ---
@@ -261,7 +261,7 @@ gsap.ticker.lagSmoothing(0)
 | 5 | Five specialized engines (`#products`) | `ProductEcosystem` | `useScene`, 5 steps, 520svh track. Left: product name list (current one expanded). Center: stacked **poster cards filled with the product color** fan in and out (`x d*70`, `rotate d*7`, `scale`). Right: step badge, summary and link crossfade. Clicking a name jumps to its step. Mobile: grid of posters. |
 | 6 | The complete audit firm workflow (`#workflow`, dark) | `WorkflowTour` + `mockups/workflow-canvas.tsx` | Custom ScrollTrigger scene, 440svh, `scrub 0.6`, 6 steps. The SVG layers crossfade (`[data-layer]`), strokes draw (`strokeDashoffset`), a dot travels the pipeline via **MotionPathPlugin**, copy and chips crossfade, step tabs track progress, and a progress line scales. |
 | 7 | Why Praszo (`#why-praszo`) | `WhyPraszo` | `HorizontalScroll` rail with a `WordReveal` intro and `RevealHeading` |
-| 8 | Who it is for: "Built for firms that cannot risk data exposure" | `Segments` (photos from `src/assets/segments/`) | `useScene`, 2 steps, `count*130+40` svh. One persistent frame with no surface (hairline top rule, progress rule at the bottom, content on the page grid; it still clips content moving in and out). Each step holds for most of its slice. Inside a `SWITCH = 0.32` window the outgoing content leaves in reading order (photo tilts and shrinks, copy rises 42px, points slide left 64px, stagger 0.07). Then the incoming content builds in from below and the right, with no overlap. A progress rule fills along the frame bottom, and tabs jump to settled points. Type matches the pillars: `display-sm` title, `label` subtitle in brand teal, `copy` body, numbered points (`label` index, `copy` text) between hairline rules, and a `label` link. Each firm size shows a **photo** (glass towers for larger firms, a mid-rise office for mid-sized firms) in a 3:2 rounded frame that tilts and shrinks with the content. |
+| 8 | Who it is for: "Built for firms that cannot risk data exposure" | `Segments` (photos from `src/assets/segments/`) | `useScene`, 2 steps, `count*130+40` svh. One persistent frame with no surface (hairline top rule, progress rule at the bottom, content on the page grid; it still clips content moving in and out). Each step holds for most of its slice. Inside a `SWITCH = 0.32` window the outgoing content leaves in reading order (photo tilts and shrinks, copy rises 42px, points slide left 64px, stagger 0.07). Then the incoming content builds in from below and the right, with no overlap. A progress rule fills along the frame bottom, and tabs jump to settled points. Type matches the pillars: `display-sm` title, `label` subtitle in brand coral (`brand-strong`), `copy` body, numbered points (`label` index, `copy` text) between hairline rules, and a `label` link. Each firm size shows a **photo** (glass towers for larger firms, a mid-rise office for mid-sized firms) in a 3:2 rounded frame that tilts and shrinks with the content. |
 | 9 | Testimonials | `Testimonials` | `HorizontalScroll` rail of 4 quotes |
 | 10 | FAQ (`#faq`) | `FaqSection` | Native `<details>` accordion, plus FAQPage JSON-LD |
 | 11 | Final CTA (dark) | `FinalCta` | `RevealHeading` plus `RevealBlock` |

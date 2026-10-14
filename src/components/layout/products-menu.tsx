@@ -117,7 +117,7 @@ export function ProductsMenu({ align = "start" }: { align?: "start" | "end" }) {
                   className="flex items-center justify-between gap-4 rounded-[1rem] bg-bg/60 px-4 py-3 text-sm text-ink-2 transition-colors hover:bg-bg"
                 >
                   <span>Each product works on its own. Together they form one operating cycle.</span>
-                  <span className="shrink-0 font-semibold text-brand">See the workflow →</span>
+                  <span className="shrink-0 font-semibold text-brand-strong">See the workflow →</span>
                 </Link>
               </li>
             </ul>

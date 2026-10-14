@@ -19,7 +19,7 @@ type ButtonProps = Omit<ComponentProps<"a">, "href"> & {
 };
 
 const variants: Record<Variant, string> = {
-  primary: "bg-brand text-brand-ink hover:bg-brand-strong",
+  primary: "bg-brand text-brand-ink hover:bg-brand-hover",
   secondary: "border border-line-strong bg-bg text-ink hover:border-ink/50",
   ghost: "text-ink hover:bg-elevated",
   product: "bg-product-deep text-product-ink hover:brightness-110",

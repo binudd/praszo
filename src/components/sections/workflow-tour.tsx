@@ -36,7 +36,7 @@ function StepCopy({ step, className }: { step: WorkflowStep; className?: string 
       <h3 className="display-sm mt-5 text-ink">{step.label}</h3>
       <p className="lede mt-4 max-w-md">{step.body}</p>
       {step.product ? (
-        <a href={`/${step.product.slug}`} className="mt-5 inline-flex text-sm font-bold text-brand hover:underline">
+        <a href={`/${step.product.slug}`} className="mt-5 inline-flex text-sm font-bold text-brand-strong hover:underline">
           Explore Praszo {step.product.name} →
         </a>
       ) : null}

@@ -187,7 +187,7 @@ export function ProductEcosystem() {
               <li key={product.slug}>
                 <Link href={`/${product.slug}`} className="group block">
                   <ProductPoster product={product} className="transition-transform duration-500 group-hover:-translate-y-1" />
-                  <span className="mt-4 inline-flex items-center gap-2 text-[15px] font-bold text-brand">
+                  <span className="mt-4 inline-flex items-center gap-2 text-[15px] font-bold text-brand-strong">
                     Explore Praszo {product.name}
                     <ArrowRight size={16} aria-hidden />
                   </span>
