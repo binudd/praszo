@@ -46,7 +46,9 @@ function Card({ card }: { card: KanbanCard }) {
 /**
  * Praszo Practice engagement board. Tasks glide between columns in a loop
  * (forward through the moves, then back) using GSAP Flip, so the layout
- * reflows smoothly and never jumps. Static under reduced motion.
+ * reflows smoothly and never jumps. A moved card lands at the top of its new
+ * column, so it stays visible however short the frame is. Static under
+ * reduced motion.
  */
 export function KanbanBoard({ paused, className }: MockupProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -87,7 +89,7 @@ export function KanbanBoard({ paused, className }: MockupProps) {
         await gsap.to(card, { scale: 1.03, rotate: -1.2, boxShadow: "0 14px 28px -12px rgba(15,23,42,0.35)", duration: 0.25, ease: "power2.out" });
         if (!alive) return;
         const state = Flip.getState(cards());
-        list.appendChild(card);
+        list.insertBefore(card, list.firstChild);
         updateCounts();
         await Flip.from(state, { duration: 0.75, ease: "power2.inOut", absolute: true, nested: true, prune: true });
         if (!alive) return;
@@ -129,7 +131,7 @@ export function KanbanBoard({ paused, className }: MockupProps) {
   return (
     <div ref={rootRef} className={className}>
       <MockupShell title={kanban.engagement} meta={kanban.meta}>
-        <div className="grid h-full min-h-0 grid-cols-2 gap-2 p-2.5 sm:grid-cols-4">
+        <div className="grid h-full min-h-0 grid-cols-2 grid-rows-[minmax(0,1fr)] gap-2 p-2.5 sm:grid-cols-4">
           {kanban.columns.map((column, index) => (
             <section
               key={column.id}

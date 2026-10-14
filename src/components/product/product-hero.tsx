@@ -15,6 +15,23 @@ import { Eyebrow } from "@/components/ui/eyebrow";
 import { demoCta } from "@/data/company";
 import type { Product } from "@/data/products";
 
+/** Hero CTAs: compact on phones (both fit one row), regular on tablets, large on desktop. */
+const heroButton = "max-sm:h-10 max-sm:px-4 max-sm:text-sm lg:h-12 lg:px-6 lg:text-base";
+
+/** Keeps hyphenated words such as "Purpose-built" on one line; the giant type otherwise breaks at the hyphen. */
+function Headline({ text }: { text: string }) {
+  return (
+    <>
+      {text.split(" ").map((word, index) => (
+        <span key={`${word}-${index}`}>
+          {index > 0 ? " " : null}
+          {word.includes("-") ? <span className="whitespace-nowrap">{word}</span> : word}
+        </span>
+      ))}
+    </>
+  );
+}
+
 export function ProductHero({ product }: { product: Product }) {
   const rootRef = useRef<HTMLElement | null>(null);
   useHeroEntrance(rootRef, `product:${product.slug}`);
@@ -42,8 +59,7 @@ export function ProductHero({ product }: { product: Product }) {
             <Button
               href={`#${featuresId}`}
               variant="secondary"
-              size="md"
-              className="lg:h-12 lg:px-6 lg:text-base"
+              className={heroButton}
               onClick={(event) => {
                 event.preventDefault();
                 jumpToFeatures();
@@ -53,7 +69,7 @@ export function ProductHero({ product }: { product: Product }) {
               See the features
             </Button>
             <Magnetic>
-              <Button href={demoCta.href} variant="product" size="md" className="lg:h-12 lg:px-6 lg:text-base">
+              <Button href={demoCta.href} variant="product" className={heroButton}>
                 {demoCta.label}
                 <ArrowRight size={18} aria-hidden />
               </Button>
@@ -66,7 +82,7 @@ export function ProductHero({ product }: { product: Product }) {
         <h1 id={`${product.slug}-hero-title`} className="display-hero max-w-[16ch] text-ink">
           <span className="mask-reveal block pb-[0.08em]">
             <span data-hero="headline" className="block">
-              {product.hero.headline}
+              <Headline text={product.hero.headline} />
             </span>
           </span>
         </h1>

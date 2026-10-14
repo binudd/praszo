@@ -87,13 +87,13 @@ export function MatchEngine({ paused, className }: MockupProps) {
   return (
     <div ref={rootRef} className={className}>
       <MockupShell title={data.title} meta={data.meta}>
-        <div data-body className="relative grid h-full grid-cols-[1.25fr_1fr] gap-3 p-2.5 sm:gap-6 sm:p-3">
+        <div data-body className="relative grid h-full min-h-0 grid-cols-[1.25fr_1fr] grid-rows-[minmax(0,1fr)] gap-3 p-2.5 sm:gap-6 sm:p-3">
           <svg className="pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden>
             {data.documents.map((doc) => (
               <path key={doc} data-link fill="none" stroke="var(--product)" strokeWidth="1.5" opacity="0" />
             ))}
           </svg>
-          <ul className="flex flex-col gap-1.5">
+          <ul className="flex min-h-0 flex-col gap-1.5 overflow-hidden">
             {data.rows.map((row) => (
               <li
                 key={row.id}
@@ -109,7 +109,7 @@ export function MatchEngine({ paused, className }: MockupProps) {
               </li>
             ))}
           </ul>
-          <ul className="flex flex-col justify-between gap-1.5">
+          <ul className="flex min-h-0 flex-col justify-between gap-1.5">
             {data.documents.map((doc) => (
               <li
                 key={doc}

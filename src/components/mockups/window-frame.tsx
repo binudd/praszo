@@ -13,7 +13,7 @@ export function WindowFrame({
   className?: string;
 }) {
   return (
-    <div className={cn("flex flex-col overflow-hidden rounded-card border border-line bg-bg shadow-float", className)}>
+    <div className={cn("relative isolate flex flex-col overflow-hidden rounded-card border border-line bg-bg shadow-float", className)}>
       <div className="flex shrink-0 items-center gap-3 border-b border-line bg-surface px-4 py-2.5">
         <span className="flex gap-1.5" aria-hidden>
           <i className="h-2.5 w-2.5 rounded-full bg-line-strong" />

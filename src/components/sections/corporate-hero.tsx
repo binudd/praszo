@@ -13,6 +13,9 @@ import { Eyebrow } from "@/components/ui/eyebrow";
 import { company } from "@/data/company";
 import { home } from "@/data/home";
 
+/** Hero CTAs: compact on phones (both fit one row), regular on tablets, large on desktop. */
+const heroButton = "max-sm:h-10 max-sm:px-4 max-sm:text-sm lg:h-12 lg:px-6 lg:text-base";
+
 const headline = ["Run it on Praszo."];
 const opener = "Simplify your practice management.";
 
@@ -46,8 +49,7 @@ export function CorporateHero() {
             <Button
               href="#workflow"
               variant="secondary"
-              size="md"
-              className="lg:h-12 lg:px-6 lg:text-base"
+              className={heroButton}
               onClick={(event) => {
                 event.preventDefault();
                 scrollToTarget("#workflow");
@@ -57,7 +59,7 @@ export function CorporateHero() {
               See the workflow
             </Button>
             <Magnetic>
-              <Button href={home.hero.primaryCta.href} size="md" className="lg:h-12 lg:px-6 lg:text-base">
+              <Button href={home.hero.primaryCta.href} className={heroButton}>
                 {home.hero.primaryCta.label}
                 <ArrowRight size={18} aria-hidden />
               </Button>

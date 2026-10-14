@@ -94,10 +94,10 @@ export function DocsPipeline({ paused, className }: MockupProps) {
   return (
     <div ref={rootRef} className={className}>
       <MockupShell title={data.title} meta={data.meta}>
-        <div className="grid h-full grid-cols-3 gap-2 p-2.5">
+        <div className="grid h-full min-h-0 grid-cols-3 grid-rows-[minmax(0,1fr)] gap-2 p-2.5">
           <section data-lane="intake" aria-label={data.lanes[0]} className="flex min-h-0 flex-col rounded-sm border border-line bg-surface p-2">
             <h3 className="label px-0.5 pb-2 text-[9px] text-ink-3">{data.lanes[0]}</h3>
-            <ul data-items className="flex min-h-0 flex-col gap-1.5">
+            <ul data-items className="flex min-h-0 flex-col gap-1.5 overflow-hidden">
               {data.files.map((file) => (
                 <li
                   key={file.id}
@@ -127,13 +127,13 @@ export function DocsPipeline({ paused, className }: MockupProps) {
               <h3 className="label flex items-center gap-1 px-0.5 pb-2 text-[9px] text-ink-3">
                 <Wallet size={10} aria-hidden /> Finance
               </h3>
-              <ul data-items className="flex min-h-0 flex-col gap-1.5" />
+              <ul data-items className="flex min-h-0 flex-col gap-1.5 overflow-hidden" />
             </div>
             <div data-lane="legal" className="flex min-h-0 flex-1 flex-col rounded-sm border border-line bg-surface p-2">
               <h3 className="label flex items-center gap-1 px-0.5 pb-2 text-[9px] text-ink-3">
                 <Scale size={10} aria-hidden /> Legal
               </h3>
-              <ul data-items className="flex min-h-0 flex-col gap-1.5" />
+              <ul data-items className="flex min-h-0 flex-col gap-1.5 overflow-hidden" />
             </div>
           </section>
         </div>

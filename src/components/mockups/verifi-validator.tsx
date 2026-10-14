@@ -67,7 +67,7 @@ export function VerifiValidator({ paused, className }: MockupProps) {
   return (
     <div ref={rootRef} className={className}>
       <MockupShell title={data.title} meta={data.meta}>
-        <div className="grid h-full grid-cols-[6.5rem_1fr] gap-2.5 p-2.5 sm:grid-cols-[11rem_1fr]">
+        <div className="grid h-full min-h-0 grid-cols-[6.5rem_minmax(0,1fr)] grid-rows-[minmax(0,1fr)] gap-2.5 p-2.5 sm:grid-cols-[11rem_minmax(0,1fr)]">
           <div className="flex flex-col items-center justify-center rounded-sm border border-line bg-surface p-3 text-center">
             <div className="relative h-16 w-16 sm:h-20 sm:w-20">
               <svg viewBox="0 0 80 80" className="h-full w-full -rotate-90" aria-hidden>
@@ -91,7 +91,7 @@ export function VerifiValidator({ paused, className }: MockupProps) {
             </div>
             <p className="label mt-3 hidden text-[9px] text-ink-3 sm:block">{data.scoreLabel}</p>
           </div>
-          <ul className="flex min-w-0 flex-col gap-1.5">
+          <ul className="flex min-h-0 min-w-0 flex-col gap-1.5 overflow-hidden">
             {data.checks.map((check) => (
               <li
                 key={check.id}

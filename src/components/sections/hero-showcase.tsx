@@ -30,7 +30,7 @@ export function HeroShowcase() {
 
   return (
     <div className="grid h-full min-h-0 grid-cols-[minmax(0,1fr)] grid-rows-[minmax(0,1fr)_auto] gap-3">
-      <div className="fit-box">
+      <div className="fit-box fit-box-end">
         <figure className="fit-frame">
         {productList.map((item, itemIndex) => {
           const Showcase = productShowcases[item.slug].component;
