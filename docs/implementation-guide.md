@@ -18,7 +18,7 @@ The corporate site for **Praszo** (praszo.com), an on-premise practice-managemen
 | `/docs` | Praszo Docs (on-premise document management) | `#d72d2d` |
 | `/contact` | Contact and "Book a demo" | Brand teal |
 
-About, Solutions, Insights and Privacy link out to praszo.com. Every "Book a demo" goes to `/contact`, which offers `tel:` and a pre-filled `mailto:pms@praszo.com`. There is no form backend.
+About, Solutions, Insights and Privacy link out to praszo.com. Every "Book a demo" goes to `/contact` (the header button is the site's persistent one, visible at every width; hero sections show only their secondary action), which offers `tel:` and a pre-filled `mailto:pms@praszo.com`. There is no form backend.
 
 **Content rules (do not break):**
 - All copy comes from praszo.com, typos fixed, meaning unchanged. Everything lives in `src/data/`.
@@ -39,7 +39,7 @@ The design language is modeled on sports.withgoogle.com/teamusa. It uses giant d
 | `gsap` | ^3.15 | **All scroll and timeline animation.** Plugins: ScrollTrigger, Flip, MotionPathPlugin | `src/components/motion/*`, sections, mockups, splash | Import only from `@/components/motion/gsap`, never from `gsap` directly. That file registers plugins once. |
 | `@gsap/react` | ^2.1 | `useGSAP({ scope })` hook for automatic cleanup | every GSAP component | Every GSAP effect must live inside `useGSAP` or an effect with cleanup. |
 | `lenis` | ^1.3.26 | Smooth scrolling. It drives ScrollTrigger. | `src/components/motion/smooth-scroll.tsx` only | One instance, ticked by `gsap.ticker`. Use `getLenis()` and `scrollToTarget()`. Never create a second instance or call `window.scrollTo` for in-page jumps. |
-| `motion` (motion/react) | ^14 | Small UI micro-interactions only: nav follower pill, menus, back-to-top, magnetic button, `useReducedMotion` | `site-header`, `products-menu`, `back-to-top`, `magnetic`, `hero-entrance` (hook only) | Do not use it for scroll-linked animation. That is GSAP's job. |
+| `motion` (motion/react) | ^14 | Small UI micro-interactions only: nav follower pill, menus, back-to-top, `useReducedMotion` | `site-header`, `products-menu`, `back-to-top`, `hero-entrance` (hook only) | Do not use it for scroll-linked animation. That is GSAP's job. |
 | `@radix-ui/react-dialog` | ^1.2 | Mobile menu sheet (focus trap, Escape, aria) | `layout/mobile-menu.tsx` | |
 | `@radix-ui/react-visually-hidden` | ^1.2 | Dialog title for screen readers | `layout/mobile-menu.tsx` | |
 | `@radix-ui/react-slot` | ^1.4 | `asChild` on `Button` | `ui/button.tsx` | |
@@ -96,7 +96,7 @@ src/
     metadata.ts, og.tsx, json-ld.ts, fonts.ts, icons.ts, cn.ts
   components/
     motion/       gsap.ts, smooth-scroll.tsx, use-scene.ts, horizontal-scroll.tsx, reveal.tsx, word-reveal.tsx,
-                  hero-entrance.ts, hero-scroll.ts, hero-title.tsx, magnetic.tsx
+                  hero-entrance.ts, hero-scroll.ts, hero-title.tsx, 
     layout/       site-header, products-menu, mobile-menu, site-footer, splash, theme-observer, background-grid,
                   pointer-field, back-to-top, skip-link, nav-styles
     sections/     Homepage sections + shared hero-shell, hero-showcase, statement, faq-section, final-cta
@@ -152,7 +152,7 @@ The data layer drives the pages, and content edits should rarely need component 
 
 ### Surfaces
 - **No content cards.** Titled items never sit on a card surface. They use `EditorialItem` (`ui/editorial-item.tsx`): hairline top rule, `label` row (index and/or icon), `display-sm` + `lede` for sets of 2–3 (`size="display"`) or `heading` + `copy` for rails and lists (`size="heading"`). Used by pillars, highlights, audience, feature groups, both card rails and the contact details. Product link grids use `ProductLinks` (`ui/product-links.tsx`): rule, glyph, `heading`, one line of `copy`, hover to brand. The old `ui/card.tsx` was removed. Surfaces remain only for UI depictions (mockups, screenshots, the product posters), menus and buttons.
-- **Menus.** `.menu-surface` (nav pill, tabs) and `.menu-panel` (dropdowns) are glass. Blur is emitted via `@apply backdrop-blur-xl backdrop-saturate-150`, because Lightning CSS drops the unprefixed property from hand-written rules.
+- **Menus.** `.menu-surface` (header nav pill and menu button; flat, no shadow) and `.menu-panel` (dropdowns; keeps `--shadow-menu` because it floats over content) are glass. Blur is emitted via `@apply backdrop-blur-xl backdrop-saturate-150`, because Lightning CSS drops the unprefixed property from hand-written rules.
 - **Mockups** follow the contrast rule: flat `bg-elevated` desk, borderless `bg-bg` cards, state shown by a tint (`bg-product-soft`), shadow only while lifted. **No inner borders.**
 - **Ecosystem posters** must reach AA (4.5:1) for every text layer: white on the product colour when it passes (Practice 7.06, Docs 4.88), else white on `colorDeep` when that passes (Modifi #1f5fd6, 5.73), else ink on the product colour (Verifi 7.29, Match 8.34). Text is full opacity; the badge uses `bg-black/15` (white text) or `bg-black/10` (ink).
 
@@ -214,7 +214,7 @@ gsap.ticker.lagSmoothing(0)
 3. **Hero entrance** (`motion/hero-entrance.ts`). Its timeline is created `paused: splashActive()` and plays on `onSplashDone()`. Order:
    - Eyebrow fades.
    - **Title words** (`[data-hero="word"]` from `HeroTitle`) rise from per-word masks: `yPercent 115→0`, `rotate 7→0`, `blur 12px→0`, `opacity 0→1`, 1.15 s `expo.out`, stagger 0.075. Note the explicit `y: 0` in both states, because GSAP otherwise reads the CSS gating `translateY(110%)` as pixels and leaves words offset.
-   - Copy, then CTAs.
+   - Copy, then the hero's secondary action ("See the workflow" / "See the features").
    - Visual (`y 28→0`, `scale .985→1`, `clearProps: transform`).
    - When it finishes, the root gets `.is-ready`, and the CSS gating (`[data-entrance]:not(.is-ready) [data-hero]{opacity:0}`) releases.
 4. **Hero scroll depth** (`motion/hero-scroll.ts`). A scrubbed timeline (`top top` to `bottom top`, `scrub: true`) on wrapper elements `[data-hero-depth]`:
@@ -236,7 +236,6 @@ gsap.ticker.lagSmoothing(0)
 | `ClipReveal` | `product/clip-reveal.tsx` | `once`, `top 82%` | `clip-path inset(10% 6%) → inset(0)` plus scale | |
 | `HeroTitle` | `motion/hero-title.tsx` | (entrance) | Splits a title into per-word masks, keeps hyphenated words whole, colors one `highlight` word, keeps an `sr-only` full title | |
 | `useHeroEntrance` / `useHeroScroll` | `motion/hero-entrance.ts`, `hero-scroll.ts` | see §7.4 | | `.is-static` |
-| `Magnetic` | `motion/magnetic.tsx` | motion/react springs | CTA follows the pointer ±8px (fine pointers only) | |
 | `useOnScreen(ref)` | `motion/use-on-screen.ts` | IntersectionObserver | Pauses the hero mockup loops and the 7 s rotation while the hero is off screen | |
 | `useHeaderReveal(ref, { delta, topOffset, duration, resetKey })` | `motion/use-header-reveal.ts` | One ScrollTrigger (`start 0`, `end "max"`) fed by Lenis; GSAP `yPercent` tween with `overwrite` | Hides the site header on scroll down (`yPercent -100`, `power2.in`), reveals it on scroll up (`power3.out`, 0.38 s). Defaults: 8 px run before reacting, always shown within 96 px of the top, overscroll clamped, 350 ms settle window after mount or route change. Never hides while any header trigger has `aria-expanded="true"` (Products menu, mobile drawer) or keyboard focus is inside; focus entering a hidden header reveals it. Sets `data-header-hidden`. | Reduced motion: instant hide and show |
 | `ProductIconNav` | `ui/product-icon-nav.tsx` | `gsap.to` indicator | Sliding highlight behind hovered or focused product glyph, tooltips, links | |

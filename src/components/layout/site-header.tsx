@@ -109,7 +109,7 @@ export function SiteHeader() {
     ? ({ "--product": product.color, "--product-deep": product.colorDeep } as CSSProperties)
     : undefined;
 
-  const pillClass = "menu-surface hidden items-center gap-0.5 rounded-full p-1.5 transition-[background-color,box-shadow] duration-500 lg:flex";
+  const pillClass = "menu-surface hidden items-center gap-0.5 rounded-full p-1.5 transition-[background-color] duration-500 lg:flex";
 
   return (
     <header
@@ -188,7 +188,8 @@ export function SiteHeader() {
               <ProductsMenu align="end" />
             </div>
           ) : null}
-          <Button href={demoCta.href} size="sm" variant={product ? "product" : "primary"} className="hidden sm:inline-flex">
+          {/* The site's one persistent "Book a demo" (hero sections no longer repeat it), so it shows on every screen size. */}
+          <Button href={demoCta.href} size="sm" variant={product ? "product" : "primary"} className="max-sm:h-9 max-sm:px-3.5 max-sm:text-[13px]">
             {demoCta.label}
           </Button>
           <MobileMenu product={product} />

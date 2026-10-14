@@ -1,11 +1,10 @@
 "use client";
 
-import { ArrowRight, Play } from "lucide-react";
+import { Play } from "lucide-react";
 import { useRef } from "react";
 
 import { useHeroEntrance } from "@/components/motion/hero-entrance";
 import { HeroTitle } from "@/components/motion/hero-title";
-import { Magnetic } from "@/components/motion/magnetic";
 import { scrollToTarget } from "@/components/motion/smooth-scroll";
 import { HeroShell } from "@/components/sections/hero-shell";
 import { HeroShowcase } from "@/components/sections/hero-showcase";
@@ -46,12 +45,6 @@ export function CorporateHero() {
               <Play size={14} className="fill-current" aria-hidden />
               See the workflow
             </Button>
-            <Magnetic>
-              <Button href={home.hero.primaryCta.href} className={heroButton}>
-                {home.hero.primaryCta.label}
-                <ArrowRight size={18} aria-hidden />
-              </Button>
-            </Magnetic>
           </div>
         </>
       }

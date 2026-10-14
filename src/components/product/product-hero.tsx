@@ -6,14 +6,12 @@ import { useRef } from "react";
 
 import { useHeroEntrance } from "@/components/motion/hero-entrance";
 import { HeroTitle } from "@/components/motion/hero-title";
-import { Magnetic } from "@/components/motion/magnetic";
 import { scrollToTarget } from "@/components/motion/smooth-scroll";
 import { ProductShowcase } from "@/components/product/product-showcase";
 import { HeroShell } from "@/components/sections/hero-shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Eyebrow } from "@/components/ui/eyebrow";
-import { demoCta } from "@/data/company";
 import type { Product } from "@/data/products";
 
 /** Hero CTAs: compact on phones (both fit one row), regular on tablets, large on desktop. */
@@ -55,12 +53,6 @@ export function ProductHero({ product }: { product: Product }) {
               <Play size={14} className="fill-current" aria-hidden />
               See the features
             </Button>
-            <Magnetic>
-              <Button href={demoCta.href} variant="product" className={heroButton}>
-                {demoCta.label}
-                <ArrowRight size={18} aria-hidden />
-              </Button>
-            </Magnetic>
           </div>
         </>
       }

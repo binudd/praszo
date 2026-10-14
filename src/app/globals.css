@@ -181,11 +181,10 @@
     text-transform: uppercase;
   }
 
-  /* Menu surface: every floating menu (nav pill, tab pills) shares this readable glass look. */
+  /* Menu surface: the header nav pill and menu button. Flat glass: background only, no border or shadow. */
   .menu-surface {
     @apply backdrop-blur-xl backdrop-saturate-150;
     background: color-mix(in srgb, var(--menu-bg) 82%, transparent);
-    box-shadow: var(--shadow-menu);
     border: 0;
   }
 
