@@ -1,7 +1,3 @@
-"use client";
-
-import { useRef } from "react";
-
 import { WordReveal } from "@/components/motion/word-reveal";
 import { Container } from "@/components/ui/container";
 import { Eyebrow } from "@/components/ui/eyebrow";
@@ -11,7 +7,7 @@ type Props = {
   id?: string;
   eyebrow?: string;
   text: string;
-  highlights?: string[];
+  highlights?: ReadonlyArray<string>;
   chips?: ReadonlyArray<string>;
   theme?: "dark" | "light";
   /** Scroll distance the statement takes to reveal. */
@@ -21,10 +17,9 @@ type Props = {
 
 /** Full-viewport statement whose words light up as the visitor scrolls through it. */
 export function Statement({ id, eyebrow, text, highlights, chips, theme = "dark", height = "190svh", className }: Props) {
-  const trackRef = useRef<HTMLDivElement | null>(null);
   return (
     <section id={id} data-theme={theme} aria-label={text} className={cn("relative", className)}>
-      <div ref={trackRef} className="relative" style={{ height }}>
+      <div data-reveal-track className="relative" style={{ height }}>
         <div className="sticky top-0 flex h-[100svh] flex-col items-center justify-center overflow-hidden">
           <div className="dot-field" aria-hidden />
           <Container className="relative text-center">
@@ -32,7 +27,6 @@ export function Statement({ id, eyebrow, text, highlights, chips, theme = "dark"
             <WordReveal
               text={text}
               highlights={highlights}
-              trackRef={trackRef}
               start="top top"
               end="bottom bottom"
               className="display-md mx-auto mt-6 max-w-[24ch]"

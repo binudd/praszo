@@ -19,12 +19,7 @@ export default function HomePage() {
     <main id="main" className="relative z-10">
       <CorporateHero />
       <TrustedBy />
-      <Statement
-        eyebrow={home.hero.eyebrow}
-        text={home.hero.description}
-        highlights={["cannot risk data exposure"]}
-        chips={["Secure on-premise deployment", "AI-powered workflows", "Full control over your data"]}
-      />
+      <Statement {...home.statement} />
       <PlatformPillars />
       <ProductEcosystem />
       <WorkflowTour />

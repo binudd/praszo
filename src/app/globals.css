@@ -174,7 +174,8 @@
     stroke-width: 2.2;
     stroke-linecap: round;
     stroke-linejoin: round;
-    stroke-dasharray: 1;
+    /* Gap longer than the path: with an equal gap the round cap of the next dash shows as a dot at rest. */
+    stroke-dasharray: 1 2;
     stroke-dashoffset: 1;
     transition: stroke-dashoffset 0.35s var(--ease-out);
   }
@@ -377,7 +378,6 @@ section[data-theme="dark"] {
 
 .word-reveal .word {
   display: inline-block;
-  margin-right: 0.26em;
   color: color-mix(in srgb, var(--ink) 28%, transparent);
   transition: color 0.25s var(--ease-out);
 }
@@ -390,19 +390,11 @@ section[data-theme="dark"] {
   color: var(--brand);
 }
 
-.word-reveal .word[data-strong] {
-  font-weight: 700;
-}
-
-.word-reveal.is-static .word,
-[data-entrance].is-ready .word-reveal .word,
-[data-entrance].is-static .word-reveal .word {
+.word-reveal.is-static .word {
   color: var(--ink);
 }
 
-.word-reveal.is-static .word[data-highlight],
-[data-entrance].is-ready .word-reveal .word[data-highlight],
-[data-entrance].is-static .word-reveal .word[data-highlight] {
+.word-reveal.is-static .word[data-highlight] {
   color: var(--brand);
 }
 

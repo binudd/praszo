@@ -1,7 +1,7 @@
 "use client";
 
-import type { HTMLAttributes, ReactNode } from "react";
-import { useRef } from "react";
+import type { ReactNode } from "react";
+import { Fragment, useRef } from "react";
 
 import { gsap, ScrollTrigger, useGSAP } from "@/components/motion/gsap";
 import { cn } from "@/lib/cn";
@@ -10,26 +10,18 @@ import { prefersReducedMotion } from "@/lib/motion";
 type Props = {
   text: string;
   /** Phrases rendered in the brand color once revealed. */
-  highlights?: string[];
+  highlights?: ReadonlyArray<string>;
   className?: string;
-  /** Element that drives the scrub (defaults to the reveal itself). */
-  trackRef?: React.RefObject<HTMLElement | null>;
   start?: string;
   end?: string;
   as?: "p" | "h2" | "h1";
-  /** Phrases set in bold (kept in the ink color). */
-  strong?: string[];
-  /**
-   * false: no scroll trigger. The words stay dim until a parent lights them (adds .is-on), as the
-   * hero entrance does; [data-entrance].is-ready / .is-static show them all lit.
-   */
-  scrub?: boolean;
   children?: ReactNode;
-} & Omit<HTMLAttributes<HTMLElement>, "children" | "className">;
+};
 
-function markPhrases(words: string[], phrases: string[]) {
+function splitWords(text: string, highlights: ReadonlyArray<string>) {
+  const words = text.split(/\s+/).filter(Boolean);
   const flags = new Array<boolean>(words.length).fill(false);
-  for (const phrase of phrases) {
+  for (const phrase of highlights) {
     const target = phrase.split(/\s+/).filter(Boolean);
     for (let i = 0; i + target.length <= words.length; i += 1) {
       const slice = words.slice(i, i + target.length).map((word) => word.replace(/[.,!?;:]+$/, "").toLowerCase());
@@ -38,32 +30,18 @@ function markPhrases(words: string[], phrases: string[]) {
       }
     }
   }
-  return flags;
+  return words.map((word, index) => ({ word, highlight: flags[index] }));
 }
 
-function splitWords(text: string, highlights: string[], strong: string[]) {
-  const words = text.split(/\s+/).filter(Boolean);
-  const highlighted = markPhrases(words, highlights);
-  const bold = markPhrases(words, strong);
-  return words.map((word, index) => ({ word, highlight: highlighted[index], strong: bold[index] }));
-}
-
-/** Statement whose words light up one by one as the visitor scrolls. */
-export function WordReveal({
-  text,
-  highlights = [],
-  strong = [],
-  className,
-  trackRef,
-  start = "top 75%",
-  end = "bottom 45%",
-  as: Tag = "p",
-  scrub = true,
-  children,
-  ...rest
-}: Props) {
+/**
+ * Statement whose words light up one by one as the visitor scrolls.
+ * The scrub follows the nearest ancestor marked [data-reveal-track] (e.g. a sticky statement's tall
+ * track), else the text itself. The track is looked up from the DOM because a parent's ref is not
+ * attached yet when this child's layout effect runs.
+ */
+export function WordReveal({ text, highlights = [], className, start = "top 75%", end = "bottom 45%", as: Tag = "p", children }: Props) {
   const ref = useRef<HTMLElement | null>(null);
-  const words = splitWords(text, highlights, strong);
+  const words = splitWords(text, highlights);
 
   useGSAP(
     () => {
@@ -73,10 +51,9 @@ export function WordReveal({
         node.classList.add("is-static");
         return () => node.classList.remove("is-static");
       }
-      if (!scrub) return;
       const wordNodes = Array.from(node.querySelectorAll<HTMLElement>(".word"));
       const trigger = ScrollTrigger.create({
-        trigger: trackRef?.current ?? node,
+        trigger: node.closest<HTMLElement>("[data-reveal-track]") ?? node,
         start,
         end,
         scrub: 0.4,
@@ -91,15 +68,18 @@ export function WordReveal({
         gsap.set(wordNodes, { clearProps: "all" });
       };
     },
-    { scope: ref, dependencies: [scrub] },
+    { scope: ref },
   );
 
   return (
-    <Tag {...rest} ref={ref as React.RefObject<HTMLParagraphElement>} className={cn("word-reveal", className)}>
+    <Tag ref={ref as React.RefObject<HTMLParagraphElement>} className={cn("word-reveal", className)}>
       {words.map((item, index) => (
-        <span key={`${item.word}-${index}`} className="word" data-highlight={item.highlight || undefined} data-strong={item.strong || undefined}>
-          {item.word}
-        </span>
+        <Fragment key={`${item.word}-${index}`}>
+          {index > 0 ? " " : null}
+          <span className="word" data-highlight={item.highlight || undefined}>
+            {item.word}
+          </span>
+        </Fragment>
       ))}
       {children}
     </Tag>

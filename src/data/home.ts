@@ -25,6 +25,13 @@ export const home = {
     primaryCta: { label: "Book a demo", href: "/contact" },
     secondaryCta: { label: "Explore the products", href: "#products" },
   },
+  /** Scroll-revealed statement after the logos ("Precision for Audit"). */
+  statement: {
+    eyebrow: "Precision for Audit",
+    text: "On-premise practice management tools built for audit firms. Designed for firms that cannot risk data exposure.",
+    highlights: ["cannot risk data exposure"],
+    chips: ["Secure on-premise deployment", "AI-powered workflows", "Full control over your data"],
+  },
   trustedBy: {
     title: "Trusted by audit firms worldwide",
     logos: [

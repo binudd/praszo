@@ -233,7 +233,7 @@ gsap.ticker.lagSmoothing(0)
 | `RevealHeading` | `motion/reveal.tsx` | `once`, `top 90%` | Masked line rise (`y 110%→0`) | none needed |
 | `RevealBlock` | same | `once`, `top 90%` | Fade-up 18px | |
 | `RevealGroup` (+ `data-reveal` children) | same | `once`, `top 85%`, stagger 0.08 | Staggered fade-up of children | |
-| `WordReveal` | `motion/word-reveal.tsx` | ScrollTrigger `scrub 0.4` on a track | Words gain `.is-on` progressively; highlight phrases get the brand color; `strong` phrases are bold. With `scrub={false}` there is no trigger and a parent lights the words: the homepage hero paragraph is lit word by word by `useHeroEntrance` after it fades in. | `.is-static` shows all; inside a hero, `[data-entrance].is-ready` or `.is-static` shows all (route re-show, reduced motion) |
+| `WordReveal` | `motion/word-reveal.tsx` | ScrollTrigger `scrub 0.4` on the nearest `[data-reveal-track]` ancestor (else the text). Found from the DOM, not a ref: a parent ref is still null when the child layout effect runs, which once made the Statement reveal snap on in one step. | Words gain `.is-on` progressively; highlight phrases get the brand color | `.is-static` shows all |
 | `ClipReveal` | `product/clip-reveal.tsx` | `once`, `top 82%` | `clip-path inset(10% 6%) → inset(0)` plus scale | |
 | `HeroTitle` | `motion/hero-title.tsx` | (entrance) | Splits a title into per-word masks, keeps hyphenated words whole, colors one `highlight` word, keeps an `sr-only` full title | |
 | `useHeroEntrance` / `useHeroScroll` | `motion/hero-entrance.ts`, `hero-scroll.ts` | see §7.4 | | `.is-static` |
