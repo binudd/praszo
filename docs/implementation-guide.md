@@ -148,6 +148,7 @@ The data layer drives the pages, and content edits should rarely need component 
 ### Typography
 - **Font.** Manrope through `next/font` (`lib/fonts.ts`) as `--font-manrope`. Body weight is 500.
 - **Display scale** (in `@layer components`): `.display-xl`, `.display-lg` (homepage hero and big section titles), `.display-hero` (product hero), `.display-md`, `.display-sm`, `.heading` (item titles in rails, lists and dense grids, 19→24px), plus `.lede` (intro and short bodies), `.copy` (running text and lists, 16→18px) and `.label` (uppercase tracking: index numbers, kicker lines, compact links). Avoid one-off `text-[Npx]` sizes in sections; pick a tier.
+- **Kickers.** `Eyebrow` (`ui/eyebrow.tsx`) has no dot. It carries a hand-drawn pen underline, the same loose stroke as the Modifi signature, as an inline SVG (`.eyebrow-scribble`). The stroke draws on hover of the kicker or its parent block (kicker + title + intro) via `stroke-dashoffset` with `pathLength=1`, CSS only, and retracts faster on leave. Touch screens (`hover: none`) show it drawn. Do not add `vector-effect: non-scaling-stroke`: Chrome then measures dashes in screen pixels and the stroke stops partway. The SVG needs an explicit width, because an absolutely positioned SVG ignores `left` + `right`.
 - **Layer rule.** Base typography sits in `@layer base`. Unlayered CSS beats Tailwind utilities, which broke `truncate` once, so keep custom rules layered or class-scoped.
 
 ### Surfaces
@@ -232,7 +233,7 @@ gsap.ticker.lagSmoothing(0)
 | `RevealHeading` | `motion/reveal.tsx` | `once`, `top 90%` | Masked line rise (`y 110%→0`) | none needed |
 | `RevealBlock` | same | `once`, `top 90%` | Fade-up 18px | |
 | `RevealGroup` (+ `data-reveal` children) | same | `once`, `top 85%`, stagger 0.08 | Staggered fade-up of children | |
-| `WordReveal` | `motion/word-reveal.tsx` | ScrollTrigger `scrub 0.4` on a track | Words gain `.is-on` progressively; highlight phrases get the brand color | `.is-static` shows all |
+| `WordReveal` | `motion/word-reveal.tsx` | ScrollTrigger `scrub 0.4` on a track | Words gain `.is-on` progressively; highlight phrases get the brand color; `strong` phrases are bold. With `scrub={false}` there is no trigger and a parent lights the words: the homepage hero paragraph is lit word by word by `useHeroEntrance` after it fades in. | `.is-static` shows all; inside a hero, `[data-entrance].is-ready` or `.is-static` shows all (route re-show, reduced motion) |
 | `ClipReveal` | `product/clip-reveal.tsx` | `once`, `top 82%` | `clip-path inset(10% 6%) → inset(0)` plus scale | |
 | `HeroTitle` | `motion/hero-title.tsx` | (entrance) | Splits a title into per-word masks, keeps hyphenated words whole, colors one `highlight` word, keeps an `sr-only` full title | |
 | `useHeroEntrance` / `useHeroScroll` | `motion/hero-entrance.ts`, `hero-scroll.ts` | see §7.4 | | `.is-static` |

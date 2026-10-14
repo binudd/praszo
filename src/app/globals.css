@@ -150,6 +150,48 @@
     color: var(--ink-2);
   }
 
+  /* Section kicker with a hand-drawn underline (Eyebrow). The pen stroke draws itself while the
+     kicker's block (its parent: kicker + heading + intro) is hovered, using the same stroke-reveal
+     as the Modifi signature, and retracts on leave. CSS only. */
+  .eyebrow {
+    position: relative;
+  }
+
+  .eyebrow-scribble {
+    position: absolute;
+    left: -0.15em;
+    width: calc(100% + 0.5em);
+    bottom: -0.7em;
+    height: 0.6em;
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  .eyebrow-scribble path {
+    fill: none;
+    stroke: currentColor;
+    /* User units: the 10-unit viewBox maps to 0.6em, so this renders about 1.6px thick. */
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 0.35s var(--ease-out);
+  }
+
+  :where(*:has(> .eyebrow)):hover > .eyebrow .eyebrow-scribble path,
+  .eyebrow:hover .eyebrow-scribble path {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+  }
+
+  /* No hover on touch screens: show the underline drawn. */
+  @media (hover: none) {
+    .eyebrow-scribble path {
+      stroke-dashoffset: 0;
+    }
+  }
+
   /* Item titles in rails, lists and dense grids: the tier below .display-sm. */
   .heading {
     font-size: clamp(1.2rem, 1rem + 0.55vw, 1.5rem);
@@ -348,11 +390,19 @@ section[data-theme="dark"] {
   color: var(--brand);
 }
 
-.word-reveal.is-static .word {
+.word-reveal .word[data-strong] {
+  font-weight: 700;
+}
+
+.word-reveal.is-static .word,
+[data-entrance].is-ready .word-reveal .word,
+[data-entrance].is-static .word-reveal .word {
   color: var(--ink);
 }
 
-.word-reveal.is-static .word[data-highlight] {
+.word-reveal.is-static .word[data-highlight],
+[data-entrance].is-ready .word-reveal .word[data-highlight],
+[data-entrance].is-static .word-reveal .word[data-highlight] {
   color: var(--brand);
 }
 

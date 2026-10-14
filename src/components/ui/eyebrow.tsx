@@ -11,13 +11,11 @@ const tones: Record<Tone, string> = {
   inverse: "text-white/80",
 };
 
-const dots: Record<Tone, string> = {
-  brand: "bg-brand",
-  product: "bg-product",
-  muted: "bg-ink-3",
-  inverse: "bg-white/70",
-};
-
+/**
+ * Section kicker. Instead of a dot it carries a hand-drawn pen underline (the same loose stroke as
+ * the Modifi signature) that draws itself while the kicker's block is hovered; see .eyebrow in
+ * globals.css. Shown drawn on touch screens, where there is no hover.
+ */
 export function Eyebrow({
   tone = "brand",
   className,
@@ -25,16 +23,11 @@ export function Eyebrow({
   ...props
 }: ComponentProps<"p"> & { tone?: Tone }) {
   return (
-    <p
-      className={cn(
-        "inline-flex items-center gap-2 text-[12px] font-bold tracking-[0.16em] uppercase",
-        tones[tone],
-        className,
-      )}
-      {...props}
-    >
-      <span aria-hidden className={cn("h-1.5 w-1.5 rounded-full", dots[tone])} />
+    <p className={cn("eyebrow inline-flex items-center text-[12px] font-bold tracking-[0.16em] uppercase", tones[tone], className)} {...props}>
       {children}
+      <svg aria-hidden focusable="false" className="eyebrow-scribble" viewBox="0 0 100 10" preserveAspectRatio="none">
+        <path pathLength={1} d="M1.5 6.4C9 3.9 15.5 7.9 24 6.1S38.5 3 47.5 5.2 63 8.4 72 5.6 88 2.9 98.5 4.8" />
+      </svg>
     </p>
   );
 }

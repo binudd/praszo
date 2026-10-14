@@ -6,6 +6,7 @@ import { useRef } from "react";
 import { useHeroEntrance } from "@/components/motion/hero-entrance";
 import { HeroTitle } from "@/components/motion/hero-title";
 import { scrollToTarget } from "@/components/motion/smooth-scroll";
+import { WordReveal } from "@/components/motion/word-reveal";
 import { HeroShell } from "@/components/sections/hero-shell";
 import { HeroShowcase } from "@/components/sections/hero-showcase";
 import { Button } from "@/components/ui/button";
@@ -29,9 +30,14 @@ export function CorporateHero() {
       lede={
         <>
           <Eyebrow data-hero="eyebrow">{home.hero.eyebrow}</Eyebrow>
-          <p data-hero="copy" className="lede mt-4 max-w-[34rem] max-lg:text-[0.98rem] max-lg:leading-snug lg:mt-5">
-            <strong>{opener}</strong> {company.description}
-          </p>
+          {/* Same dim-to-lit word reveal as the Why Praszo intro, played by the hero entrance. */}
+          <WordReveal
+            data-hero="copy"
+            scrub={false}
+            text={`${opener} ${company.description}`}
+            strong={[opener]}
+            className="lede mt-4 max-w-[34rem] max-lg:text-[0.98rem] max-lg:leading-snug lg:mt-5"
+          />
           <div data-hero="cta" className="mt-5 flex flex-wrap items-center gap-3 lg:mt-7">
             <Button
               href="#workflow"

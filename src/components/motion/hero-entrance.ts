@@ -78,6 +78,19 @@ export function useHeroEntrance(rootRef: RefObject<HTMLElement | null>, key: str
         "-=0.55",
       );
 
+      // Word-reveal copy (the same dim-to-lit effect as the Why Praszo intro): once the paragraph has
+      // faded in, its words light up one by one. Added last so the calls do not push back the steps
+      // above, which are positioned relative to the timeline's end.
+      const copy = pick('[data-hero="copy"]')[0];
+      const words = pick('[data-hero="copy"] .word');
+      if (copy && words.length) {
+        const from = timeline.getChildren(false, true, false).find((tween) => tween.targets().includes(copy))?.startTime() ?? 0;
+        const gap = Math.min(0.06, 1.6 / words.length);
+        words.forEach((word, index) => {
+          timeline.call(() => word.classList.add("is-on"), undefined, from + 0.2 + index * gap);
+        });
+      }
+
       pick("[data-hero-float]").forEach((node, index) => {
         gsap.to(node, {
           y: index % 2 ? -6 : 6,
@@ -94,6 +107,7 @@ export function useHeroEntrance(rootRef: RefObject<HTMLElement | null>, key: str
       return () => {
         stopWaiting();
         root.classList.remove("is-ready");
+        words.forEach((word) => word.classList.remove("is-on"));
       };
     },
     { scope: rootRef, dependencies: [reduced, key] },
