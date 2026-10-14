@@ -21,6 +21,7 @@ export function Logo({ className, size = "md" }: { className?: string; size?: "s
         src={mark}
         alt=""
         aria-hidden
+        data-logo-mark
         className="mx-[0.04em] h-[0.74em] w-auto translate-y-[0.03em]"
         sizes="32px"
       />
@@ -31,5 +32,5 @@ export function Logo({ className, size = "md" }: { className?: string; size?: "s
 
 /** The coral Praszo mark on its own (decorative; label the surrounding link). */
 export function BrandMark({ className }: { className?: string }) {
-  return <Image src={mark} alt="" aria-hidden className={cn("h-8 w-auto", className)} sizes="48px" />;
+  return <Image src={mark} alt="" aria-hidden data-logo-mark className={cn("h-8 w-auto", className)} sizes="48px" />;
 }

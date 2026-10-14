@@ -6,11 +6,13 @@ import { PointerField } from "@/components/layout/pointer-field";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SkipLink } from "@/components/layout/skip-link";
+import { Splash } from "@/components/layout/splash";
 import { ThemeObserver } from "@/components/layout/theme-observer";
 import { SmoothScroll } from "@/components/motion/smooth-scroll";
 import { company, siteUrl } from "@/data/company";
 import { manrope } from "@/lib/fonts";
 import { jsonLd } from "@/lib/json-ld";
+import { splashBootScript } from "@/lib/splash";
 
 import "./globals.css";
 
@@ -63,11 +65,14 @@ const organizationJsonLd = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="en" data-theme="light" className={`${manrope.variable} h-full antialiased`}>
+    <html lang="en" data-theme="light" className={`${manrope.variable} h-full antialiased`} suppressHydrationWarning>
       <body className="relative min-h-full font-sans text-ink">
+        {/* Decides before first paint whether the first-load splash shows (see lib/splash.ts). */}
+        <script dangerouslySetInnerHTML={{ __html: splashBootScript }} />
+        <Splash />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLd(organizationJsonLd) }} />
         <noscript>
-          <style>{`[data-entrance] [data-hero]{opacity:1;transform:none}.scene-stack{display:block}.word-reveal .word{color:var(--ink)}`}</style>
+          <style>{`[data-entrance] [data-hero]{opacity:1;transform:none}.scene-stack{display:block}.word-reveal .word{color:var(--ink)}.splash{display:none!important}html{overflow:auto!important}`}</style>
         </noscript>
         <SkipLink />
         <div aria-hidden className="brand-bar" />

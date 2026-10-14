@@ -5,6 +5,7 @@ import type { RefObject } from "react";
 
 import { gsap, useGSAP } from "@/components/motion/gsap";
 import { EASE, prefersReducedMotion } from "@/lib/motion";
+import { onSplashDone, splashActive } from "@/lib/splash";
 
 /** Routes whose hero already played; a re-shown route (React Activity) skips the replay. */
 const played = new Set<string>();
@@ -33,7 +34,9 @@ export function useHeroEntrance(rootRef: RefObject<HTMLElement | null>, key: str
       }
 
       const pick = (selector: string) => Array.from(root.querySelectorAll<HTMLElement>(selector));
+      // On a first visit the timeline holds until the splash hands over to the page.
       const timeline = gsap.timeline({
+        paused: splashActive(),
         defaults: { ease: EASE },
         onComplete: () => {
           root.classList.add("is-ready");
@@ -79,7 +82,12 @@ export function useHeroEntrance(rootRef: RefObject<HTMLElement | null>, key: str
         });
       });
 
-      return () => root.classList.remove("is-ready");
+      const stopWaiting = onSplashDone(() => timeline.play());
+
+      return () => {
+        stopWaiting();
+        root.classList.remove("is-ready");
+      };
     },
     { scope: rootRef, dependencies: [reduced, key] },
   );

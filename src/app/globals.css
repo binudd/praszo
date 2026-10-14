@@ -634,3 +634,55 @@ details[open] .faq-chevron {
     aspect-ratio: 720 / 520;
   }
 }
+
+/* First-load splash ------------------------------------------------------------
+   <html data-splash> is set before first paint by the boot script in the root
+   layout: "on" shows the splash, "skip" hides it, "landing"/"done" after it. */
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+  display: none;
+}
+
+[data-splash="on"] .splash,
+[data-splash="landing"] .splash {
+  display: block;
+}
+
+[data-splash="on"] .splash {
+  pointer-events: auto;
+}
+
+[data-splash="on"],
+[data-splash="on"] body {
+  overflow: hidden;
+}
+
+.splash-screen {
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  will-change: clip-path;
+}
+
+.splash-mark {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin: -36px 0 0 calc(var(--splash-w, 77px) / -2);
+  background: #ffffff;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-position: center;
+  mask-position: center;
+  will-change: transform;
+}
+
+/* The header mark stays hidden until the flying copy lands on it. */
+[data-splash="on"] header [data-logo-mark] {
+  visibility: hidden;
+}
