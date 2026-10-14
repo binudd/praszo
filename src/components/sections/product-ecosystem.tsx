@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRef, type CSSProperties } from "react";
 
-import { gsap } from "@/components/motion/gsap";
 import { scrollToTarget } from "@/components/motion/smooth-scroll";
 import { applySceneItems, stepOpacity, useScene } from "@/components/motion/use-scene";
 import { mockups } from "@/components/mockups/registry";
@@ -35,27 +34,36 @@ function productStyle(product: Product) {
 function ProductPoster({ product, className }: { product: Product; className?: string }) {
   const visual = product.hero.visual;
   const Mockup = visual.kind === "mockup" ? mockups[visual.id] : null;
-  // Verifi green and Match orange sit below 3:1 with white, so they get dark text. Modifi blue (about 4.2:1)
-  // reads better with white than with dark ink, which scores about the same.
-  const light = whiteContrast(product.color) < 3;
+  // Every text layer must reach WCAG AA (4.5:1) on the poster surface:
+  // - white on the product colour when it passes (Practice 7.06, Docs 4.88);
+  // - otherwise white on the product's deep shade when that passes (Modifi: #2874ff 4.17 -> #1f5fd6 5.73);
+  // - otherwise dark ink on the product colour (Verifi 7.29, Match 8.34).
+  const whiteOnColor = whiteContrast(product.color) >= 4.5;
+  const useDeep = !whiteOnColor && whiteContrast(product.colorDeep) >= 4.5;
+  const light = !whiteOnColor && !useDeep;
   return (
     <div
       style={productStyle(product)}
-      className={cn("flex flex-col overflow-hidden rounded-media bg-product shadow-stage", light ? "text-ink" : "text-white", className)}
+      className={cn(
+        "flex flex-col overflow-hidden rounded-media shadow-stage",
+        useDeep ? "bg-product-deep" : "bg-product",
+        light ? "text-ink" : "text-white",
+        className,
+      )}
     >
       <div className="flex items-center justify-between gap-4 px-6 pt-6">
         <span className="inline-flex items-center gap-3">
           <ProductGlyph slug={product.slug} size={44} />
           <span className="flex flex-col leading-none">
-            <span className="text-[11px] font-semibold opacity-70">Praszo</span>
+            <span className="text-[11px] font-semibold">Praszo</span>
             <span className="mt-1 text-xl font-bold tracking-[-0.02em]">{product.name}</span>
           </span>
         </span>
-        <Badge className={cn("hidden border-transparent sm:inline-flex", light ? "bg-black/10 text-ink" : "bg-white/15 text-white")}>
+        <Badge className={cn("hidden border-transparent sm:inline-flex", light ? "bg-black/10 text-ink" : "bg-black/15 text-white")}>
           {product.category}
         </Badge>
       </div>
-      <p className="px-6 pt-4 pb-5 text-[15px] leading-relaxed opacity-90">{product.tagline}</p>
+      <p className="px-6 pt-4 pb-5 text-[15px] leading-relaxed">{product.tagline}</p>
       <div className="relative min-h-[14rem] flex-1 overflow-hidden bg-black/10 px-6 pt-5">
         <div className={cn("absolute inset-x-6 top-5 bottom-0 overflow-hidden rounded-t-xl text-ink", visual.kind === "image" && "bg-white shadow-float")}>
           {visual.kind === "image" ? (
@@ -78,20 +86,22 @@ export function ProductEcosystem() {
 
   useScene(rootRef, {
     count,
-    onUpdate: (_progress, t, index) => {
+    onUpdate: (_progress, t, index, set) => {
       const stage = stageRef.current;
       if (!stage) return;
-      applySceneItems(stage, t, index, 0.6, 24);
+      applySceneItems(stage, t, index, 0.6, 24, set);
       stage.querySelectorAll<HTMLElement>("[data-scene-card]").forEach((card, cardIndex) => {
         const d = cardIndex - t;
         const opacity = stepOpacity(t, cardIndex, 0.9);
-        gsap.set(card, {
-          opacity,
-          x: d * 70,
-          rotate: d * 7,
-          scale: 1 - Math.min(Math.abs(d), 1) * 0.1,
+        // Parked cards (out of view) are written once, then left alone.
+        const hidden = opacity < 0.03;
+        set(card, {
+          opacity: hidden ? 0 : opacity,
+          x: hidden ? 0 : d * 70,
+          rotate: hidden ? 0 : d * 7,
+          scale: hidden ? 0.9 : 1 - Math.min(Math.abs(d), 1) * 0.1,
           zIndex: 10 - Math.round(Math.abs(d)),
-          visibility: opacity < 0.03 ? "hidden" : "visible",
+          visibility: hidden ? "hidden" : "visible",
         });
       });
     },

@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState, type CSSProperties } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 
 import { MockupThemeProvider } from "@/components/mockups/mockup-theme";
 import { productShowcases } from "@/components/mockups/product-showcases";
+import { useOnScreen } from "@/components/motion/use-on-screen";
 import { ProductIconNav } from "@/components/ui/product-icon-nav";
 import { ProductLockup } from "@/components/ui/product-lockup";
 import { productList, type ProductSlug } from "@/data/products";
@@ -15,23 +16,26 @@ const DWELL = 7000;
 /**
  * Hero visual: the five product mockups stacked in one frame that fills the
  * height it is given. They rotate on a timer; hovering or focusing a product
- * icon shows that product and holds. Only the visible mockup animates.
+ * icon shows that product and holds. Only the visible mockup animates, and
+ * nothing animates (or rotates) while the hero is scrolled out of view.
  */
 export function HeroShowcase() {
   const [index, setIndex] = useState(0);
   const [hovered, setHovered] = useState<ProductSlug | null>(null);
   const current = hovered ? productList.findIndex((product) => product.slug === hovered) : index;
   const product = productList[current];
+  const frameRef = useRef<HTMLDivElement | null>(null);
+  const onScreen = useOnScreen(frameRef);
 
   useEffect(() => {
-    if (hovered || prefersReducedMotion()) return;
+    if (hovered || !onScreen || prefersReducedMotion()) return;
     const timer = window.setInterval(() => setIndex((value) => (value + 1) % productList.length), DWELL);
     return () => window.clearInterval(timer);
-  }, [hovered]);
+  }, [hovered, onScreen]);
 
   return (
     <div className="grid h-full min-h-0 grid-cols-[minmax(0,1fr)] grid-rows-[minmax(0,1fr)_auto] gap-3">
-      <div className="fit-box fit-box-end">
+      <div ref={frameRef} className="fit-box fit-box-end">
         <MockupThemeProvider>
           {(theme) => (
             <figure className="fit-frame" data-theme={theme} data-theme-local>
@@ -49,7 +53,7 @@ export function HeroShowcase() {
                       active ? "scale-100 opacity-100" : "pointer-events-none scale-[0.985] opacity-0",
                     )}
                   >
-                    <Showcase paused={!active} className="h-full" />
+                    <Showcase paused={!active || !onScreen} className="h-full" />
                   </div>
                 );
               })}

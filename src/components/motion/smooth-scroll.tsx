@@ -6,13 +6,54 @@ import { useEffect } from "react";
 
 import { gsap, ScrollTrigger } from "@/components/motion/gsap";
 import { ANCHOR_OFFSET } from "@/lib/motion";
+import { onSplashDone, splashActive } from "@/lib/splash";
 
 import "lenis/dist/lenis.css";
 
 let lenisInstance: Lenis | null = null;
 
+/**
+ * QA hook, compiled in only when the build sets NEXT_PUBLIC_QA_HOOKS=1 (the
+ * condition is inlined at build time, so normal builds drop this code). Lets
+ * headless browser checks count ScrollTriggers and Lenis instances.
+ */
+const qa =
+  process.env.NEXT_PUBLIC_QA_HOOKS === "1" && typeof window !== "undefined"
+    ? ((window as unknown as { __praszoQA?: Record<string, unknown> }).__praszoQA ??= {
+        gsap,
+        ScrollTrigger,
+        getLenis: () => lenisInstance,
+        lenisCreated: 0,
+        lenisDestroyed: 0,
+      })
+    : null;
+
 export function getLenis() {
   return lenisInstance;
+}
+
+/**
+ * Reasons currently holding smooth scrolling (the splash, an open menu…).
+ * Lenis is stopped while any hold is active, so one owner releasing its hold
+ * can never restart scrolling another owner still needs stopped.
+ */
+const scrollHolds = new Set<string>();
+
+function applyScrollHolds() {
+  if (!lenisInstance) return;
+  if (scrollHolds.size > 0) lenisInstance.stop();
+  else lenisInstance.start();
+}
+
+/** Stop smooth scrolling until `releaseScroll(reason)` is called. */
+export function holdScroll(reason: string) {
+  scrollHolds.add(reason);
+  applyScrollHolds();
+}
+
+/** Release a hold; a no-op if `reason` was not holding. */
+export function releaseScroll(reason: string) {
+  if (scrollHolds.delete(reason)) applyScrollHolds();
 }
 
 /**
@@ -57,7 +98,17 @@ export function SmoothScroll() {
     });
 
     lenisInstance = lenis;
+    if (qa) qa.lenisCreated = (qa.lenisCreated as number) + 1;
     lenis.on("scroll", ScrollTrigger.update);
+
+    // The first-load splash covers the page: hold smooth scrolling until it releases the site,
+    // otherwise wheel input during the splash would scroll the page underneath it.
+    let stopWaiting = () => {};
+    if (splashActive()) {
+      scrollHolds.add("splash");
+      stopWaiting = onSplashDone(() => releaseScroll("splash"));
+    }
+    applyScrollHolds();
 
     const onTick = (time: number) => {
       lenis.raf(time * 1000);
@@ -65,20 +116,16 @@ export function SmoothScroll() {
     gsap.ticker.add(onTick);
     gsap.ticker.lagSmoothing(0);
 
-    const onStop = () => lenis.stop();
-    const onStart = () => lenis.start();
     const onLoad = () => ScrollTrigger.refresh();
-    window.addEventListener("lenis:stop", onStop);
-    window.addEventListener("lenis:start", onStart);
     window.addEventListener("load", onLoad);
 
     return () => {
-      window.removeEventListener("lenis:stop", onStop);
-      window.removeEventListener("lenis:start", onStart);
+      stopWaiting();
       window.removeEventListener("load", onLoad);
       gsap.ticker.remove(onTick);
       lenis.destroy();
       lenisInstance = null;
+      if (qa) qa.lenisDestroyed = (qa.lenisDestroyed as number) + 1;
     };
   }, []);
 

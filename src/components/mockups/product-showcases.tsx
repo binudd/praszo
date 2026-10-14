@@ -16,6 +16,3 @@ export const productShowcases: Record<ProductSlug, { component: ComponentType<Mo
   modifi: { component: ModifiFlow, label: "Engagement letter lifecycle" },
   docs: { component: DocsPipeline, label: "Document pipeline" },
 };
-
-/** Shared frame sizing: taller on phones, 720:520 from the small breakpoint up. */
-export const showcaseAspect = "aspect-[4/5] sm:aspect-[720/520]";

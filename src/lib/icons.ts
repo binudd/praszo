@@ -164,7 +164,3 @@ export const icons = {
 } satisfies Record<string, LucideIcon>;
 
 export type IconName = keyof typeof icons;
-
-export function getIcon(name: IconName): LucideIcon {
-  return icons[name];
-}

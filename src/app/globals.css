@@ -48,7 +48,10 @@
     color: var(--ink);
     scroll-padding-top: 6rem;
     overflow-x: clip;
-    transition: background-color 0.6s ease, color 0.6s ease;
+    /* Only the page background crossfades between scenes. Transitioning `color` here (or on body)
+       made every descendant re-resolve its inherited colour each frame for 0.6s on every theme
+       flip (~800ms of style work per flip on the homepage). Text switches with the tokens. */
+    transition: background-color 0.6s ease;
   }
 
   body {
@@ -59,7 +62,6 @@
     font-weight: 500;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
-    transition: color 0.6s ease;
   }
 
   [data-theme="dark"] body,

@@ -1,5 +1,7 @@
 # Praszo corporate website
 
+> Full implementation guide for agents and developers (packages, motion architecture, every section and its animation, rules, QA, audit findings): [`docs/implementation-guide.md`](docs/implementation-guide.md).
+
 Marketing site for [Praszo](https://praszo.com) — on-premise practice management tools for audit firms — built with Next.js 16 (App Router, Cache Components), React 19, Tailwind CSS v4, GSAP + ScrollTrigger, Lenis and `motion/react`.
 
 ## Routes

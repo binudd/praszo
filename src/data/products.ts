@@ -697,7 +697,8 @@ const modifi: Product = {
       kind: "image",
       src: modifiHub,
       alt: "Praszo Modifi document hub listing engagement documents with approvers, dates, and statuses such as in progress, completed, and pending review",
-      frame: "none",
+      // Cropped to the app area (no browser chrome), so the site's WindowFrame supplies it.
+      frame: "browser",
     },
   },
   spotlights: [

@@ -89,6 +89,10 @@ export function HorizontalScroll({
             end: () => `+=${distance()}`,
             pin: true,
             pinSpacing: true,
+            // Pin with a transform rather than position: fixed. The fixed/static swap at pin start
+            // and end registered as a layout shift (CLS ~2 per rail). Lenis drives ScrollTrigger on
+            // the same tick, so the transform stays in sync with the scroll.
+            pinType: "transform",
             // No scrub lag: Lenis already smooths the scroll, and lag would keep the
             // track sliding after the pin releases.
             scrub: true,

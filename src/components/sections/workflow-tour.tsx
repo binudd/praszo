@@ -5,7 +5,7 @@ import { useRef } from "react";
 import { WorkflowCanvas } from "@/components/mockups/workflow-canvas";
 import { gsap, ScrollTrigger, useGSAP } from "@/components/motion/gsap";
 import { scrollToTarget } from "@/components/motion/smooth-scroll";
-import { stepOpacity } from "@/components/motion/use-scene";
+import { createSceneSetter, stepOpacity } from "@/components/motion/use-scene";
 import { Badge } from "@/components/ui/badge";
 import { Container } from "@/components/ui/container";
 import { Eyebrow } from "@/components/ui/eyebrow";
@@ -84,27 +84,31 @@ export function WorkflowTour() {
             ? gsap.to(dot, { motionPath: { path, align: path, alignOrigin: [0.5, 0.5] }, duration: 1, ease: "none", paused: true })
             : null;
 
+        // Change-only writes: parked layers, copies and chips are not rewritten every frame.
+        const set = createSceneSetter();
         const apply = (progress: number) => {
           const t = progress * (STEP_COUNT - 1);
           const index = Math.round(t);
-          layers.forEach((layer, layerIndex) => gsap.set(layer, { opacity: stepOpacity(t, layerIndex, 0.85) }));
+          layers.forEach((layer, layerIndex) => set(layer, { opacity: stepOpacity(t, layerIndex, 0.85) }));
           copies.forEach((copy, copyIndex) => {
             const opacity = stepOpacity(t, copyIndex, 0.62);
-            gsap.set(copy, { opacity, y: (copyIndex - t) * 28, visibility: opacity < 0.05 ? "hidden" : "visible", zIndex: copyIndex === index ? 2 : 1 });
+            const hidden = opacity < 0.05;
+            set(copy, { opacity: hidden ? 0 : opacity, y: hidden ? 0 : (copyIndex - t) * 28, visibility: hidden ? "hidden" : "visible", zIndex: copyIndex === index ? 2 : 1 });
           });
           chips.forEach((chip, chipIndex) => {
             const opacity = stepOpacity(t, chipIndex, 0.5);
-            gsap.set(chip, { opacity, y: (chipIndex - t) * 12, visibility: opacity < 0.05 ? "hidden" : "visible" });
+            const hidden = opacity < 0.05;
+            set(chip, { opacity: hidden ? 0 : opacity, y: hidden ? 0 : (chipIndex - t) * 12, visibility: hidden ? "hidden" : "visible" });
           });
           tabs.forEach((tab, tabIndex) => {
             tab.classList.toggle("is-current", tabIndex === index);
             tab.classList.toggle("is-done", tabIndex < index);
           });
-          if (progressLine) gsap.set(progressLine, { scaleX: progress });
+          if (progressLine) set(progressLine, { scaleX: progress });
           strokes.forEach((stroke, strokeIndex) => {
             const layerIndex = Number(stroke.closest<SVGGElement>("[data-layer]")?.dataset.layer ?? 0);
             const draw = gsap.utils.clamp(0, 1, 1.4 - Math.abs(t - layerIndex) * 1.6);
-            gsap.set(stroke, { strokeDashoffset: strokeLengths[strokeIndex] * (1 - draw) });
+            set(stroke, { strokeDashoffset: strokeLengths[strokeIndex] * (1 - draw) });
           });
           dotTween?.progress(progress);
         };

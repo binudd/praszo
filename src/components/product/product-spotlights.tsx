@@ -3,7 +3,6 @@
 import { CircleCheck } from "lucide-react";
 import { useRef } from "react";
 
-import { gsap } from "@/components/motion/gsap";
 import { RevealBlock } from "@/components/motion/reveal";
 import { scrollToTarget } from "@/components/motion/smooth-scroll";
 import { applySceneItems, stepOpacity, useScene } from "@/components/motion/use-scene";
@@ -42,17 +41,18 @@ export function ProductSpotlights({ product }: { product: Product }) {
 
   useScene(rootRef, {
     count,
-    onUpdate: (_progress, t, index) => {
+    onUpdate: (_progress, t, index, set) => {
       const stage = stageRef.current;
       if (!stage) return;
-      applySceneItems(stage, t, index, 0.55, 30);
+      applySceneItems(stage, t, index, 0.55, 30, set);
       stage.querySelectorAll<HTMLElement>("[data-scene-card]").forEach((card, cardIndex) => {
         const opacity = stepOpacity(t, cardIndex, 0.55);
-        gsap.set(card, {
-          opacity,
-          y: (cardIndex - t) * 48,
-          scale: 0.94 + 0.06 * opacity,
-          visibility: opacity < 0.03 ? "hidden" : "visible",
+        const hidden = opacity < 0.03;
+        set(card, {
+          opacity: hidden ? 0 : opacity,
+          y: hidden ? 0 : (cardIndex - t) * 48,
+          scale: hidden ? 0.94 : 0.94 + 0.06 * opacity,
+          visibility: hidden ? "hidden" : "visible",
           zIndex: cardIndex === index ? 2 : 1,
         });
       });

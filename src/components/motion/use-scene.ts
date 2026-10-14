@@ -5,11 +5,45 @@ import type { RefObject } from "react";
 import { gsap, ScrollTrigger, useGSAP } from "@/components/motion/gsap";
 import { prefersReducedMotion } from "@/lib/motion";
 
+type SceneValue = number | string;
+/**
+ * Writes only the properties whose value changed since the last write to that
+ * element. Scroll scenes call it every frame for every item; without it, items
+ * that are parked (hidden or fully shown) are rewritten each frame, which
+ * re-invalidates style for their whole subtree.
+ */
+export type SceneSetter = (target: Element, vars: Record<string, SceneValue>) => void;
+
+/** A setter with its own cache. Create one per scene activation so a torn-down scene starts clean. */
+export function createSceneSetter(): SceneSetter {
+  const cache = new WeakMap<Element, Record<string, SceneValue>>();
+  return (target, vars) => {
+    let last = cache.get(target);
+    if (!last) {
+      last = {};
+      cache.set(target, last);
+    }
+    let changed: Record<string, SceneValue> | null = null;
+    for (const key in vars) {
+      const raw = vars[key];
+      const value = typeof raw === "number" ? Math.round(raw * 1000) / 1000 : raw;
+      if (last[key] !== value) {
+        last[key] = value;
+        (changed ??= {})[key] = value;
+      }
+    }
+    if (changed) gsap.set(target, changed);
+  };
+}
+
 type SceneOptions = {
   /** Number of steps the scrubbed track maps onto. */
   count: number;
-  /** Called with scroll progress (0–1) and the fractional step position t (0..count-1). */
-  onUpdate: (progress: number, t: number, index: number) => void;
+  /**
+   * Called with scroll progress (0–1), the fractional step position t (0..count-1), the
+   * nearest step, and a change-only setter scoped to this activation of the scene.
+   */
+  onUpdate: (progress: number, t: number, index: number, set: SceneSetter) => void;
   /** Media query that enables the sticky scene; below it the static stack renders. */
   media?: string;
   scrub?: number;
@@ -34,9 +68,10 @@ export function useScene(rootRef: RefObject<HTMLElement | null>, options: SceneO
         const track = root.querySelector<HTMLElement>("[data-scene-track]");
         if (!track) return;
 
+        const set = createSceneSetter();
         const apply = (progress: number) => {
           const t = progress * (count - 1);
-          onUpdate(progress, t, Math.round(t));
+          onUpdate(progress, t, Math.round(t), set);
         };
 
         const trigger = ScrollTrigger.create({
@@ -65,14 +100,15 @@ export function stepOpacity(t: number, index: number, fade = 0.6) {
   return distance >= fade ? 0 : 1 - distance / fade;
 }
 
-/** Crossfades [data-scene-item] copies and toggles [data-scene-tab] states. */
-export function applySceneItems(stage: HTMLElement, t: number, index: number, fade = 0.6, travel = 28) {
+/** Crossfades [data-scene-item] copies and toggles [data-scene-tab] states. Parked (hidden) items are not rewritten. */
+export function applySceneItems(stage: HTMLElement, t: number, index: number, fade = 0.6, travel = 28, set: SceneSetter = gsap.set) {
   stage.querySelectorAll<HTMLElement>("[data-scene-item]").forEach((item, itemIndex) => {
     const opacity = stepOpacity(t, itemIndex, fade);
-    gsap.set(item, {
-      opacity,
-      y: (itemIndex - t) * travel,
-      visibility: opacity < 0.04 ? "hidden" : "visible",
+    const hidden = opacity < 0.04;
+    set(item, {
+      opacity: hidden ? 0 : opacity,
+      y: hidden ? 0 : (itemIndex - t) * travel,
+      visibility: hidden ? "hidden" : "visible",
       zIndex: itemIndex === index ? 2 : 1,
     });
   });

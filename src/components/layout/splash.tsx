@@ -3,7 +3,6 @@
 import { useEffect, useRef, useState } from "react";
 
 import { gsap } from "@/components/motion/gsap";
-import { getLenis } from "@/components/motion/smooth-scroll";
 import { prefersReducedMotion } from "@/lib/motion";
 import { SPLASH_EVENT, splashActive } from "@/lib/splash";
 
@@ -23,8 +22,28 @@ const MARK = {
 /** Height the mark settles at in the middle of the screen before it moves to the header. */
 const REST_HEIGHT = 96;
 /** Shortest time the coral screen stays up, and the longest it waits for the page to finish loading. */
-const MIN_MS = 900;
+const MIN_MS = 600;
 const MAX_MS = 4000;
+/** Hard ceiling: whatever happens (stalled load, thrown error, lost tween), the site is handed over by then. */
+const WATCHDOG_MS = 7000;
+/** Phase durations (seconds). Contract into the mark, pause, then settle into the header. */
+const CONTRACT = 1.05;
+const SETTLE = 0.7;
+
+/**
+ * React Strict Mode (development) mounts, unmounts and remounts effects. The
+ * unmount must not end the splash, so a real unmount finalises only if no
+ * remount follows within a tick.
+ */
+let finalizeTimer: ReturnType<typeof setTimeout> | undefined;
+
+/** Hands the page over: interactive, scroll unlocked (SmoothScroll listens), hero entrance released. */
+function releaseSite(state: "landing" | "done") {
+  const root = document.documentElement;
+  const wasLocked = root.dataset.splash === "on";
+  root.dataset.splash = state;
+  if (wasLocked) window.dispatchEvent(new Event(SPLASH_EVENT));
+}
 
 const pageLoaded = () =>
   new Promise<void>((resolve) => {
@@ -45,8 +64,9 @@ function headerMark() {
  * itself, scaled up around a point inside its solid wedge so it covers the
  * viewport. Once the page has loaded, the coral contracts into the mark
  * (revealing the site around it), then the mark settles into the header logo
- * and hands over to it. One vector shape, transformed by GSAP; Lenis is paused
- * until the site starts. Under reduced motion the coral screen simply fades.
+ * and hands over to it. One vector shape, transformed by GSAP. SmoothScroll
+ * keeps Lenis stopped until the splash releases the site (SPLASH_EVENT). Under
+ * reduced motion the coral screen fades as soon as fonts are ready.
  */
 export function Splash() {
   const svgRef = useRef<SVGSVGElement | null>(null);
@@ -57,20 +77,21 @@ export function Splash() {
     const svg = svgRef.current;
     const group = groupRef.current;
     if (!svg || !group) return;
+    clearTimeout(finalizeTimer);
     if (!splashActive()) {
       const frame = requestAnimationFrame(() => setGone(true));
       return () => cancelAnimationFrame(frame);
     }
 
     const root = document.documentElement;
-    const lenis = getLenis();
-    lenis?.stop();
+    const reduced = prefersReducedMotion();
     let cancelled = false;
-    let started = false;
+    let timeline: gsap.core.Timeline | null = null;
 
     const vw = window.innerWidth;
     const vh = window.innerHeight;
     svg.setAttribute("viewBox", `0 0 ${vw} ${vh}`);
+    gsap.set(svg, { opacity: 1 });
 
     // The mark is placed by: screen point (x, y) shows mark point (fx, fy) at scale s.
     const state = {
@@ -85,34 +106,27 @@ export function Splash() {
     };
     render();
 
-    const startSite = () => {
-      if (started) return;
-      started = true;
-      // Pointer events pass through from here, and the hero entrance plays under the landing mark.
-      root.dataset.splash = "landing";
-      lenis?.start();
-      window.dispatchEvent(new Event(SPLASH_EVENT));
-    };
     const finish = () => {
       if (cancelled) return;
-      startSite();
-      root.dataset.splash = "done";
+      releaseSite("done");
       setGone(true);
     };
 
     const outro = () => {
       if (cancelled) return;
-      if (prefersReducedMotion()) {
-        startSite();
-        gsap.to(svg, { opacity: 0, duration: 0.4, ease: "power1.out", onComplete: finish });
+      if (reduced) {
+        releaseSite("landing");
+        timeline = gsap.timeline({ onComplete: finish }).to(svg, { opacity: 0, duration: 0.25, ease: "power1.out" });
         return;
       }
       const target = headerMark()?.getBoundingClientRect();
       const rest = REST_HEIGHT / MARK.height;
       const tl = gsap.timeline({ onUpdate: render, onComplete: finish });
+      timeline = tl;
       // 1. The coral screen contracts into the mark, centered.
-      tl.to(state, { s: rest, fx: MARK.center.x, fy: MARK.center.y, duration: 1.25, ease: "expo.inOut" })
-        .add(startSite, "-=0.35")
+      tl.to(state, { s: rest, fx: MARK.center.x, fy: MARK.center.y, duration: CONTRACT, ease: "expo.inOut" })
+        // The site becomes interactive (and the hero entrance starts) while the mark is still shrinking.
+        .add(() => releaseSite("landing"), "-=0.35")
         // 2. The mark settles into the header logo (or bows out where there is none).
         .to(
           state,
@@ -121,13 +135,13 @@ export function Splash() {
                 x: target.left + target.width / 2,
                 y: target.top + target.height / 2,
                 s: target.height / MARK.height,
-                duration: 0.85,
+                duration: SETTLE,
                 ease: "power3.inOut",
               }
-            : { s: rest * 0.6, duration: 0.5, ease: "power2.in" },
-          "+=0.12",
+            : { s: rest * 0.6, duration: 0.45, ease: "power2.in" },
+          "+=0.06",
         );
-      if (!target) tl.to(svg, { opacity: 0, duration: 0.3 }, "<0.2");
+      if (!target) tl.to(svg, { opacity: 0, duration: 0.3 }, "<0.15");
       // 3. The real logo takes over underneath, then the copy fades.
       else
         tl.add(() => {
@@ -136,18 +150,27 @@ export function Splash() {
     };
 
     const begin = performance.now();
-    const ready = Promise.race([Promise.all([pageLoaded(), document.fonts?.ready]), new Promise((resolve) => setTimeout(resolve, MAX_MS))]);
+    // Reduced motion only waits for fonts (no choreography to protect); otherwise wait for the full load.
+    const loaded = reduced ? Promise.resolve(document.fonts?.ready) : Promise.all([pageLoaded(), document.fonts?.ready]);
+    const ready = Promise.race([loaded, new Promise((resolve) => setTimeout(resolve, MAX_MS))]);
+    let outroTimer: ReturnType<typeof setTimeout> | undefined;
     void ready.then(() => {
-      gsap.delayedCall(Math.max(0, MIN_MS - (performance.now() - begin)) / 1000, outro);
+      if (cancelled) return;
+      const wait = reduced ? 0 : Math.max(0, MIN_MS - (performance.now() - begin));
+      outroTimer = setTimeout(outro, wait);
     });
+    const watchdog = setTimeout(finish, WATCHDOG_MS);
 
     return () => {
       cancelled = true;
+      clearTimeout(watchdog);
+      clearTimeout(outroTimer);
+      timeline?.kill();
       gsap.killTweensOf([state, svg]);
-      if (root.dataset.splash !== "done") {
-        startSite();
-        root.dataset.splash = "done";
-      }
+      // Strict Mode remounts immediately and clears this; a real unmount releases the site.
+      finalizeTimer = setTimeout(() => {
+        if (root.dataset.splash !== "done") releaseSite("done");
+      }, 50);
     };
   }, []);
 

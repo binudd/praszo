@@ -3,7 +3,6 @@
 import { ArrowUpRight } from "lucide-react";
 import { useRef } from "react";
 
-import { gsap } from "@/components/motion/gsap";
 import { scrollToTarget } from "@/components/motion/smooth-scroll";
 import { useScene } from "@/components/motion/use-scene";
 import { FirmCutout } from "@/components/illustrations/firm-cutout";
@@ -96,7 +95,7 @@ export function Segments() {
 
   useScene(rootRef, {
     count,
-    onUpdate: (progress) => {
+    onUpdate: (progress, _t, _index, set) => {
       const stage = stageRef.current;
       if (!stage) return;
       // Hold each step for most of its slice; move through the switch window around each boundary.
@@ -112,7 +111,7 @@ export function Segments() {
         // d > 0: being left behind (moves up and left); d < 0: arriving (comes from below and the right).
         const leaving = d > 0;
         const dir = leaving ? -1 : 1;
-        gsap.set(item, { visibility: visible ? "visible" : "hidden", zIndex: i === index ? 2 : 1, pointerEvents: i === index ? "auto" : "none" });
+        set(item, { visibility: visible ? "visible" : "hidden", zIndex: i === index ? 2 : 1, pointerEvents: i === index ? "auto" : "none" });
         if (!visible) return;
 
         const parts = item.querySelectorAll<HTMLElement>("[data-seg-part]");
@@ -121,15 +120,15 @@ export function Segments() {
         if (icon) {
           const e = away(s, 0, parts.length + 1, leaving);
           // The cutout pops like a paper piece: drops, shrinks and tilts slightly from its base.
-          gsap.set(icon, { opacity: 1 - e, scale: 1 - e * 0.25, y: dir * e * 36, rotate: dir * e * 6 });
+          set(icon, { opacity: 1 - e, scale: 1 - e * 0.25, y: dir * e * 36, rotate: dir * e * 6 });
         }
         parts.forEach((el, k) => {
           const e = away(s, k + 1, parts.length + 1, leaving);
-          gsap.set(el, { opacity: 1 - e, y: dir * e * 42 });
+          set(el, { opacity: 1 - e, y: dir * e * 42 });
         });
         points.forEach((el, k) => {
           const e = away(s, k, points.length, leaving);
-          gsap.set(el, { opacity: 1 - e, x: dir * e * 64 });
+          set(el, { opacity: 1 - e, x: dir * e * 64 });
         });
       });
 
@@ -139,7 +138,7 @@ export function Segments() {
         else tab.removeAttribute("aria-current");
       });
       const bar = stage.querySelector<HTMLElement>("[data-seg-progress]");
-      if (bar) gsap.set(bar, { scaleX: progress });
+      if (bar) set(bar, { scaleX: progress });
     },
   });
 

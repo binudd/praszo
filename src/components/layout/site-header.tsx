@@ -21,7 +21,7 @@ const homeSectionIds = primaryNav
   .filter((item) => item.href.startsWith("/#"))
   .map((item) => item.href.slice(2));
 
-export function productForPath(pathname: string): Product | undefined {
+function productForPath(pathname: string): Product | undefined {
   return productList.find((product) => pathname === `/${product.slug}`);
 }
 

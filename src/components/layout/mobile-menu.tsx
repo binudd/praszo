@@ -6,7 +6,7 @@ import { Menu, Phone, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, type CSSProperties } from "react";
 
-import { findVisible, scrollToTarget } from "@/components/motion/smooth-scroll";
+import { findVisible, holdScroll, releaseScroll, scrollToTarget } from "@/components/motion/smooth-scroll";
 import { Button } from "@/components/ui/button";
 import { BrandMark, Logo } from "@/components/ui/logo";
 import { ProductGlyph } from "@/components/ui/product-glyph";
@@ -21,8 +21,12 @@ const rowLink = "block rounded-xl py-2.5 text-[15px] font-semibold text-ink tran
 export function MobileMenu({ product }: { product?: Product }) {
   const [open, setOpen] = useState(false);
 
+  // Hold smooth scrolling while the sheet is open. Releasing on close (or unmount) only drops
+  // this menu's own hold, so it can never restart scrolling the splash is still holding.
   useEffect(() => {
-    window.dispatchEvent(new Event(open ? "lenis:stop" : "lenis:start"));
+    if (!open) return;
+    holdScroll("mobile-menu");
+    return () => releaseScroll("mobile-menu");
   }, [open]);
 
   const jumpTo = (id: string) => {
