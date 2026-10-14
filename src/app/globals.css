@@ -635,7 +635,7 @@ details[open] .faq-chevron {
 
 @media (min-width: 768px) {
   .screen-rail {
-    --screen-h: min(32rem, calc(100svh - 28rem), calc(86vw / 2.1));
+    --screen-h: min(32rem, calc(100svh - 29rem), calc(86vw / 2.1));
   }
 }
 
