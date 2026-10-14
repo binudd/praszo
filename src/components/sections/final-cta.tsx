@@ -26,7 +26,7 @@ export function FinalCta({ title, subtitle, body, bullets, tone = "brand" }: Pro
         <RevealBlock>
           <p className="lede mx-auto mt-7 max-w-2xl">{body}</p>
           {bullets?.length ? (
-            <ul className="mt-7 flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm font-semibold text-ink-2">
+            <ul className="label mt-7 flex flex-wrap justify-center gap-x-6 gap-y-2 text-ink-2">
               {bullets.map((bullet) => (
                 <li key={bullet} className="inline-flex items-center gap-2">
                   <CircleCheck size={16} className="text-brand" aria-hidden /> {bullet}
@@ -39,7 +39,7 @@ export function FinalCta({ title, subtitle, body, bullets, tone = "brand" }: Pro
               {demoCta.label}
               <ArrowRight size={18} aria-hidden />
             </Button>
-            <a href={company.phone.href} className="inline-flex items-center gap-2 text-sm font-semibold text-ink-2 hover:text-ink">
+            <a href={company.phone.href} className="label inline-flex items-center gap-2 text-ink-2 hover:text-ink">
               <Phone size={16} aria-hidden /> {company.phone.display}
             </a>
           </div>

@@ -151,6 +151,14 @@
     color: var(--ink-2);
   }
 
+  /* Item titles in rails, lists and dense grids: the tier below .display-sm. */
+  .heading {
+    font-size: clamp(1.2rem, 1rem + 0.55vw, 1.5rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    font-weight: 600;
+  }
+
   /* Running text: the tier below .lede, for multi-sentence bodies and lists. */
   .copy {
     font-size: clamp(1rem, 0.85rem + 0.35vw, 1.125rem);
@@ -553,6 +561,14 @@ details[open] .faq-chevron {
 .hscroll.is-pinned .hscroll-stage {
   min-height: 100svh;
   padding-block: 4.5rem 2.5rem;
+}
+
+/* Short laptop screens: tighten the pinned stage so header + rail fit in one viewport. */
+@media (max-height: 820px) {
+  .hscroll.is-pinned .hscroll-stage {
+    padding-block: 3.5rem 1.5rem;
+    gap: 1.5rem;
+  }
 }
 
 .hscroll-header {

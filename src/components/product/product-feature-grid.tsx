@@ -2,66 +2,29 @@ import { HorizontalCard, HorizontalScroll } from "@/components/motion/horizontal
 import { RevealGroup, RevealHeading } from "@/components/motion/reveal";
 import { Container } from "@/components/ui/container";
 import { Eyebrow } from "@/components/ui/eyebrow";
-import { Icon } from "@/components/ui/icon";
+import { EditorialItem } from "@/components/ui/editorial-item";
 import type { FeatureGroup, FeatureSection, Product } from "@/data/products";
 
 function RailCard({ item, index }: { item: FeatureGroup["items"][number]; index: number }) {
   return (
-    <HorizontalCard className="flex min-h-[19rem] w-[min(19rem,80vw)] flex-col rounded-card border border-line bg-surface p-5 transition-colors duration-500 hover:bg-elevated md:w-[21rem]">
-      <div className="flex h-28 items-center justify-center rounded-sm bg-elevated text-product">
-        <Icon name={item.icon} size={38} strokeWidth={1.5} aria-hidden />
-      </div>
-      <p className="label mt-5 text-ink-3">{String(index + 1).padStart(2, "0")}</p>
-      <h3 className="mt-1.5 text-lg text-ink">{item.name}</h3>
-      {item.description ? <p className="mt-2 text-[14.5px] leading-relaxed text-ink-2">{item.description}</p> : null}
+    <HorizontalCard className="w-[min(18rem,76vw)] md:w-[20rem]">
+      <EditorialItem as="div" index={index} icon={item.icon} tone="product" title={item.name} body={item.description} />
     </HorizontalCard>
   );
 }
 
-function CompactItem({ item }: { item: FeatureGroup["items"][number] }) {
-  return (
-    <li data-reveal className="flex items-center gap-3 rounded-sm border border-line bg-bg px-4 py-3 text-[15px] font-semibold text-ink">
-      <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-product-soft text-product-deep">
-        <Icon name={item.icon} size={16} aria-hidden />
-      </span>
-      <span>
-        {item.name}
-        {item.description ? <span className="block text-[13px] font-medium text-ink-3">{item.description}</span> : null}
-      </span>
-    </li>
-  );
-}
-
 function GroupBlock({ group, index }: { group: FeatureGroup; index: number }) {
-  const compact = group.items.every((item) => !item.description || item.description.length < 40);
   return (
-    <RevealGroup className="grid gap-6 border-t border-line py-12 lg:grid-cols-[minmax(0,0.6fr)_minmax(0,1.4fr)] lg:gap-14">
+    <RevealGroup className="grid gap-8 border-t border-line-strong py-12 lg:grid-cols-[minmax(0,0.6fr)_minmax(0,1.4fr)] lg:gap-14">
       <div data-reveal>
         <p className="label text-ink-3">{String(index + 1).padStart(2, "0")}</p>
-        <span className="mt-4 inline-flex h-12 w-12 items-center justify-center rounded-sm bg-product-soft text-product-deep">
-          <Icon name={group.icon} size={24} aria-hidden />
-        </span>
         <h3 className="display-sm mt-5 text-ink">{group.title}</h3>
-        {group.description ? <p className="mt-3 max-w-sm text-[15.5px] leading-relaxed text-ink-2">{group.description}</p> : null}
+        {group.description ? <p className="copy mt-3 max-w-sm">{group.description}</p> : null}
       </div>
-      <ul className="grid gap-3 sm:grid-cols-2">
-        {group.items.map((item) =>
-          compact ? (
-            <CompactItem key={item.name} item={item} />
-          ) : (
-            <li
-              key={item.name}
-              data-reveal
-              className="rounded-card border border-line bg-bg p-6 shadow-card transition-[transform,box-shadow,border-color] duration-300 hover:-translate-y-0.5 hover:border-product/40 hover:shadow-float"
-            >
-              <span className="inline-flex h-10 w-10 items-center justify-center rounded-lg bg-product-soft text-product-deep">
-                <Icon name={item.icon} size={20} aria-hidden />
-              </span>
-              <h4 className="mt-5 text-[17px] text-ink">{item.name}</h4>
-              <p className="mt-2 text-[14.5px] leading-relaxed text-ink-2">{item.description}</p>
-            </li>
-          ),
-        )}
+      <ul className="grid gap-x-8 gap-y-8 sm:grid-cols-2">
+        {group.items.map((item) => (
+          <EditorialItem key={item.name} as="li" reveal icon={item.icon} tone="product" titleAs="h4" title={item.name} body={item.description} />
+        ))}
       </ul>
     </RevealGroup>
   );

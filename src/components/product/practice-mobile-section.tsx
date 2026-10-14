@@ -29,7 +29,7 @@ export function PracticeMobileSection() {
             </p>
             <ul className="mt-6 flex flex-wrap gap-x-8 gap-y-3">
               {bullets.map((bullet) => (
-                <li key={bullet} className="inline-flex items-center gap-2 text-[15px] font-semibold text-ink">
+                <li key={bullet} className="copy inline-flex items-center gap-2 font-semibold text-ink">
                   <CircleCheck size={18} className="text-product-deep" aria-hidden /> {bullet}
                 </li>
               ))}

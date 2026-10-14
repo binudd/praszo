@@ -22,7 +22,7 @@ function SpotlightCopy({ spotlight }: { spotlight: Spotlight }) {
       {spotlight.bullets?.length ? (
         <ul className="mt-6 space-y-2.5">
           {spotlight.bullets.map((bullet) => (
-            <li key={bullet} className="flex items-start gap-2.5 text-[15px] font-semibold text-ink">
+            <li key={bullet} className="copy flex items-start gap-2.5 font-semibold text-ink">
               <CircleCheck size={18} className="mt-0.5 shrink-0 text-product-deep" aria-hidden />
               {bullet}
             </li>

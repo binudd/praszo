@@ -50,8 +50,8 @@ function ScreenCard({ screen, index }: { screen: Screen; index: number }) {
       <div className="mt-4 flex gap-3 pr-4">
         <span className="label mt-0.5 shrink-0 text-ink-3">{String(index + 1).padStart(2, "0")}</span>
         <span className="min-w-0">
-          <span className="block text-[15px] font-semibold text-ink">{screen.title}</span>
-          <span className="mt-0.5 line-clamp-2 text-[13.5px] leading-snug text-ink-3">{visual.alt}</span>
+          <span className="heading block text-ink">{screen.title}</span>
+          <span className="copy mt-1 line-clamp-2 text-ink-3">{visual.alt}</span>
         </span>
       </div>
     </HorizontalCard>
@@ -78,7 +78,7 @@ export function ProductPreview({ product }: { product: Product }) {
           <ClipReveal className="mt-10">
             <ProductVisual visual={product.hero.visual} sizes="(min-width: 1024px) 86rem, 100vw" className="shadow-stage" />
           </ClipReveal>
-          <p className="mt-4 text-center text-sm text-ink-3">{product.hero.visual.alt}</p>
+          <p className="copy mt-4 text-center text-ink-3">{product.hero.visual.alt}</p>
         </Container>
       </section>
     );

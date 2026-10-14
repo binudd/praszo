@@ -40,10 +40,10 @@ export function FaqSection({ id, eyebrow = "FAQs", title, description, items, to
             titleId={`${id}-title`}
             className="lg:sticky lg:top-28 lg:self-start"
           />
-          <div className="divide-y divide-line border-y border-line">
+          <div className="divide-y divide-line-strong border-y border-line-strong">
             {items.map((item) => (
               <details key={item.q} className="group py-6">
-                <summary className="flex cursor-pointer list-none items-start justify-between gap-6 text-left text-lg font-semibold tracking-[-0.01em] text-ink md:text-xl">
+                <summary className="heading flex cursor-pointer list-none items-start justify-between gap-6 text-left text-ink">
                   <span>{item.q}</span>
                   <span
                     className={cn(
@@ -55,7 +55,7 @@ export function FaqSection({ id, eyebrow = "FAQs", title, description, items, to
                     <Plus size={16} />
                   </span>
                 </summary>
-                <p className="mt-4 max-w-2xl pr-14 text-[15.5px] leading-relaxed text-ink-2 md:text-base">{item.a}</p>
+                <p className="copy mt-4 max-w-2xl pr-14">{item.a}</p>
               </details>
             ))}
           </div>
