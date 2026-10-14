@@ -1,5 +1,6 @@
 import ashanAmeer from "@/assets/team/ashan-ameer.jpg";
 import manuGeorgeMicheal from "@/assets/team/manu-george-micheal.jpg";
+import mohammedLabinash from "@/assets/team/mohammed-labinash.jpg";
 import subeesha from "@/assets/team/subeesha.jpg";
 import type { StaticImageData } from "next/image";
 
@@ -8,8 +9,8 @@ import type { FeatureItem, PageHeroContent, PageMeta } from "@/data/pages/types"
 /**
  * About page copy, from praszo.com/about-us/.
  * The page's numeric claims (100%, 99%, 10,000+, Zero) are intentionally left out, like the
- * homepage stats. The photo praszo.com shows for Mohammed Labinash is a theme placeholder
- * (member7.webp), so he is shown with initials until a real portrait is supplied.
+ * homepage stats. Mohammed Labinash's portrait was supplied directly (praszo.com shows a theme
+ * placeholder, member7.webp, for him). TeamGrid still falls back to initials for a member without a photo.
  */
 
 export type TeamMember = { name: string; role: string; photo?: StaticImageData };
@@ -55,7 +56,7 @@ export const about = {
     members: [
       { name: "Manu George Micheal", role: "Director", photo: manuGeorgeMicheal },
       { name: "Ashan Ameer", role: "Product Owner", photo: ashanAmeer },
-      { name: "Mohammed Labinash", role: "Product Engineering Head" },
+      { name: "Mohammed Labinash", role: "Product Engineering Head", photo: mohammedLabinash },
       { name: "Subeesha", role: "Practice Management Consultant", photo: subeesha },
     ] satisfies TeamMember[],
   },

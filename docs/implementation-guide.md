@@ -17,8 +17,13 @@ The corporate site for **Praszo** (praszo.com), an on-premise practice-managemen
 | `/modifi` | Praszo Modifi (engagement letter automation) | `#2874ff` |
 | `/docs` | Praszo Docs (on-premise document management) | `#d72d2d` |
 | `/contact` | Contact and "Book a demo" | Brand coral |
+| `/about` | About Praszo (mission, team, values) | Brand coral |
+| `/large-firms` | Solution: larger audit firms | Brand coral |
+| `/mid-sized-firms` | Solution: mid-sized audit firms | Brand coral |
+| `/insights` | Insights hub (articles list, empty for now) | Brand coral |
+| `/privacy-policy` | Privacy policy | Brand coral |
 
-About, Solutions, Insights and Privacy link out to praszo.com. Every "Book a demo" goes to `/contact` (the header button is the site's persistent one, visible at every width; hero sections show only their secondary action), which offers `tel:` and a pre-filled `mailto:pms@praszo.com`. There is no form backend.
+Every footer link is an internal page; only the social profiles open externally. Every "Book a demo" goes to `/contact` (the header button is the site's persistent one, visible at every width; hero sections show only their secondary action), which offers `tel:` and a pre-filled `mailto:pms@praszo.com`. There is no form backend.
 
 **Content rules (do not break):**
 - All copy comes from praszo.com, typos fixed, meaning unchanged. Everything lives in `src/data/`.
@@ -287,7 +292,15 @@ Every page is wrapped by `ProductPage`, which provides the product color scope, 
 `data/product-sections.ts` lists the in-page menu per product. Its ids must equal the rendered ids above. All currently match.
 
 ### 8.3 Contact (`/contact`)
-Static hero with `mailto:` and `tel:` buttons, three contact cards (`RevealGroup`), and a product quick-link grid. No form.
+`PageHero` with `mailto:` and `tel:` buttons, the three contact items as its aside (`RevealGroup`), and a product quick-link grid. No form.
+
+### 8.4 Company pages (About, solutions, Insights, legal)
+Data-driven and built from one kit in `components/page/`, so new pages need no new layout:
+- **Content** lives in `src/data/pages/` (`about.ts`, `solutions.ts`, `insights.ts`, `legal.ts`, shared shapes in `types.ts`). Copy is from praszo.com only. Left out on purpose: the About stats (100%, 99%, 10,000+, Zero), "Join 500+ partners", the template blog posts on praszo.com/insights-resources, and the theme placeholder photo praszo.com shows for Mohammed Labinash (his real portrait was supplied directly). `TeamGrid` falls back to an initials tile for any member without a photo.
+- **Kit:** `PageHero` (eyebrow, h1 `display-lg` or `display-md`, lede, actions, optional aside, never a demo button), `PageSection` (rule, `SectionHeader`, content; id `<id>`, heading `<id>-title`), `FeatureGrid` (EditorialItems, 2 or 3 columns), `MediaFrame`, `TeamGrid`, `QuoteBlock`, `LegalDocument` (sticky "On this page" index, numbered sections, plain anchors smoothed by Lenis), `ArticleList` (rows, or an empty state while `insights.articles` is empty), `SolutionPage` (a whole solution page from one entry). Pages close with `FinalCta`.
+- **Recipes.** New solution: add an entry to `solutions.ts`, then a route folder with the three-line `page.tsx` and `opengraph-image.tsx` (copy `large-firms/`). New article: push to `insights.articles`. New legal page: add a `LegalDocument` object in `legal.ts` and render it like `privacy-policy/page.tsx`. Then add the path to `routes` in `data/company.ts` (sitemap) and, if it belongs in the footer, to `companyLinks` or `legalLinks`.
+- **Why static folders, not `[slug]`:** `dynamicParams = false` is unavailable with Cache Components, so an unknown slug could not be forced to 404 at build. Folder-per-page keeps every route statically prerendered.
+- **Unique ids:** routes stay mounted, so `TrustedBy` and `FinalCta` take an `id` prop; every page passes its own.
 
 ---
 
