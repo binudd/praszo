@@ -16,7 +16,7 @@ export function ThemeObserver() {
   useEffect(() => {
     const root = document.documentElement;
     const main = findVisible("main") ?? document.body;
-    const scenes = Array.from(main.querySelectorAll<HTMLElement>("[data-theme]"));
+    const scenes = Array.from(main.querySelectorAll<HTMLElement>("[data-theme]:not([data-theme-local])"));
     const apply = () => {
       const middle = window.innerHeight / 2;
       const active = scenes.find((scene) => {

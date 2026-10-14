@@ -1,3 +1,4 @@
+import { MockupThemeProvider } from "@/components/mockups/mockup-theme";
 import { productShowcases } from "@/components/mockups/product-showcases";
 import type { Product } from "@/data/products";
 import { cn } from "@/lib/cn";
@@ -7,12 +8,16 @@ export function ProductShowcase({ product, className }: { product: Product; clas
   const { component: Showcase, label } = productShowcases[product.slug];
   return (
     <div className={cn("fit-box", className)}>
-      <figure className="fit-frame">
-        <Showcase className="absolute inset-0" />
-        <figcaption className="sr-only">
-          Praszo {product.name}: {label}.
-        </figcaption>
-      </figure>
+      <MockupThemeProvider>
+        {(theme) => (
+          <figure className="fit-frame" data-theme={theme} data-theme-local>
+            <Showcase className="absolute inset-0" />
+            <figcaption className="sr-only">
+              Praszo {product.name}: {label}.
+            </figcaption>
+          </figure>
+        )}
+      </MockupThemeProvider>
     </div>
   );
 }

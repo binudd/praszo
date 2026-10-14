@@ -124,7 +124,7 @@ export function MatchEngine({ paused, className }: MockupProps) {
                 <span className="shrink-0 text-[9px] font-bold">
                   <span className="hidden rounded-full bg-elevated px-1.5 py-0.5 text-ink-3 group-data-[state=idle]:inline">…</span>
                   <span className="hidden rounded-full bg-success/12 px-1.5 py-0.5 text-success group-data-[state=match]:inline">Match</span>
-                  <span className="hidden rounded-full bg-bg px-1.5 py-0.5 text-product-deep group-data-[state=partial]:inline">85%</span>
+                  <span className="hidden rounded-full bg-bg px-1.5 py-0.5 text-product-deep dark:text-product group-data-[state=partial]:inline">85%</span>
                 </span>
               </li>
             ))}

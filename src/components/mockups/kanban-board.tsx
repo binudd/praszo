@@ -36,7 +36,7 @@ function Card({ card }: { card: KanbanCard }) {
           ) : null}
         </span>
         {product ? (
-          <span className="shrink-0 rounded-full bg-product-soft px-1.5 py-0.5 text-[8px] font-bold tracking-[0.06em] text-product-deep uppercase">
+          <span className="shrink-0 rounded-full bg-product-soft px-1.5 py-0.5 text-[8px] font-bold tracking-[0.06em] text-product-deep dark:text-product uppercase">
             {product.name}
           </span>
         ) : null}

@@ -52,7 +52,7 @@ export function ProductHero({ product }: { product: Product }) {
           <Eyebrow tone="product" data-hero="eyebrow">
             {product.hero.eyebrow}
           </Eyebrow>
-          <p data-hero="copy" className="lede mt-4 max-w-[34rem] max-lg:line-clamp-5 max-lg:text-[0.98rem] max-lg:leading-snug lg:mt-5">
+          <p data-hero="copy" className="lede mt-4 max-w-[34rem] max-lg:line-clamp-5 lg:line-clamp-4 max-lg:text-[0.98rem] max-lg:leading-snug lg:mt-5">
             {product.hero.description}
           </p>
           <div data-hero="cta" className="mt-5 flex flex-wrap items-center gap-3 lg:mt-7">
@@ -79,7 +79,7 @@ export function ProductHero({ product }: { product: Product }) {
       }
       visual={<ProductShowcase product={product} />}
       title={
-        <h1 id={`${product.slug}-hero-title`} className="display-hero max-w-[16ch] text-ink">
+        <h1 id={`${product.slug}-hero-title`} className="display-hero max-w-[16ch] text-ink lg:max-w-[24ch] lg:text-[min(5.9rem,6.2vw,9.5svh)]">
           <span className="mask-reveal block pb-[0.08em]">
             <span data-hero="headline" className="block">
               <Headline text={product.hero.headline} />

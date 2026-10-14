@@ -119,7 +119,7 @@ export function DocsPipeline({ paused, className }: MockupProps) {
                     <span className="truncate">{file.name}</span>
                   </p>
                   <p className="mt-1.5 hidden flex-wrap gap-1 group-data-[state=tagged]:flex">
-                    <span className="rounded-full bg-product-soft px-1.5 py-0.5 text-[8px] font-bold text-product-deep">{file.type}</span>
+                    <span className="rounded-full bg-product-soft px-1.5 py-0.5 text-[8px] font-bold text-product-deep dark:text-product">{file.type}</span>
                     <span className="rounded-full bg-elevated px-1.5 py-0.5 text-[8px] font-bold text-ink-2">{file.correspondent}</span>
                   </p>
                 </li>
@@ -131,7 +131,7 @@ export function DocsPipeline({ paused, className }: MockupProps) {
             aria-label={data.lanes[1]}
             className="relative flex min-h-0 flex-col overflow-hidden rounded-sm bg-product-soft p-2"
           >
-            <h3 className="label px-1 pb-2 text-[9px] text-product-deep">{data.lanes[1]}</h3>
+            <h3 className="label px-1 pb-2 text-[9px] text-product-deep dark:text-product">{data.lanes[1]}</h3>
             <ul data-items className="relative flex min-h-0 flex-col gap-2" />
             <span
               data-scan

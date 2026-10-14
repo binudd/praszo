@@ -107,7 +107,7 @@ export function VerifiValidator({ paused, className }: MockupProps) {
                   <span className="hidden items-center gap-1 rounded-full bg-elevated px-1.5 py-0.5 text-[9px] font-bold text-ink-3 group-data-[state=pending]:inline-flex">
                     Queued
                   </span>
-                  <span className="hidden items-center gap-1 rounded-full bg-bg px-1.5 py-0.5 text-[9px] font-bold text-product-deep group-data-[state=running]:inline-flex">
+                  <span className="hidden items-center gap-1 rounded-full bg-bg px-1.5 py-0.5 text-[9px] font-bold text-product-deep dark:text-product group-data-[state=running]:inline-flex">
                     <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-product" /> Checking
                   </span>
                   <span className="hidden items-center gap-1 rounded-full bg-success/12 px-1.5 py-0.5 text-[9px] font-bold text-success group-data-[state=pass]:inline-flex">

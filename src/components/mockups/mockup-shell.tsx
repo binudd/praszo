@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+import { MockupThemeToggle } from "@/components/mockups/mockup-theme";
 import { WindowFrame } from "@/components/mockups/window-frame";
 import { cn } from "@/lib/cn";
 
@@ -22,7 +23,7 @@ export function MockupShell({
   className?: string;
 }) {
   return (
-    <WindowFrame title={title} className={cn("h-full shadow-stage", className)}>
+    <WindowFrame title={title} action={<MockupThemeToggle />} className={cn("h-full shadow-none", className)}>
       <div className="flex h-full flex-col bg-elevated">
         {meta.length ? (
           <ul className="flex shrink-0 flex-wrap items-center gap-1.5 px-3 pt-3">

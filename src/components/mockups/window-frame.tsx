@@ -6,10 +6,13 @@ import { cn } from "@/lib/cn";
 export function WindowFrame({
   children,
   title,
+  action,
   className,
 }: {
   children: ReactNode;
   title?: string;
+  /** Control shown at the right end of the window bar (e.g. a theme toggle). */
+  action?: ReactNode;
   className?: string;
 }) {
   return (
@@ -25,6 +28,7 @@ export function WindowFrame({
             {title}
           </span>
         ) : null}
+        {action ? <span className="ml-auto flex items-center">{action}</span> : null}
       </div>
       <div className="min-h-0 flex-1">{children}</div>
     </div>

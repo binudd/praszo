@@ -17,7 +17,7 @@ const count = segments.length;
 /** Share of the scroll used to crossfade between two steps. */
 const SWITCH = 0.1;
 
-function SegmentPanel({ segment, index }: { segment: Segment; index: number }) {
+function SegmentPanel({ segment }: { segment: Segment }) {
   return (
     <div className="grid gap-8 rounded-panel bg-surface p-6 sm:p-10 lg:h-full lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-center lg:gap-14 lg:p-12">
       <div className="flex flex-col">
@@ -37,28 +37,22 @@ function SegmentPanel({ segment, index }: { segment: Segment; index: number }) {
           <ArrowUpRight size={16} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden />
         </a>
       </div>
-      <ol data-points={index} className="flex flex-col gap-1.5">
-        {segment.points.map((text, i) => (
-          <li
-            key={text}
-            data-point
-            className="group flex items-start gap-4 rounded-sm px-4 py-3 transition-[background-color,box-shadow,transform] duration-500 ease-[var(--ease-out)] data-[active]:bg-bg data-[active]:shadow-card lg:data-[active]:translate-x-1"
-          >
-            <span className="label mt-0.5 inline-flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-elevated text-[10px] text-ink-3 transition-colors duration-500 group-data-[active]:bg-brand group-data-[active]:text-brand-ink">
-              {String(i + 1).padStart(2, "0")}
-            </span>
-            <span className="text-[15px] leading-relaxed text-ink-2 transition-colors duration-500 group-data-[active]:text-ink">{text}</span>
+      <ul className="divide-y divide-line">
+        {segment.points.map((text) => (
+          <li key={text} className="flex gap-3 py-3.5 text-[15px] leading-relaxed text-ink-2 first:pt-0 last:pb-0">
+            <span aria-hidden className="mt-[0.6em] h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
+            {text}
           </li>
         ))}
-      </ol>
+      </ul>
     </div>
   );
 }
 
 /**
  * "Who it is for" as a sticky scroll scene, like the product spotlights: the
- * firm-size tabs and panels swap as the visitor scrolls, and within each
- * panel the points highlight one by one. Tabs jump to their step. Below lg,
+ * firm-size tabs and panels swap as the visitor scrolls. Tabs jump to their
+ * step. Below lg,
  * under reduced motion and without JS the panels simply stack.
  */
 export function Segments() {
@@ -75,14 +69,6 @@ export function Segments() {
       for (let k = 1; k < count; k += 1) t += Math.min(1, Math.max(0, (progress - k / count) / SWITCH + 0.5));
       const index = Math.round(t);
       applySceneItems(stage, t, index, 1, 24);
-      stage.querySelectorAll<HTMLElement>("[data-points]").forEach((list) => {
-        const segment = Number(list.dataset.points);
-        const points = list.querySelectorAll<HTMLElement>("[data-point]");
-        // Each segment owns an equal slice of the scroll; its points share that slice.
-        const local = Math.min(0.999, Math.max(0, progress * count - segment));
-        const active = segment === index ? Math.floor(local * points.length) : -1;
-        points.forEach((point, i) => point.toggleAttribute("data-active", i === active));
-      });
     },
   });
 
@@ -101,7 +87,7 @@ export function Segments() {
         <SectionHeader eyebrow={home.segments.eyebrow} title={home.segments.title} titleId="segments-title" align="center" size="lg" />
       </Container>
 
-      <div data-scene-track className="scene-track" style={{ height: `${count * 170 + 40}svh` }}>
+      <div data-scene-track className="scene-track" style={{ height: `${count * 110 + 40}svh` }}>
         <div ref={stageRef} data-scene-stage className="scene-stage pt-[var(--header-h)]">
           <Container wide className="w-full">
             <div className="flex justify-center">
@@ -116,9 +102,9 @@ export function Segments() {
               </ol>
             </div>
             <div className="relative mt-6 h-[min(36rem,calc(100svh-11rem))]">
-              {segments.map((segment, index) => (
+              {segments.map((segment) => (
                 <div key={segment.title} data-scene-item className="scene-item">
-                  <SegmentPanel segment={segment} index={index} />
+                  <SegmentPanel segment={segment} />
                 </div>
               ))}
             </div>
@@ -129,8 +115,8 @@ export function Segments() {
       <div className="scene-stack pt-12 pb-24 md:pb-32">
         <Container wide>
           <div className="flex flex-col gap-4">
-            {segments.map((segment, index) => (
-              <SegmentPanel key={segment.title} segment={segment} index={index} />
+            {segments.map((segment) => (
+              <SegmentPanel key={segment.title} segment={segment} />
             ))}
           </div>
         </Container>

@@ -86,7 +86,7 @@ export function ModifiFlow({ paused, className }: MockupProps) {
                   key={field.id}
                   data-field={field.id}
                   data-state="empty"
-                  className="group relative inline-flex h-5 items-center rounded bg-product-soft px-1.5 font-mono text-[9px] font-semibold text-product-deep transition-colors duration-300 data-[state=filled]:bg-elevated data-[state=filled]:font-sans data-[state=filled]:text-ink"
+                  className="group relative inline-flex h-5 items-center rounded bg-product-soft px-1.5 font-mono text-[9px] font-semibold text-product-deep dark:text-product transition-colors duration-300 data-[state=filled]:bg-elevated data-[state=filled]:font-sans data-[state=filled]:text-ink"
                 >
                   <span className="group-data-[state=filled]:hidden">{field.placeholder}</span>
                   <span className="hidden group-data-[state=filled]:inline">{field.value}</span>

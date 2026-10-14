@@ -17,37 +17,49 @@ import { home } from "@/data/home";
 import { productList, type Product } from "@/data/products";
 import { cn } from "@/lib/cn";
 
+/** WCAG contrast of white text on a hex color. */
+function whiteContrast(hex: string) {
+  const channel = (i: number) => {
+    const v = parseInt(hex.slice(i, i + 2), 16) / 255;
+    return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
+  };
+  const luminance = 0.2126 * channel(1) + 0.7152 * channel(3) + 0.0722 * channel(5);
+  return 1.05 / (luminance + 0.05);
+}
+
 function productStyle(product: Product) {
   return { "--product": product.color, "--product-deep": product.colorDeep } as CSSProperties;
 }
 
-/** Poster card: glyph, name and a cropped interface preview. */
+/** Poster card filled with the product color: glyph, name and a cropped interface preview. */
 function ProductPoster({ product, className }: { product: Product; className?: string }) {
   const visual = product.hero.visual;
   const Mockup = visual.kind === "mockup" ? mockups[visual.id] : null;
+  // Verifi green and Match orange sit below 3:1 with white, so they get dark text. Modifi blue (about 4.2:1)
+  // reads better with white than with dark ink, which scores about the same.
+  const light = whiteContrast(product.color) < 3;
   return (
     <div
       style={productStyle(product)}
-      className={cn("flex flex-col overflow-hidden rounded-media border border-line bg-bg shadow-stage", className)}
+      className={cn("flex flex-col overflow-hidden rounded-media bg-product shadow-stage", light ? "text-ink" : "text-white", className)}
     >
-      <span aria-hidden className="h-1.5 w-full bg-product" />
       <div className="flex items-center justify-between gap-4 px-6 pt-6">
         <span className="inline-flex items-center gap-3">
           <ProductGlyph slug={product.slug} size={44} />
           <span className="flex flex-col leading-none">
-            <span className="text-[11px] font-semibold text-ink-3">Praszo</span>
-            <span className="mt-1 text-xl font-bold tracking-[-0.02em] text-ink">{product.name}</span>
+            <span className="text-[11px] font-semibold opacity-70">Praszo</span>
+            <span className="mt-1 text-xl font-bold tracking-[-0.02em]">{product.name}</span>
           </span>
         </span>
-        <Badge tone="product" className="hidden sm:inline-flex">
+        <Badge className={cn("hidden border-transparent sm:inline-flex", light ? "bg-black/10 text-ink" : "bg-white/15 text-white")}>
           {product.category}
         </Badge>
       </div>
-      <p className="px-6 pt-4 pb-5 text-[15px] leading-relaxed text-ink-2">{product.tagline}</p>
-      <div className="relative mt-auto h-[14rem] overflow-hidden border-t border-line bg-product-soft/60 px-6 pt-5">
-        <div className="h-full overflow-hidden rounded-t-xl border border-b-0 border-line bg-white shadow-card">
+      <p className="px-6 pt-4 pb-5 text-[15px] leading-relaxed opacity-90">{product.tagline}</p>
+      <div className="relative min-h-[14rem] flex-1 overflow-hidden bg-black/10 px-6 pt-5">
+        <div className={cn("absolute inset-x-6 top-5 bottom-0 overflow-hidden rounded-t-xl text-ink", visual.kind === "image" && "bg-white shadow-float")}>
           {visual.kind === "image" ? (
-            <Image src={visual.src} alt="" aria-hidden sizes="420px" className="h-auto w-full" />
+            <Image src={visual.src} alt="" aria-hidden sizes="560px" className="h-full w-full object-cover object-left-top" />
           ) : Mockup ? (
             <div className="origin-top-left scale-[0.62] [width:161%]">
               <Mockup />
