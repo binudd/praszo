@@ -237,6 +237,7 @@ gsap.ticker.lagSmoothing(0)
 | `useHeroEntrance` / `useHeroScroll` | `motion/hero-entrance.ts`, `hero-scroll.ts` | see §7.4 | | `.is-static` |
 | `Magnetic` | `motion/magnetic.tsx` | motion/react springs | CTA follows the pointer ±8px (fine pointers only) | |
 | `useOnScreen(ref)` | `motion/use-on-screen.ts` | IntersectionObserver | Pauses the hero mockup loops and the 7 s rotation while the hero is off screen | |
+| `useHeaderReveal(ref, { delta, topOffset, duration, resetKey })` | `motion/use-header-reveal.ts` | One ScrollTrigger (`start 0`, `end "max"`) fed by Lenis; GSAP `yPercent` tween with `overwrite` | Hides the site header on scroll down (`yPercent -100`, `power2.in`), reveals it on scroll up (`power3.out`, 0.38 s). Defaults: 8 px run before reacting, always shown within 96 px of the top, overscroll clamped, 350 ms settle window after mount or route change. Never hides while any header trigger has `aria-expanded="true"` (Products menu, mobile drawer) or keyboard focus is inside; focus entering a hidden header reveals it. Sets `data-header-hidden`. | Reduced motion: instant hide and show |
 | `ProductIconNav` | `ui/product-icon-nav.tsx` | `gsap.to` indicator | Sliding highlight behind hovered or focused product glyph, tooltips, links | |
 | `PointerField` | `layout/pointer-field.tsx` | rAF-throttled pointermove | Updates `--mx` and `--my` for the ambient glow | off for coarse pointers and reduced motion |
 | Logo marquee | CSS `.marquee` | CSS keyframes 42 s, pauses on hover | Client logos scroll | duplicates hidden, static under reduced motion |
@@ -318,6 +319,7 @@ All five share `MockupShell`: a `WindowFrame` (dots, title pill, optional `actio
 - **Hero frames.** These have no shadow (`shadow-none` in `MockupShell`).
 
 ### 9.4 Header (`layout/site-header.tsx`)
+- **Scroll direction.** `useHeaderReveal(headerRef, { resetKey: pathname })` slides the whole header away while scrolling down and back on scroll up (see §7.5). It only moves the transform, so nothing below shifts, and the hidden header sits fully above the viewport, so it cannot intercept clicks.
 - **Shell.** The header is fixed, transparent and `pointer-events-none`; only its children take events. It holds the logo (or product lockup), the pill nav (`menu-surface`, motion follower) and the CTA.
 - **Product pages.** The pill shows "⟨mark⟩ Home", the product's section links and a right-aligned Products mega menu.
 - **Scroll spy.** It is position-based: the last section whose top is above 40% of the viewport wins, and the check is rAF-throttled. It deliberately does not use IntersectionObserver, which failed for tall and pinned sections.
@@ -425,6 +427,8 @@ Measured on a `NEXT_PUBLIC_QA_HOOKS=1` production build served by `next start`, 
 **Verified unchanged / healthy**
 - 21 client navigations: ScrollTrigger counts identical per route every round, one Lenis instance, no console errors, history back works.
 - All 7 routes at 1440 and 390: no console errors, failed requests, broken images or horizontal overflow; one h1, description, canonical and OG image each.
+
+- **Route change during wheel momentum.** Clicking a link while Lenis was still easing landed the next page mid-scroll, because Lenis kept animating toward the old target. A `useLayoutEffect` on pathname in `smooth-scroll.tsx` now stops (resets) Lenis before Next applies the new route's scroll, then re-applies the scroll holds.
 
 **Remaining risks**
 - Verifi (#0f8f5c, 4.11:1) and Match (#c4640a, 4.06:1) deep shades with white text, used by product buttons and `text-product-deep` on white, are below 4.5:1 for normal text. Needs a brand decision on darker deep shades.

@@ -3,12 +3,13 @@
 import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState, type CSSProperties, type MouseEvent } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from "react";
 
 import { MobileMenu } from "@/components/layout/mobile-menu";
 import { navLinkClass } from "@/components/layout/nav-styles";
 import { ProductsMenu } from "@/components/layout/products-menu";
 import { findVisible, scrollToTarget } from "@/components/motion/smooth-scroll";
+import { useHeaderReveal } from "@/components/motion/use-header-reveal";
 import { Button } from "@/components/ui/button";
 import { BrandMark, Logo } from "@/components/ui/logo";
 import { ProductLockup } from "@/components/ui/product-lockup";
@@ -41,11 +42,14 @@ function Follower({ active, reduced }: { active: boolean; reduced: boolean | nul
 /**
  * One floating header for the whole site. On a product page it takes on the
  * product identity: the lockup replaces the logo and the pill lists that page's
- * sections with a "Praszo home" link. Colors follow the document theme.
+ * sections with a "Praszo home" link. Colors follow the document theme. It
+ * slides away while scrolling down and returns on scroll up (useHeaderReveal).
  */
 export function SiteHeader() {
   const pathname = usePathname();
   const reduced = useReducedMotion();
+  const headerRef = useRef<HTMLElement | null>(null);
+  useHeaderReveal(headerRef, { resetKey: pathname });
   const [section, setSection] = useState<string | null>(null);
   const product = productForPath(pathname);
   const isHome = pathname === "/";
@@ -109,8 +113,9 @@ export function SiteHeader() {
 
   return (
     <header
+      ref={headerRef}
       style={productStyle}
-      className="site-header pointer-events-none fixed inset-x-0 top-1 z-50"
+      className="site-header pointer-events-none fixed inset-x-0 top-1 z-50 will-change-transform"
     >
       <div className="mx-auto flex h-[4.5rem] w-full max-w-wide items-center justify-between gap-4 px-5 md:px-8 lg:px-10 [&>*]:pointer-events-auto">
         {product ? (

@@ -2,7 +2,7 @@
 
 import Lenis from "lenis";
 import { usePathname } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useLayoutEffect } from "react";
 
 import { gsap, ScrollTrigger } from "@/components/motion/gsap";
 import { ANCHOR_OFFSET } from "@/lib/motion";
@@ -128,6 +128,18 @@ export function SmoothScroll() {
       if (qa) qa.lenisDestroyed = (qa.lenisDestroyed as number) + 1;
     };
   }, []);
+
+  // A route change must cancel any in-flight smooth scroll. Otherwise Lenis keeps easing toward the
+  // previous page's target and overrides Next's own scroll position (clicking a link while the wheel
+  // momentum is still settling landed the next page mid-scroll). Runs as a layout effect, before
+  // Next applies the new route's scroll. stop() resets Lenis to the current position; the holds
+  // decide whether it restarts.
+  useLayoutEffect(() => {
+    const lenis = getLenis();
+    if (!lenis) return;
+    lenis.stop();
+    applyScrollHolds();
+  }, [pathname]);
 
   // Re-measure ScrollTriggers after each navigation (again once the route has
   // settled, since preserved routes swap in and out) and honor deep links.
