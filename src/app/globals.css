@@ -556,6 +556,8 @@ details[open] .faq-chevron {
   overflow-y: hidden;
   overscroll-behavior-x: contain;
   scroll-snap-type: x proximity;
+  /* Snap cards to the page gutter, not the screen edge (otherwise the first card loads flush left). */
+  scroll-padding-inline: var(--hscroll-inset);
   scrollbar-width: none;
   outline-offset: -2px;
 }

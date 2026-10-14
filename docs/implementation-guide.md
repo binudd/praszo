@@ -154,7 +154,7 @@ The data layer drives the pages, and content edits should rarely need component 
 ### Surfaces
 - **Menus.** `.menu-surface` (nav pill, tabs) and `.menu-panel` (dropdowns) are glass. Blur is emitted via `@apply backdrop-blur-xl backdrop-saturate-150`, because Lightning CSS drops the unprefixed property from hand-written rules.
 - **Mockups** follow the contrast rule: flat `bg-elevated` desk, borderless `bg-bg` cards, state shown by a tint (`bg-product-soft`), shadow only while lifted. **No inner borders.**
-- **Ecosystem posters** are filled with the product color. Light colors (Verifi, Match) switch to dark text by WCAG contrast.
+- **Ecosystem posters** must reach AA (4.5:1) for every text layer: white on the product colour when it passes (Practice 7.06, Docs 4.88), else white on `colorDeep` when that passes (Modifi #1f5fd6, 5.73), else ink on the product colour (Verifi 7.29, Match 8.34). Text is full opacity; the badge uses `bg-black/15` (white text) or `bg-black/10` (ink).
 
 ### Layout utilities
 - **`Container`** has two widths: `--container-site 72rem`, or `wide` at `--container-wide 86rem`.
@@ -184,8 +184,10 @@ gsap.ticker.lagSmoothing(0)
 ```
 
 - **Anchors.** Lenis subtracts `scroll-margin-top` and `scroll-padding-top` itself, so `ANCHOR_OFFSET = 0` and `html { scroll-padding-top: 6rem }`.
-- **Pause and resume.** Use `getLenis()?.stop()` and `.start()`. The splash does this, and the mobile menu dispatches `lenis:stop` and `lenis:start` window events.
+- **Pause and resume.** Use `holdScroll(reason)` and `releaseScroll(reason)` from `smooth-scroll.tsx`. Lenis stays stopped while any reason holds it, so one owner can never restart scrolling another still needs stopped. SmoothScroll itself holds `"splash"` until `SPLASH_EVENT`; the mobile menu holds `"mobile-menu"` while open. (The old `lenis:stop`/`lenis:start` window events were removed: the menu fired `lenis:start` on mount, which restarted Lenis under the splash.)
+- **QA hook.** A build with `NEXT_PUBLIC_QA_HOOKS=1` exposes `window.__praszoQA` (`gsap`, `ScrollTrigger`, `getLenis`, Lenis created/destroyed counts) for headless checks. The condition is inlined at build time, so normal builds contain none of it.
 - **In-page jumps.** `scrollToTarget(target)` accepts a selector, element or number, resolves visible elements and uses Lenis.
+- **Theme flips.** `html` transitions only `background-color`. Never transition `color` (or any inherited property) on `html` or `body`: every descendant then re-resolves its colour each frame, which cost about 820 ms of style work per scene flip (now about 75 ms).
 - **Scrollable regions.** Inner scroll areas that must not be hijacked carry `data-lenis-prevent`, for example the native horizontal rail on mobile.
 
 **Consequence:** any ScrollTrigger animation with `scrub: true` is automatically smooth, because Lenis already eases the scroll. Use `scrub: true` (no lag) for pinned or 1:1 motion. Use small numbers (0.4 to 0.6) for "soft" step scenes.
@@ -200,7 +202,7 @@ gsap.ticker.lagSmoothing(0)
 
 ### 7.4 First-load sequence (timeline)
 1. **Boot script** (inline, first in `<body>`, from `lib/splash.ts`) sets `<html data-splash="on">` before first paint, on every full load. Client navigation never replays it.
-2. **Splash** (`layout/splash.tsx`). The screen is the Praszo mark as a vector, traced from `praszo-mark.png` as two polygons in coral `#f46a4a`.
+2. **Splash** (`layout/splash.tsx`). Timings: minimum 0.6 s, contraction 1.05 s, settle 0.7 s (about 2.8 s total on a fast load; was 3.5 s). A 7 s watchdog always hands the site over. React Strict Mode safe: the effect cleanup only finalises if no remount follows within 50 ms (before, development showed the splash for about 0.4 s). Under reduced motion it waits only for fonts and fades in 0.25 s (about 0.45 s total). The screen is the Praszo mark as a vector, traced from `praszo-mark.png` as two polygons in coral `#f46a4a`.
    - **Cover.** The mark is scaled up around a point inside its solid wedge, so it covers the viewport. A CSS fallback paints solid coral until JS places it.
    - **Wait.** It waits for `window.load` plus `document.fonts.ready`, with a minimum of 0.9 s and a maximum of 4 s.
    - **Contract.** GSAP contracts the shape into a 96px "Z" (1.25 s `expo.inOut`). It is driven by one proxy object `{x, y, fx, fy, s}` and an SVG `transform` written in `onUpdate`.
@@ -224,8 +226,8 @@ gsap.ticker.lagSmoothing(0)
 
 | Primitive | File | Trigger and engine | What it does | Fallback |
 |---|---|---|---|---|
-| `useScene(rootRef, { count, onUpdate, media, scrub })` | `motion/use-scene.ts` | ScrollTrigger on `[data-scene-track]` (`top top` to `bottom bottom`), `scrub 0.6`, desktop `(min-width:1024px)` | Sticky step scene. Calls `onUpdate(progress, t, index)`, where `t` is a fractional step. Adds `.scene.is-ready`, which shows track and stage and hides `.scene-stack`. Helpers: `stepOpacity(t, i, fade)` and `applySceneItems(stage, t, index)` (crossfade `[data-scene-item]`, toggles `[data-scene-tab]` `.is-current`). | `.scene-stack` static layout |
-| `HorizontalScroll` / `HorizontalCard` | `motion/horizontal-scroll.tsx` | `pinMedia (min-width:768px)` and no reduced motion: pins the section, tweens the track `x` by its overflow, `scrub: true`, `invalidateOnRefresh`. A ResizeObserver refreshes only when `track.scrollWidth` changes. Keyboard focus scrolls the card into view via Lenis. | Pinned horizontal carousel driven by vertical scroll | Native horizontal scroll with snap (`data-lenis-prevent`) |
+| `useScene(rootRef, { count, onUpdate, media, scrub })` | `motion/use-scene.ts` | ScrollTrigger on `[data-scene-track]` (`top top` to `bottom bottom`), `scrub 0.6`, desktop `(min-width:1024px)` | Sticky step scene. Calls `onUpdate(progress, t, index, set)`, where `set` is a change-only setter (`createSceneSetter()`) scoped to this activation: it writes only properties whose value changed, and parked items are not rewritten every frame, where `t` is a fractional step. Adds `.scene.is-ready`, which shows track and stage and hides `.scene-stack`. Helpers: `stepOpacity(t, i, fade)` and `applySceneItems(stage, t, index)` (crossfade `[data-scene-item]`, toggles `[data-scene-tab]` `.is-current`). | `.scene-stack` static layout |
+| `HorizontalScroll` / `HorizontalCard` | `motion/horizontal-scroll.tsx` | `pinMedia (min-width:768px)` and no reduced motion: pins the section with `pinType: "transform"` (the fixed/static swap scored about 2.0 CLS per rail; transform pinning measures 0.015 and stays within 0.3 px while pinned), tweens the track `x` by its overflow, `scrub: true`, `invalidateOnRefresh`. A ResizeObserver refreshes only when `track.scrollWidth` changes. Keyboard focus scrolls the card into view via Lenis. | Pinned horizontal carousel driven by vertical scroll | Native horizontal scroll with snap (`data-lenis-prevent`); `scroll-padding-inline` keeps cards on the page gutter |
 | `RevealHeading` | `motion/reveal.tsx` | `once`, `top 90%` | Masked line rise (`y 110%→0`) | none needed |
 | `RevealBlock` | same | `once`, `top 90%` | Fade-up 18px | |
 | `RevealGroup` (+ `data-reveal` children) | same | `once`, `top 85%`, stagger 0.08 | Staggered fade-up of children | |
@@ -234,6 +236,7 @@ gsap.ticker.lagSmoothing(0)
 | `HeroTitle` | `motion/hero-title.tsx` | (entrance) | Splits a title into per-word masks, keeps hyphenated words whole, colors one `highlight` word, keeps an `sr-only` full title | |
 | `useHeroEntrance` / `useHeroScroll` | `motion/hero-entrance.ts`, `hero-scroll.ts` | see §7.4 | | `.is-static` |
 | `Magnetic` | `motion/magnetic.tsx` | motion/react springs | CTA follows the pointer ±8px (fine pointers only) | |
+| `useOnScreen(ref)` | `motion/use-on-screen.ts` | IntersectionObserver | Pauses the hero mockup loops and the 7 s rotation while the hero is off screen | |
 | `ProductIconNav` | `ui/product-icon-nav.tsx` | `gsap.to` indicator | Sliding highlight behind hovered or focused product glyph, tooltips, links | |
 | `PointerField` | `layout/pointer-field.tsx` | rAF-throttled pointermove | Updates `--mx` and `--my` for the ambient glow | off for coarse pointers and reduced motion |
 | Logo marquee | CSS `.marquee` | CSS keyframes 42 s, pauses on hover | Client logos scroll | duplicates hidden, static under reduced motion |
@@ -357,10 +360,14 @@ All five share `MockupShell`: a `WindowFrame` (dots, title pill, optional `actio
 7. React Compiler lint:
    - Never create components during render. Use `<Icon name>`, not `getIcon()`.
    - No synchronous `setState` in effects. Derive the value, or defer it to rAF or an event.
-8. Implicit grid tracks must be `minmax(0,1fr)` (or `grid-cols-1`). An `auto` track grows to nowrap text and causes horizontal page overflow at 360px.
-9. Tints that depend on `--product` must be mixed per element, never on `:root`.
-10. Any local dark area must carry `data-theme-local`. Header marks the splash may land on must carry `data-logo-mark`.
-11. Content stays sourced from praszo.com, with no stats, pricing or fake forms.
+8. Scene `onUpdate` writes go through the provided `set` (change-only). Plain `gsap.set` every frame on parked items re-invalidates style for their subtree.
+9. Pin horizontal rails with `pinType: "transform"`. Hold Lenis with `holdScroll`/`releaseScroll`, never `lenis.start()` directly.
+10. Never transition inherited properties (`color`) on `html`/`body`.
+11. Looping visuals accept `paused` and are paused off screen (`useOnScreen`).
+12. Implicit grid tracks must be `minmax(0,1fr)` (or `grid-cols-1`). An `auto` track grows to nowrap text and causes horizontal page overflow at 360px.
+13. Tints that depend on `--product` must be mixed per element, never on `:root`.
+14. Any local dark area must carry `data-theme-local`. Header marks the splash may land on must carry `data-logo-mark`.
+15. Content stays sourced from praszo.com, with no stats, pricing or fake forms.
 
 **Recipes**
 - **New sticky step section.** Markup is `section.scene` > `[data-scene-track]` (height in svh) > `[data-scene-stage].scene-stage` with `[data-scene-item]` and `[data-scene-tab]`, plus a `.scene-stack` fallback. Drive it with `useScene(rootRef, { count, onUpdate })`. For holds and crossfade windows, copy the `SWITCH` mapping from `segments.tsx`.
@@ -385,32 +392,41 @@ All five share `MockupShell`: a `WindowFrame` (dots, title pill, optional `actio
 
 ---
 
-## 13. Audit findings (as of this commit)
+## 13. Audit findings and remediation (2026-10-14)
 
-**Healthy**
-- Build, lint and types are clean. All routes are static.
-- Every scene and rail has a fallback.
-- Product menu ids all resolve.
-- No page has horizontal overflow at 360px.
-- The hero fits all 7 tested sizes.
-- Frame timing is steady in measured animations.
+Measured on a `NEXT_PUBLIC_QA_HOOKS=1` production build served by `next start`, headless Chrome, homepage wheel-scrolled top to bottom (120 px steps every 16 ms). Desktop is 1440×900 unthrottled; mobile is 390×844 with 4× CPU throttle. Lab numbers, not field data.
 
-**Stale documentation**
-- `README.md` (motion primitives paragraph) still mentions a `Tilt` pointer-tilt primitive. It no longer exists.
-- The project memory note mentions `DragRail`, which was replaced by `HorizontalScroll`.
+| Metric | Before | After |
+|---|---|---|
+| Desktop CLS during scroll | 3.997 | 0.010 |
+| Desktop style recalculation | 5,206 ms | 535 ms |
+| Desktop script time | 1,892 ms | 272 ms |
+| Desktop avg / p99 frame | 21.4 / 50 ms | 16.7 / 16.8 ms |
+| Desktop frames over 33 ms / long tasks | 50 / 12 | 0 / 0 |
+| Mobile 4× style / layout | 6,653 / 604 ms | 1,940 / 16 ms |
+| Mobile 4× long tasks (count, total) | 53, 5,472 ms | 5, 459 ms |
+| Page scrolled behind splash by wheel | about 2,360 px | 0 |
+| Splash done (desktop) | 3.51 s | 2.79 s |
+| Splash done (reduced motion) | 1.95 s | 0.46 s |
+| Splash in dev (Strict Mode) | ended at 0.4 s | full sequence |
 
-**Unused exports (safe to remove or keep as API)**
-- `getIcon` (`lib/icons.ts`): superseded by `<Icon>`. Keep it out of render paths.
-- `showcaseAspect` (`mockups/product-showcases.tsx`): superseded by `.fit-frame`.
-- `productOrder` (`data/products.ts`) and `productForPath` (`site-header.tsx`): exported but unused outside their files.
-- `buttonClasses` (`ui/button.tsx`).
-- Types only: `KanbanColumn`, `KanbanMove`, `FeatureItem`, `NavLink`, `ProductSection`, `MockupTheme`.
+**Fixed**
+- Lenis restarted under the splash by the mobile menu's mount effect; replaced with keyed scroll holds.
+- Splash killed by Strict Mode cleanup in development; outro scheduling hardened; 7 s watchdog.
+- Theme-flip style storm from inherited `color` transitions on `html`/`body`.
+- Pinned-rail CLS (transform pinning).
+- Scroll scenes rewriting unchanged styles each frame (change-only setter).
+- Hero mockups animating while off screen (paused via `useOnScreen`).
+- Modifi poster contrast (4.17 → 5.73) and poster text opacity/badge contrast on all products.
+- Modifi document-hub capture contained its own browser chrome; cropped to the app area (`modifi-hub.png`, 1496×940) and flagged `frame: "browser"`.
+- Phone rails loaded scrolled 20 px (first card flush to the screen edge); snap now respects the gutter.
+- Removed `getIcon`, `showcaseAspect`; `productForPath` no longer exported. Kept `productOrder`, `buttonClasses` and the data-model types (used internally; part of the typed data API). README `Tilt` reference removed.
 
-**Known trade-offs and risks**
-- **Splash length.** The splash plays on every full load (min 0.9 s, max 4 s wait, about 3.5 s total on a fast load). If that is too much for returning visitors, gate it with `sessionStorage` in the boot script. That was the original behavior, removed at the user's request.
-- **Modifi contrast.** The Modifi blue ecosystem poster scores about 4.2:1 with white text, below 4.5:1 for small text.
-- **Double chrome.** `modifi-hub.png` already contains browser chrome, so inside the rail's `WindowFrame` it shows two sets.
-- **Tight phone frame.** At 360×780 the Modifi hero mockup shows only the document card. It is clipped by design but tight.
-- **Long scroll.** Sticky scenes add a lot of scroll length (ecosystem 520svh, workflow 440svh, segments 300svh, statements 190svh). Watch total page length when adding more.
-- **Mockup theme resets.** The hero mockup theme toggle is not persisted.
-- **Many tickers on the homepage.** These are the mockup loops, the 7 s showcase timer and CSS marquee. Hidden mockups are paused, so keep new loops pausable via the `paused` prop.
+**Verified unchanged / healthy**
+- 21 client navigations: ScrollTrigger counts identical per route every round, one Lenis instance, no console errors, history back works.
+- All 7 routes at 1440 and 390: no console errors, failed requests, broken images or horizontal overflow; one h1, description, canonical and OG image each.
+
+**Remaining risks**
+- Verifi (#0f8f5c, 4.11:1) and Match (#c4640a, 4.06:1) deep shades with white text, used by product buttons and `text-product-deep` on white, are below 4.5:1 for normal text. Needs a brand decision on darker deep shades.
+- No unit, component or browser test suite exists in the repo; QA is scripted headless Chrome.
+- Lighthouse and field Core Web Vitals not measured here.

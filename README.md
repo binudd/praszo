@@ -49,7 +49,7 @@ npm run build && npm start
 
 The visual language borrows from editorial "type as graphic" sites: giant Manrope display titles (`.display-xl/-lg/-hero/-md/-sm` in `src/app/globals.css`) that overlap the content below them, a fixed 100×150px grid texture with a thin teal→coral brand bar, and alternating light/dark **scenes**. A section opts into the dark scene with `data-theme="dark"`; the token set in `src/app/tokens.css` flips automatically and `ThemeObserver` mirrors the scene crossing the viewport middle onto `<html>`, so the floating pill nav and the background crossfade with it. Praszo's brand colors stay the primaries: teal for actions, coral for the mark, one color per product.
 
-Reusable motion primitives live in `src/components/motion/`: `useScene` (sticky, scroll-scrubbed step scenes used by the product ecosystem, the workflow tour and product spotlights), `WordReveal` (statements that light up word by word), `HorizontalScroll` (see below), `Tilt` (pointer-following 3D tilt on hero visuals) and the GSAP `RevealHeading`/`RevealGroup` helpers. Every scene renders a stacked fallback for mobile, reduced motion and no-JS.
+Reusable motion primitives live in `src/components/motion/`: `useScene` (sticky, scroll-scrubbed step scenes used by the product ecosystem, the workflow tour and product spotlights), `WordReveal` (statements that light up word by word), `HorizontalScroll` (see below) and the GSAP `RevealHeading`/`RevealGroup` helpers. Every scene renders a stacked fallback for mobile, reduced motion and no-JS.
 
 ### Horizontal scroll carousel
 
