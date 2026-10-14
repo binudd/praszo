@@ -3,26 +3,18 @@
 import { ArrowRight, Play } from "lucide-react";
 import { useRef } from "react";
 
-import { HeroShowcase } from "@/components/sections/hero-showcase";
 import { useHeroEntrance } from "@/components/motion/hero-entrance";
 import { Magnetic } from "@/components/motion/magnetic";
 import { scrollToTarget } from "@/components/motion/smooth-scroll";
+import { HeroShell } from "@/components/sections/hero-shell";
+import { HeroShowcase } from "@/components/sections/hero-showcase";
 import { Button } from "@/components/ui/button";
-import { Container } from "@/components/ui/container";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { company } from "@/data/company";
 import { home } from "@/data/home";
 
 const headline = ["Run it on Praszo."];
 const opener = "Simplify your practice management.";
-
-function Lede() {
-  return (
-    <>
-      <strong>{opener}</strong> {company.description}
-    </>
-  );
-}
 
 function HeadlineLine({ line }: { line: string }) {
   const index = line.indexOf("Praszo");
@@ -41,23 +33,21 @@ export function CorporateHero() {
   useHeroEntrance(rootRef, "home");
 
   return (
-    <section
-      ref={rootRef}
-      data-entrance
-      aria-labelledby="home-hero-title"
-      className="relative flex min-h-[100svh] flex-col justify-end overflow-hidden pt-28 pb-10 md:pt-30 lg:pt-32 lg:pb-12"
-    >
-      <Container wide className="grid gap-10 lg:grid-cols-12 lg:items-start lg:gap-12">
-        <div className="relative z-10 lg:col-span-5">
+    <HeroShell
+      rootRef={rootRef}
+      labelledBy="home-hero-title"
+      lede={
+        <>
           <Eyebrow data-hero="eyebrow">{home.hero.eyebrow}</Eyebrow>
-          <p data-hero="copy" className="lede mt-5 max-w-[34rem]">
-            <Lede />
+          <p data-hero="copy" className="lede mt-4 max-w-[34rem] max-lg:text-[0.98rem] max-lg:leading-snug lg:mt-5">
+            <strong>{opener}</strong> {company.description}
           </p>
-          <div data-hero="cta" className="mt-7 flex flex-wrap items-center gap-3">
+          <div data-hero="cta" className="mt-5 flex flex-wrap items-center gap-3 lg:mt-7">
             <Button
               href="#workflow"
               variant="secondary"
-              size="lg"
+              size="md"
+              className="lg:h-12 lg:px-6 lg:text-base"
               onClick={(event) => {
                 event.preventDefault();
                 scrollToTarget("#workflow");
@@ -67,19 +57,16 @@ export function CorporateHero() {
               See the workflow
             </Button>
             <Magnetic>
-              <Button href={home.hero.primaryCta.href} size="lg">
+              <Button href={home.hero.primaryCta.href} size="md" className="lg:h-12 lg:px-6 lg:text-base">
                 {home.hero.primaryCta.label}
                 <ArrowRight size={18} aria-hidden />
               </Button>
             </Magnetic>
           </div>
-        </div>
-        <div data-hero="visual" className="relative lg:col-span-7">
-          <HeroShowcase />
-        </div>
-      </Container>
-
-      <Container wide className="mt-14 flex flex-col gap-8 lg:mt-16 lg:flex-row lg:items-end lg:justify-between">
+        </>
+      }
+      visual={<HeroShowcase />}
+      title={
         <h1 id="home-hero-title" className="display-lg text-ink">
           {headline.map((line) => (
             <span key={line} className="mask-reveal block pb-[0.08em]">
@@ -89,11 +76,13 @@ export function CorporateHero() {
             </span>
           ))}
         </h1>
+      }
+      aside={
         <p data-hero="cta" className="text-sm leading-tight font-semibold text-ink lg:pb-3 lg:text-right">
           Praszo OS
           <span className="block font-medium text-ink-3">{home.ecosystem.title}</span>
         </p>
-      </Container>
-    </section>
+      }
+    />
   );
 }

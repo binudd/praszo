@@ -51,14 +51,12 @@ export function SiteHeader() {
   const isHome = pathname === "/";
   const spyIds = product ? productSections[product.slug].map((item) => item.id) : isHome ? homeSectionIds : [];
   const spyKey = spyIds.join("|");
+  const activeSection = spyKey ? section : null;
 
   // Scroll-spy: the section covering a line 40% down the viewport is current.
   // (Works for pinned and multi-screen sections, unlike intersection ratios.)
   useEffect(() => {
-    if (!spyKey) {
-      setSection(null);
-      return;
-    }
+    if (!spyKey) return;
     const root = findVisible("main") ?? document;
     const ids = spyKey.split("|");
     let frame = 0;
@@ -77,7 +75,7 @@ export function SiteHeader() {
     const schedule = () => {
       if (!frame) frame = requestAnimationFrame(update);
     };
-    update();
+    schedule();
     window.addEventListener("scroll", schedule, { passive: true });
     window.addEventListener("resize", schedule);
     return () => {
@@ -141,7 +139,7 @@ export function SiteHeader() {
                 Home
               </Link>
               {productSections[product.slug].map((item) => {
-                const current = section === item.id;
+                const current = activeSection === item.id;
                 return (
                   <a
                     key={item.id}
@@ -161,7 +159,7 @@ export function SiteHeader() {
               <ProductsMenu />
               {primaryNav.map((item) => {
                 const id = item.href.startsWith("/#") ? item.href.slice(2) : null;
-                const current = id ? isHome && section === id : pathname === item.href;
+                const current = id ? isHome && activeSection === id : pathname === item.href;
                 return (
                   <Link
                     key={item.href}

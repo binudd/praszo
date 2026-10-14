@@ -586,3 +586,27 @@ details[open] .faq-chevron {
 .hscroll-footer {
   padding-inline: var(--hscroll-inset);
 }
+
+/* Hero frame that fits the space it is given: the box it sits in is a size
+   container, so the frame can be as wide as the box or as tall as the box,
+   whichever is reached first, while keeping its aspect ratio. */
+.fit-box {
+  container-type: size;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+.fit-frame {
+  position: relative;
+  margin-left: auto;
+  width: min(100cqw, calc(100cqh * 0.8));
+  aspect-ratio: 4 / 5;
+}
+
+@media (min-width: 640px) {
+  .fit-frame {
+    width: min(100cqw, calc(100cqh * 1.3846));
+    aspect-ratio: 720 / 520;
+  }
+}

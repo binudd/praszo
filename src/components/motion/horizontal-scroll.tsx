@@ -74,6 +74,8 @@ export function HorizontalScroll({
       mm.add(`${pinMedia} and (prefers-reduced-motion: no-preference)`, () => {
         root.classList.add("is-pinned");
         viewport.scrollLeft = 0;
+        // While pinned, vertical wheel input must reach Lenis (smoothed) rather than the native scroller.
+        viewport.removeAttribute("data-lenis-prevent");
 
         // Travel = how much of the track is hidden to the right of the viewport.
         const distance = () => Math.max(0, track.scrollWidth - viewport.clientWidth);
@@ -87,8 +89,9 @@ export function HorizontalScroll({
             end: () => `+=${distance()}`,
             pin: true,
             pinSpacing: true,
-            anticipatePin: 1,
-            scrub: 0.4,
+            // No scrub lag: Lenis already smooths the scroll, and lag would keep the
+            // track sliding after the pin releases.
+            scrub: true,
             invalidateOnRefresh: true,
             onRefresh: (self) => {
               triggerRef.current = self;
@@ -100,22 +103,29 @@ export function HorizontalScroll({
         return () => {
           triggerRef.current = null;
           root.classList.remove("is-pinned");
+          viewport.setAttribute("data-lenis-prevent", "");
           gsap.set(track, { clearProps: "transform" });
         };
       });
 
-      // Re-measure when the track's size changes (fonts, images, responsive reflow).
-      const resize = new ResizeObserver(() => ScrollTrigger.refresh());
-      resize.observe(track);
-      const images = Array.from(track.querySelectorAll("img"));
-      const onLoad = () => ScrollTrigger.refresh();
-      images.forEach((img) => {
-        if (!img.complete) img.addEventListener("load", onLoad, { once: true });
+      // Re-measure only when the track's width actually changes (fonts, images,
+      // responsive reflow), coalesced to one refresh per frame.
+      let lastWidth = track.scrollWidth;
+      let frame = 0;
+      const resize = new ResizeObserver(() => {
+        if (track.scrollWidth === lastWidth) return;
+        lastWidth = track.scrollWidth;
+        if (frame) return;
+        frame = requestAnimationFrame(() => {
+          frame = 0;
+          ScrollTrigger.refresh();
+        });
       });
+      resize.observe(track);
 
       return () => {
         resize.disconnect();
-        images.forEach((img) => img.removeEventListener("load", onLoad));
+        if (frame) cancelAnimationFrame(frame);
         mm.revert();
       };
     },

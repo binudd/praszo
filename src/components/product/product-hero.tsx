@@ -8,9 +8,9 @@ import { useHeroEntrance } from "@/components/motion/hero-entrance";
 import { Magnetic } from "@/components/motion/magnetic";
 import { scrollToTarget } from "@/components/motion/smooth-scroll";
 import { ProductShowcase } from "@/components/product/product-showcase";
+import { HeroShell } from "@/components/sections/hero-shell";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Container } from "@/components/ui/container";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { demoCta } from "@/data/company";
 import type { Product } from "@/data/products";
@@ -26,26 +26,24 @@ export function ProductHero({ product }: { product: Product }) {
   };
 
   return (
-    <section
-      ref={rootRef}
-      data-entrance
+    <HeroShell
+      rootRef={rootRef}
       id={`${product.slug}-overview`}
-      aria-labelledby={`${product.slug}-hero-title`}
-      className="relative flex min-h-[100svh] flex-col justify-end overflow-hidden pt-28 pb-10 md:pt-30 lg:pt-32 lg:pb-12"
-    >
-      <Container wide className="grid gap-10 lg:grid-cols-12 lg:items-start lg:gap-12">
-        <div className="relative z-10 lg:col-span-5">
+      labelledBy={`${product.slug}-hero-title`}
+      lede={
+        <>
           <Eyebrow tone="product" data-hero="eyebrow">
             {product.hero.eyebrow}
           </Eyebrow>
-          <p data-hero="copy" className="lede mt-5 max-w-[34rem]">
+          <p data-hero="copy" className="lede mt-4 max-w-[34rem] max-lg:line-clamp-5 max-lg:text-[0.98rem] max-lg:leading-snug lg:mt-5">
             {product.hero.description}
           </p>
-          <div data-hero="cta" className="mt-7 flex flex-wrap items-center gap-3">
+          <div data-hero="cta" className="mt-5 flex flex-wrap items-center gap-3 lg:mt-7">
             <Button
               href={`#${featuresId}`}
               variant="secondary"
-              size="lg"
+              size="md"
+              className="lg:h-12 lg:px-6 lg:text-base"
               onClick={(event) => {
                 event.preventDefault();
                 jumpToFeatures();
@@ -55,19 +53,16 @@ export function ProductHero({ product }: { product: Product }) {
               See the features
             </Button>
             <Magnetic>
-              <Button href={demoCta.href} variant="product" size="lg">
+              <Button href={demoCta.href} variant="product" size="md" className="lg:h-12 lg:px-6 lg:text-base">
                 {demoCta.label}
                 <ArrowRight size={18} aria-hidden />
               </Button>
             </Magnetic>
           </div>
-        </div>
-        <div data-hero="visual" className="relative lg:col-span-7">
-          <ProductShowcase product={product} className="ml-auto w-full max-w-[calc(50svh*1.3846+1.5rem)]" />
-        </div>
-      </Container>
-
-      <Container wide className="mt-14 flex flex-col gap-8 lg:mt-16 lg:flex-row lg:items-end lg:justify-between">
+        </>
+      }
+      visual={<ProductShowcase product={product} />}
+      title={
         <h1 id={`${product.slug}-hero-title`} className="display-hero max-w-[16ch] text-ink">
           <span className="mask-reveal block pb-[0.08em]">
             <span data-hero="headline" className="block">
@@ -75,6 +70,8 @@ export function ProductHero({ product }: { product: Product }) {
             </span>
           </span>
         </h1>
+      }
+      aside={
         <Link
           data-hero="cta"
           href="/#workflow"
@@ -84,7 +81,7 @@ export function ProductHero({ product }: { product: Product }) {
           {product.workflowStep.label} · Praszo workflow
           <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" aria-hidden />
         </Link>
-      </Container>
-    </section>
+      }
+    />
   );
 }

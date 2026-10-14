@@ -115,7 +115,7 @@ export function ProductSpotlights({ product }: { product: Product }) {
             {product.spotlights.map((spotlight, index) => {
               const flip = index % 2 === 1;
               return (
-                <article key={spotlight.id} className="grid items-center gap-10 lg:grid-cols-2 lg:gap-16">
+                <article key={spotlight.id} className="grid grid-cols-1 items-center gap-10 lg:grid-cols-2 lg:gap-16">
                   <ClipReveal className={cn(flip && "lg:order-2")}>
                     <ProductVisual visual={spotlight.visual} sizes="(min-width: 1024px) 50vw, 100vw" />
                   </ClipReveal>
