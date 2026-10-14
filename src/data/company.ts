@@ -29,15 +29,6 @@ export const company = {
     },
     { label: "YouTube", href: "https://www.youtube.com/@PraszoOS", icon: "youtube" },
   ],
-  external: {
-    website: "https://praszo.com/",
-    about: "https://praszo.com/about-us/",
-    whyPraszo: "https://praszo.com/why-praszo/",
-    largeFirms: "https://praszo.com/large-firms/",
-    midSizedFirms: "https://praszo.com/mid-sized-business/",
-    insights: "https://praszo.com/insights-resources/",
-    privacy: "https://praszo.com/privacy-policy/",
-  },
 } as const;
 
 export const demoCta = { label: "Book a demo", href: "/contact" } as const;
@@ -57,14 +48,17 @@ export const primaryNav: NavLink[] = [
   { label: "Contact", href: "/contact" },
 ];
 
-export const companyLinks: (NavLink & { external?: boolean })[] = [
+/** Footer company column. Every link is an internal page. */
+export const companyLinks: NavLink[] = [
+  { label: "About Praszo", href: "/about" },
   { label: "Why Praszo", href: "/#why-praszo" },
+  { label: "Larger audit firms", href: "/large-firms" },
+  { label: "Mid-sized audit firms", href: "/mid-sized-firms" },
+  { label: "Insights", href: "/insights" },
   { label: "Contact", href: "/contact" },
-  { label: "About Praszo", href: company.external.about, external: true },
-  { label: "Larger audit firms", href: company.external.largeFirms, external: true },
-  { label: "Mid-sized audit firms", href: company.external.midSizedFirms, external: true },
-  { label: "Insights", href: company.external.insights, external: true },
 ];
+
+export const legalLinks: NavLink[] = [{ label: "Privacy Policy", href: "/privacy-policy" }];
 
 /** Every indexable route. Feeds the sitemap and internal link checks. */
 export const routes = [
@@ -74,7 +68,12 @@ export const routes = [
   { path: "/match", priority: 0.9, changeFrequency: "monthly" },
   { path: "/modifi", priority: 0.9, changeFrequency: "monthly" },
   { path: "/docs", priority: 0.9, changeFrequency: "monthly" },
+  { path: "/about", priority: 0.7, changeFrequency: "yearly" },
+  { path: "/large-firms", priority: 0.8, changeFrequency: "monthly" },
+  { path: "/mid-sized-firms", priority: 0.8, changeFrequency: "monthly" },
+  { path: "/insights", priority: 0.5, changeFrequency: "weekly" },
   { path: "/contact", priority: 0.6, changeFrequency: "yearly" },
+  { path: "/privacy-policy", priority: 0.2, changeFrequency: "yearly" },
 ] as const;
 
 /** Fixed so the sitemap stays statically prerenderable (no Date.now()). */

@@ -3,12 +3,13 @@ import Image from "next/image";
 import { Container } from "@/components/ui/container";
 import { home } from "@/data/home";
 
-export function TrustedBy() {
+/** `id` must be unique per route (routes stay mounted). */
+export function TrustedBy({ id = "trusted" }: { id?: string }) {
   const logos = home.trustedBy.logos;
   return (
-    <section aria-labelledby="trusted-title" className="border-y border-line py-10 md:py-12">
+    <section aria-labelledby={`${id}-title`} className="border-y border-line py-10 md:py-12">
       <Container>
-        <p id="trusted-title" className="label text-center text-ink-3">
+        <p id={`${id}-title`} className="label text-center text-ink-3">
           {home.trustedBy.title}
         </p>
         <div className="marquee mt-8 overflow-hidden">

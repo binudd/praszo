@@ -1,7 +1,8 @@
 "use client";
 
-import { ArrowUpRight } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRef } from "react";
 
 import { scrollToTarget } from "@/components/motion/smooth-scroll";
@@ -52,16 +53,14 @@ function SegmentPanel({ segment, scene = false }: { segment: Segment; scene?: bo
         <p data-seg-part className="copy mt-4">
           {segment.body}
         </p>
-        <a
+        <Link
           data-seg-part
           href={segment.href}
-          target="_blank"
-          rel="noreferrer"
           className="label group mt-6 inline-flex w-fit items-center gap-1.5 text-ink transition-colors hover:text-brand-strong"
         >
-          Read more on praszo.com
-          <ArrowUpRight size={14} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden />
-        </a>
+          Explore {segment.title.toLowerCase()}
+          <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" aria-hidden />
+        </Link>
       </div>
       <ol className="border-b border-line-strong">
         {segment.points.map((text, index) => (

@@ -11,16 +11,18 @@ type Props = {
   body: string;
   bullets?: ReadonlyArray<string>;
   tone?: "brand" | "product";
+  /** Unique per route: routes stay mounted (React Activity), so ids must not repeat across pages. */
+  id?: string;
 };
 
 /** Dark closing scene: a statement-sized headline and the demo CTA. */
-export function FinalCta({ title, subtitle, body, bullets, tone = "brand" }: Props) {
+export function FinalCta({ title, subtitle, body, bullets, tone = "brand", id = "final-cta" }: Props) {
   return (
-    <section data-theme="dark" aria-labelledby="final-cta-title" className="relative overflow-hidden py-28 md:py-40">
+    <section data-theme="dark" aria-labelledby={`${id}-title`} className="relative overflow-hidden py-28 md:py-40">
       <div className="dot-field" aria-hidden />
       <Container className="relative text-center">
         {subtitle ? <p className="label text-brand-strong">{subtitle}</p> : null}
-        <h2 id="final-cta-title" className="display-lg mx-auto mt-5 max-w-[14ch] text-ink">
+        <h2 id={`${id}-title`} className="display-lg mx-auto mt-5 max-w-[14ch] text-ink">
           <RevealHeading>{title}</RevealHeading>
         </h2>
         <RevealBlock>

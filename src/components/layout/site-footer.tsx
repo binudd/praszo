@@ -1,11 +1,10 @@
-import { ArrowUpRight } from "lucide-react";
 import Link from "next/link";
 
 import { Container } from "@/components/ui/container";
 import { Logo } from "@/components/ui/logo";
 import { ProductGlyph } from "@/components/ui/product-glyph";
 import { SocialIcon, type SocialIconName } from "@/components/ui/social-icons";
-import { company, companyLinks } from "@/data/company";
+import { company, companyLinks, legalLinks } from "@/data/company";
 import { productList } from "@/data/products";
 
 export function SiteFooter() {
@@ -56,30 +55,13 @@ export function SiteFooter() {
           <div>
             <p className="text-[11px] font-bold tracking-[0.16em] text-ink-3 uppercase">Company</p>
             <ul className="mt-4 flex flex-col gap-2.5">
-              {companyLinks.map((item) =>
-                item.external ? (
-                  <li key={item.href}>
-                    <a
-                      href={item.href}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="inline-flex items-center gap-1 text-[15px] font-semibold text-ink-2 transition-colors hover:text-ink"
-                    >
-                      {item.label}
-                      <ArrowUpRight size={14} className="text-ink-3" aria-hidden />
-                    </a>
-                  </li>
-                ) : (
-                  <li key={item.href}>
-                    <Link
-                      href={item.href}
-                      className="text-[15px] font-semibold text-ink-2 transition-colors hover:text-ink"
-                    >
-                      {item.label}
-                    </Link>
-                  </li>
-                ),
-              )}
+              {companyLinks.map((item) => (
+                <li key={item.href}>
+                  <Link href={item.href} className="text-[15px] font-semibold text-ink-2 transition-colors hover:text-ink">
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
             </ul>
           </div>
 
@@ -108,14 +90,15 @@ export function SiteFooter() {
 
         <div className="mt-14 flex flex-col gap-3 border-t border-line pt-6 text-sm text-ink-3 md:flex-row md:items-center md:justify-between">
           <p>© 2026 Praszo. All rights reserved. {company.legalNote}</p>
-          <p className="flex items-center gap-4">
-            <a href={company.external.privacy} target="_blank" rel="noreferrer" className="transition-colors hover:text-ink">
-              Privacy Policy
-            </a>
-            <a href={company.external.website} target="_blank" rel="noreferrer" className="transition-colors hover:text-ink">
-              praszo.com
-            </a>
-          </p>
+          <ul className="flex items-center gap-4">
+            {legalLinks.map((item) => (
+              <li key={item.href}>
+                <Link href={item.href} className="transition-colors hover:text-ink">
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
         </div>
       </Container>
     </footer>

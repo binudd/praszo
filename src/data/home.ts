@@ -135,7 +135,7 @@ export const home = {
           "Built-in compliance: every action, approval, and document change is logged and traceable",
           "Absolute data control with on-premise deployment",
         ],
-        href: "https://praszo.com/large-firms/",
+        href: "/large-firms",
         icon: "Building" satisfies IconName,
         /** Photo shown in the "Who it is for" section. */
         image: {
@@ -154,7 +154,7 @@ export const home = {
           "Structured timesheet enforcement and realization tracking",
           "Role-based access and audit trails that keep the firm inspection-ready",
         ],
-        href: "https://praszo.com/mid-sized-business/",
+        href: "/mid-sized-firms",
         icon: "TrendingUp" satisfies IconName,
         image: {
           src: midSizedFirmsPhoto,

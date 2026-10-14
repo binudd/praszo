@@ -1,6 +1,8 @@
-import { ArrowRight, ArrowUpRight, Phone } from "lucide-react";
+import { ArrowRight, Phone } from "lucide-react";
+import Link from "next/link";
 
 import { RevealGroup } from "@/components/motion/reveal";
+import { PageHero } from "@/components/page/page-hero";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Eyebrow } from "@/components/ui/eyebrow";
@@ -21,61 +23,61 @@ export const metadata = buildMetadata({
 export default function ContactPage() {
   return (
     <main id="main" className="relative z-10">
-      <section className="relative overflow-hidden pt-32 pb-16 md:pt-40 md:pb-24">
-        <Container>
-          <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-20">
-            <div>
-              <Eyebrow>Contact</Eyebrow>
-              <h1 className="display-lg mt-5 text-ink">
-                Let&rsquo;s transform your practice together
-              </h1>
-              <p className="lede mt-6 max-w-xl">
-                Have a project in mind or want to streamline your financial workflows? We&rsquo;d love to hear from you.
-                Share your goals and our team will help you find the right Praszo solution.
-              </p>
-              <div className="mt-8 flex flex-wrap items-center gap-3">
-                <Button href={demoMailto} size="lg">
-                  Book a demo by email
-                  <ArrowRight size={18} aria-hidden />
-                </Button>
-                <Button href={company.phone.href} variant="secondary" size="lg">
-                  <Phone size={18} aria-hidden /> Call {company.phone.display}
-                </Button>
-              </div>
-              <p className="copy mt-4 text-ink-3">
-                The email opens pre-filled with a short demo request. Tell us which products you want to see.
-              </p>
-            </div>
-
-            <RevealGroup className="grid content-start gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-1">
-              <EditorialItem reveal icon="Phone" titleAs="h2" title="Call">
-                <a href={company.phone.href} className="copy mt-2 block font-semibold text-ink hover:text-brand-strong">
-                  {company.phone.display}
-                </a>
-              </EditorialItem>
-              <EditorialItem reveal icon="Mail" titleAs="h2" title="Email">
-                <a href={`mailto:${company.emails.demo}`} className="copy mt-2 block font-semibold text-ink hover:text-brand-strong">
-                  {company.emails.demo}
-                </a>
-                <p className="label mt-1 text-ink-3">Demos and sales</p>
-                <a href={`mailto:${company.emails.support}`} className="copy mt-3 block font-semibold text-ink hover:text-brand-strong">
-                  {company.emails.support}
-                </a>
-                <p className="label mt-1 text-ink-3">Existing customers</p>
-              </EditorialItem>
-              <EditorialItem reveal icon="MapPin" titleAs="h2" title="Visit" className="sm:col-span-2 lg:col-span-1">
-                <address className="copy mt-2 not-italic">
-                  {company.address.name}
-                  <br />
-                  {company.address.lines[0]}
-                  <br />
-                  {company.address.lines[1]}
-                </address>
-              </EditorialItem>
-            </RevealGroup>
-          </div>
-        </Container>
-      </section>
+      <PageHero
+        titleId="contact-title"
+        eyebrow="Contact"
+        title={<>Let&rsquo;s transform your practice together</>}
+        description="Have a project in mind or want to streamline your financial workflows? We’d love to hear from you. Share your goals and our team will help you find the right Praszo solution."
+        actions={
+          <>
+            <Button href={demoMailto} size="lg">
+              Book a demo by email
+              <ArrowRight size={18} aria-hidden />
+            </Button>
+            <Button href={company.phone.href} variant="secondary" size="lg">
+              <Phone size={18} aria-hidden /> Call {company.phone.display}
+            </Button>
+          </>
+        }
+        aside={
+          <RevealGroup className="grid content-start gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-1">
+            <EditorialItem reveal icon="Phone" titleAs="h2" title="Call">
+              <a href={company.phone.href} className="copy mt-2 block font-semibold text-ink hover:text-brand-strong">
+                {company.phone.display}
+              </a>
+            </EditorialItem>
+            <EditorialItem reveal icon="Mail" titleAs="h2" title="Email">
+              <a
+                href={`mailto:${company.emails.demo}`}
+                className="copy mt-2 block font-semibold text-ink hover:text-brand-strong"
+              >
+                {company.emails.demo}
+              </a>
+              <p className="label mt-1 text-ink-3">Demos and sales</p>
+              <a
+                href={`mailto:${company.emails.support}`}
+                className="copy mt-3 block font-semibold text-ink hover:text-brand-strong"
+              >
+                {company.emails.support}
+              </a>
+              <p className="label mt-1 text-ink-3">Existing customers</p>
+            </EditorialItem>
+            <EditorialItem reveal icon="MapPin" titleAs="h2" title="Visit" className="sm:col-span-2 lg:col-span-1">
+              <address className="copy mt-2 not-italic">
+                {company.address.name}
+                <br />
+                {company.address.lines[0]}
+                <br />
+                {company.address.lines[1]}
+              </address>
+            </EditorialItem>
+          </RevealGroup>
+        }
+      >
+        <p className="copy mt-4 text-ink-3">
+          The email opens pre-filled with a short demo request. Tell us which products you want to see.
+        </p>
+      </PageHero>
 
       <section aria-labelledby="contact-products-title" className="border-t border-line py-16 md:py-20">
         <Container>
@@ -105,9 +107,12 @@ export default function ContactPage() {
           <ProductLinks products={productList} detail="category" className="mt-8 sm:grid-cols-2 lg:grid-cols-3" />
           <p className="copy mt-8 text-ink-3">
             Looking for articles and resources?{" "}
-            <a href={company.external.insights} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 font-semibold text-ink hover:text-brand-strong">
-              Visit Insights on praszo.com <ArrowUpRight size={14} aria-hidden />
-            </a>
+            <Link
+              href="/insights"
+              className="inline-flex items-center gap-1 font-semibold text-ink hover:text-brand-strong"
+            >
+              Visit Insights <ArrowRight size={14} aria-hidden />
+            </Link>
           </p>
         </Container>
       </section>
