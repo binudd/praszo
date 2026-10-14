@@ -87,19 +87,19 @@ export function MatchEngine({ paused, className }: MockupProps) {
   return (
     <div ref={rootRef} className={className}>
       <MockupShell title={data.title} meta={data.meta}>
-        <div data-body className="relative grid h-full min-h-0 grid-cols-[1.25fr_1fr] grid-rows-[minmax(0,1fr)] gap-3 p-2.5 sm:gap-6 sm:p-3">
+        <div data-body className="relative grid h-full min-h-0 grid-cols-[1.25fr_1fr] grid-rows-[minmax(0,1fr)] gap-3 p-3 sm:gap-6">
           <svg className="pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden>
             {data.documents.map((doc) => (
               <path key={doc} data-link fill="none" stroke="var(--product)" strokeWidth="1.5" opacity="0" />
             ))}
           </svg>
-          <ul className="flex min-h-0 flex-col gap-1.5 overflow-hidden">
+          <ul className="flex min-h-0 flex-col gap-2 overflow-hidden">
             {data.rows.map((row) => (
               <li
                 key={row.id}
                 data-row={row.id}
                 data-state="idle"
-                className="rounded-sm border border-line bg-bg px-2.5 py-2 transition-[border-color,background-color,opacity] duration-300 data-[state=active]:border-product data-[state=active]:bg-product-soft/40 data-[state=done]:opacity-60"
+                className="rounded-sm bg-bg px-2.5 py-2 transition-[background-color,opacity] duration-300 data-[state=active]:bg-product-soft data-[state=done]:opacity-55"
               >
                 <p className="truncate text-[11px] font-semibold text-ink">{row.vendor}</p>
                 <p className="flex justify-between gap-2 text-[10px] text-ink-3">
@@ -109,13 +109,13 @@ export function MatchEngine({ paused, className }: MockupProps) {
               </li>
             ))}
           </ul>
-          <ul className="flex min-h-0 flex-col justify-between gap-1.5">
+          <ul className="flex min-h-0 flex-col justify-between gap-2">
             {data.documents.map((doc) => (
               <li
                 key={doc}
                 data-doc={doc}
                 data-state="idle"
-                className="group flex items-center justify-between gap-2 rounded-sm border border-line bg-surface px-2.5 py-2 transition-colors duration-300 data-[state=match]:border-success/40 data-[state=partial]:border-product/60"
+                className="group flex items-center justify-between gap-2 rounded-sm bg-bg px-2.5 py-2 transition-colors duration-300 data-[state=partial]:bg-product-soft"
               >
                 <span className="flex min-w-0 items-center gap-1.5 text-[11px] font-semibold text-ink">
                   <FileText size={12} className="shrink-0 text-product" aria-hidden />
@@ -124,7 +124,7 @@ export function MatchEngine({ paused, className }: MockupProps) {
                 <span className="shrink-0 text-[9px] font-bold">
                   <span className="hidden rounded-full bg-elevated px-1.5 py-0.5 text-ink-3 group-data-[state=idle]:inline">…</span>
                   <span className="hidden rounded-full bg-success/12 px-1.5 py-0.5 text-success group-data-[state=match]:inline">Match</span>
-                  <span className="hidden rounded-full bg-product-soft px-1.5 py-0.5 text-product-deep group-data-[state=partial]:inline">85%</span>
+                  <span className="hidden rounded-full bg-bg px-1.5 py-0.5 text-product-deep group-data-[state=partial]:inline">85%</span>
                 </span>
               </li>
             ))}

@@ -10,31 +10,33 @@ import { products } from "@/data/products";
 import { cn } from "@/lib/cn";
 import { prefersReducedMotion } from "@/lib/motion";
 
-const HOLD = 1.6;
+const HOLD = 1.8;
+/** Transform-only Flip: `scale` avoids width/height tweens, `absolute` lets the card cross clipped columns. */
+const FLIP = { duration: 0.85, ease: "power3.inOut", absolute: true, scale: true, prune: true } as const;
 
 function Card({ card }: { card: KanbanCard }) {
   const product = card.tag ? products[card.tag] : null;
   return (
     <li
       data-card={card.id}
-      className="rounded-sm border border-line bg-bg p-2.5 shadow-[0_1px_2px_rgba(15,23,42,0.04)] will-change-transform"
+      className="rounded-sm bg-bg p-2.5 transition-shadow duration-300 data-[lift]:shadow-float"
       style={product ? ({ "--product": product.color, "--product-deep": product.colorDeep } as CSSProperties) : undefined}
     >
       <p className="text-[11px] leading-snug font-semibold text-ink">{card.title}</p>
       <div className="mt-2 flex items-center justify-between gap-2">
-        <span className="flex items-center gap-1.5 text-[10px] text-ink-3">
-          <span className="inline-flex h-4.5 w-4.5 items-center justify-center rounded-full bg-elevated text-[8px] font-bold text-ink-2">
+        <span className="flex min-w-0 items-center gap-1.5 text-[10px] text-ink-3">
+          <span className="inline-flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-full bg-elevated text-[8px] font-bold text-ink-2">
             {card.assignee}
           </span>
-          {card.due}
+          <span className="truncate">{card.due}</span>
           {card.hours ? (
-            <span className="inline-flex items-center gap-0.5">
+            <span className="inline-flex shrink-0 items-center gap-0.5">
               <Clock size={9} aria-hidden /> {card.hours}
             </span>
           ) : null}
         </span>
         {product ? (
-          <span className="rounded-full bg-product-soft px-1.5 py-0.5 text-[8px] font-bold tracking-[0.06em] text-product-deep uppercase">
+          <span className="shrink-0 rounded-full bg-product-soft px-1.5 py-0.5 text-[8px] font-bold tracking-[0.06em] text-product-deep uppercase">
             {product.name}
           </span>
         ) : null}
@@ -71,9 +73,11 @@ export function KanbanBoard({ paused, className }: MockupProps) {
           if (count) count.textContent = String(column.querySelectorAll("[data-card]").length);
         });
       };
+      // DOM order is preserved by the Map, so replaying it restores the original board.
       const origin = new Map(cards().map((card) => [card, card.parentElement as HTMLElement]));
 
       let alive = true;
+      let active: gsap.core.Animation | null = null;
       const wait = (seconds: number) =>
         new Promise<void>((resolve) => {
           gsap.delayedCall(seconds, () => resolve());
@@ -81,19 +85,27 @@ export function KanbanBoard({ paused, className }: MockupProps) {
       const untilResumed = async () => {
         while (alive && pausedRef.current) await wait(0.25);
       };
+      const play = (animation: gsap.core.Animation) => {
+        active = animation;
+        return animation.then(() => {
+          if (active === animation) active = null;
+        });
+      };
 
       const move = async (cardId: string, columnId: string) => {
         const card = root.querySelector<HTMLElement>(`[data-card="${cardId}"]`);
         const list = columnList(columnId);
         if (!card || !list || list.offsetParent === null) return;
-        await gsap.to(card, { scale: 1.03, rotate: -1.2, boxShadow: "0 14px 28px -12px rgba(15,23,42,0.35)", duration: 0.25, ease: "power2.out" });
+        card.dataset.lift = "";
+        await play(gsap.to(card, { scale: 1.02, duration: 0.2, ease: "power2.out" }));
         if (!alive) return;
         const state = Flip.getState(cards());
         list.insertBefore(card, list.firstChild);
         updateCounts();
-        await Flip.from(state, { duration: 0.75, ease: "power2.inOut", absolute: true, nested: true, prune: true });
+        await play(Flip.from(state, FLIP));
         if (!alive) return;
-        await gsap.to(card, { scale: 1, rotate: 0, boxShadow: "0 1px 2px rgba(15,23,42,0.04)", duration: 0.3, ease: "power2.out", clearProps: "boxShadow" });
+        await play(gsap.to(card, { scale: 1, duration: 0.25, ease: "power2.out", clearProps: "transform" }));
+        delete card.dataset.lift;
       };
 
       const run = async () => {
@@ -121,6 +133,11 @@ export function KanbanBoard({ paused, className }: MockupProps) {
 
       return () => {
         alive = false;
+        // Finish any in-flight animation so Flip restores the styles it set, then reset the board.
+        active?.progress(1).kill();
+        const all = cards();
+        gsap.set(all, { clearProps: "transform" });
+        all.forEach((card) => delete card.dataset.lift);
         origin.forEach((parent, card) => parent.appendChild(card));
         updateCounts();
       };
@@ -131,17 +148,17 @@ export function KanbanBoard({ paused, className }: MockupProps) {
   return (
     <div ref={rootRef} className={className}>
       <MockupShell title={kanban.engagement} meta={kanban.meta}>
-        <div className="grid h-full min-h-0 grid-cols-2 grid-rows-[minmax(0,1fr)] gap-2 p-2.5 sm:grid-cols-4">
+        <div className="grid h-full min-h-0 grid-cols-2 grid-rows-[minmax(0,1fr)] gap-3 p-3 sm:grid-cols-3">
           {kanban.columns.map((column, index) => (
             <section
               key={column.id}
               data-column={column.id}
               aria-label={column.title}
-              className={cn("flex min-h-0 flex-col rounded-sm border border-line bg-surface p-2", index >= 2 && "hidden sm:flex")}
+              className={cn("flex min-h-0 flex-col", index >= 2 && "hidden sm:flex")}
             >
-              <header className="flex items-center justify-between px-0.5 pb-2">
+              <header className="flex items-center justify-between px-1 pb-2">
                 <h3 className="label text-[9px] text-ink-3">{column.title}</h3>
-                <span data-count className="rounded-full bg-elevated px-1.5 text-[9px] font-bold text-ink-2 tabular-nums">
+                <span data-count className="rounded-full bg-bg px-1.5 text-[9px] font-bold text-ink-2 tabular-nums">
                   {column.cards.length}
                 </span>
               </header>

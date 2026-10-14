@@ -21,7 +21,7 @@ export function WindowFrame({
           <i className="h-2.5 w-2.5 rounded-full bg-line-strong" />
         </span>
         {title ? (
-          <span className="mx-auto hidden h-6 max-w-[60%] items-center truncate rounded-md border border-line bg-bg px-3 text-[11px] text-ink-3 sm:flex">
+          <span className="mx-auto hidden h-6 max-w-[60%] items-center truncate rounded-md bg-bg px-3 text-[11px] text-ink-3 sm:flex">
             {title}
           </span>
         ) : null}

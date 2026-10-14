@@ -22,7 +22,8 @@
   --color-warning: var(--warning);
   --color-product: var(--product);
   --color-product-deep: var(--product-deep);
-  --color-product-soft: var(--product-soft);
+  /* Mixed per element (not on :root), so the tint follows wherever --product is overridden. */
+  --color-product-soft: color-mix(in srgb, var(--product) 10%, var(--bg));
   --color-product-ink: var(--product-ink);
   --font-sans: var(--font-manrope), "Manrope", ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -585,6 +586,19 @@ details[open] .faq-chevron {
 
 .hscroll-footer {
   padding-inline: var(--hscroll-inset);
+}
+
+/* Screenshot rail: every capture shares one height (so captions line up) and
+   takes its width from its own aspect ratio. Capped so the widest capture
+   (about 2:1) plus its window bar still fits the viewport while pinned. */
+.screen-rail {
+  --screen-h: min(20rem, 55svh);
+}
+
+@media (min-width: 768px) {
+  .screen-rail {
+    --screen-h: min(32rem, calc(100svh - 28rem), calc(86vw / 2.1));
+  }
 }
 
 /* Hero frame that fills the space it is given. The box hands the frame its

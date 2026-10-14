@@ -6,7 +6,6 @@ import { useEffect, useRef } from "react";
 import { MockupShell, type MockupProps } from "@/components/mockups/mockup-shell";
 import { gsap, useGSAP } from "@/components/motion/gsap";
 import { modifiShowcase as data } from "@/data/showcases";
-import { cn } from "@/lib/cn";
 import { prefersReducedMotion } from "@/lib/motion";
 
 /** Praszo Modifi: placeholders fill from CRM data, approvals advance, the letter gets signed. */
@@ -74,8 +73,8 @@ export function ModifiFlow({ paused, className }: MockupProps) {
   return (
     <div ref={rootRef} className={className}>
       <MockupShell title={data.title} meta={data.meta}>
-        <div className="grid h-full grid-cols-1 gap-2.5 p-2.5 sm:grid-cols-[1.3fr_1fr]">
-          <div className="relative flex flex-col rounded-sm border border-line bg-surface p-3">
+        <div className="grid h-full grid-cols-1 gap-3 p-3 sm:grid-cols-[1.3fr_1fr]">
+          <div className="relative flex flex-col rounded-sm bg-bg p-3">
             <div className="h-2 w-24 rounded bg-product/70" />
             <div className="mt-3 space-y-1.5" aria-hidden>
               <div className="h-1.5 w-full rounded bg-elevated" />
@@ -87,7 +86,7 @@ export function ModifiFlow({ paused, className }: MockupProps) {
                   key={field.id}
                   data-field={field.id}
                   data-state="empty"
-                  className="group relative inline-flex h-5 items-center rounded bg-product-soft px-1.5 font-mono text-[9px] font-semibold text-product-deep transition-colors duration-300 data-[state=filled]:bg-bg data-[state=filled]:font-sans data-[state=filled]:text-ink data-[state=filled]:ring-1 data-[state=filled]:ring-line"
+                  className="group relative inline-flex h-5 items-center rounded bg-product-soft px-1.5 font-mono text-[9px] font-semibold text-product-deep transition-colors duration-300 data-[state=filled]:bg-elevated data-[state=filled]:font-sans data-[state=filled]:text-ink"
                 >
                   <span className="group-data-[state=filled]:hidden">{field.placeholder}</span>
                   <span className="hidden group-data-[state=filled]:inline">{field.value}</span>
@@ -98,7 +97,7 @@ export function ModifiFlow({ paused, className }: MockupProps) {
               <div className="h-1.5 w-full rounded bg-elevated" />
               <div className="h-1.5 w-4/5 rounded bg-elevated" />
             </div>
-            <div className="mt-3 flex items-center gap-1.5 rounded border border-dashed border-line bg-bg px-2 py-1.5 text-[9px] font-semibold text-ink-3">
+            <div className="mt-3 flex items-center gap-1.5 rounded bg-elevated px-2 py-1.5 text-[9px] font-semibold text-ink-3">
               <Lock size={10} aria-hidden /> {data.clause}
             </div>
             <div className="mt-auto flex items-end justify-between pt-3">
@@ -123,11 +122,9 @@ export function ModifiFlow({ paused, className }: MockupProps) {
                 key={step}
                 data-step={step}
                 data-state="idle"
-                className={cn(
-                  "group flex items-center gap-2.5 rounded-sm border border-line bg-bg px-2.5 py-2 transition-colors duration-300 data-[state=active]:border-product data-[state=done]:border-success/40",
-                )}
+                className="group flex items-center gap-2.5 rounded-sm bg-bg px-2.5 py-2 transition-colors duration-300 data-[state=active]:bg-product-soft"
               >
-                <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-line text-[9px] font-bold text-ink-3 group-data-[state=active]:border-product group-data-[state=active]:text-product-deep group-data-[state=done]:border-success group-data-[state=done]:bg-success group-data-[state=done]:text-white">
+                <span className="inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-elevated text-[9px] font-bold text-ink-3 transition-colors duration-300 group-data-[state=active]:bg-product group-data-[state=active]:text-product-ink group-data-[state=done]:bg-success group-data-[state=done]:text-white">
                   <span className="group-data-[state=done]:hidden">{index + 1}</span>
                   <Check size={10} className="hidden group-data-[state=done]:block" aria-hidden />
                 </span>

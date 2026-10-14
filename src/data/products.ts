@@ -7,7 +7,11 @@ import modifiDynamic from "@/assets/products/modifi-dynamic.png";
 import modifiHub from "@/assets/products/modifi-hub.png";
 import modifiTemplate from "@/assets/products/modifi-template.png";
 import modifiTransparency from "@/assets/products/modifi-transparency.png";
-import practiceTimesheet from "@/assets/products/practice-timesheet.png";
+import practiceBoard from "@/assets/products/practice-board.png";
+import practiceEditProject from "@/assets/products/practice-edit-project.png";
+import practiceMyWork from "@/assets/products/practice-my-work.png";
+import practiceProject from "@/assets/products/practice-project.png";
+import practiceTimesheetWeek from "@/assets/products/practice-timesheet-week.png";
 import verifiDashboard from "@/assets/products/verifi-dashboard.png";
 import verifiIngestion from "@/assets/products/verifi-ingestion.png";
 import verifiReporting from "@/assets/products/verifi-reporting.png";
@@ -45,6 +49,9 @@ export type FeatureSection = {
   groups: FeatureGroup[];
 };
 
+/** One capture in the screenshot carousel after the hero. */
+export type Screen = { title: string; visual: Visual };
+
 export type Spotlight = {
   id: string;
   eyebrow?: string;
@@ -74,6 +81,8 @@ export type Product = {
   highlights?: { title: string; body: string; icon: IconName }[];
   problem?: { title: string; body?: string; points: string[] };
   spotlights: Spotlight[];
+  /** Extra captures for the screenshot carousel; the hero and spotlight visuals are included automatically. */
+  screens?: Screen[];
   featureSections: FeatureSection[];
   comparison?: {
     title: string;
@@ -118,8 +127,8 @@ const practice: Product = {
       "Praszo Practice is practice management software for auditing firms that demand operational control and complete ownership of their data. It eliminates lost hours, stalled approvals, budget overruns, and compliance risks, ensuring every hour is captured, every engagement stays on track, and every audit remains inspection-ready.",
     visual: {
       kind: "image",
-      src: practiceTimesheet,
-      alt: "Praszo Practice timesheet workspace showing a weekly grid of logged hours per team member",
+      src: practiceBoard,
+      alt: "Praszo Practice project kanban board with Not Started, Completed, and In Progress columns, task estimates, logged hours, due dates, and dependencies",
       frame: "none",
     },
   },
@@ -129,6 +138,24 @@ const practice: Product = {
     points: ["Lost billable hours", "Stalled approvals", "Budget overruns", "Compliance and inspection risk"],
   },
   spotlights: [],
+  screens: [
+    {
+      title: "Project details",
+      visual: { kind: "image", src: practiceProject, alt: "Praszo Practice project details with people and organization, category, schedule, and budget versus actual hours flagged over budget", frame: "none" },
+    },
+    {
+      title: "My work",
+      visual: { kind: "image", src: practiceMyWork, alt: "Praszo Practice My Work view listing a team member's overdue tasks with status, due dates, and logged versus estimated hours", frame: "none" },
+    },
+    {
+      title: "Weekly timesheet",
+      visual: { kind: "image", src: practiceTimesheetWeek, alt: "Praszo Practice weekly timesheet grouped by member and project, with daily hours and a grand total", frame: "none" },
+    },
+    {
+      title: "Project setup",
+      visual: { kind: "image", src: practiceEditProject, alt: "Praszo Practice edit project form with template, leader, owner, members, kanban task statuses, and priority", frame: "none" },
+    },
+  ],
   featureSections: [
     {
       id: "features",
