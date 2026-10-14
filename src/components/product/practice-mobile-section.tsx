@@ -42,7 +42,7 @@ export function PracticeMobileSection() {
                 alt="Praszo Practice mobile app showing a projects list and a project status card with progress and due date"
                 sizes="(min-width: 1024px) 30vw, 80vw"
                 placeholder="blur"
-                className="mx-auto h-auto w-full max-w-[18rem] drop-shadow-xl"
+                className="mx-auto h-auto w-full max-w-[18rem]"
               />
             </div>
           </ClipReveal>

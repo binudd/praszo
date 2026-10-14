@@ -10,7 +10,7 @@ const fields = [
 /** Illustrative three-way match of a purchase register row against its evidence. */
 export function MatchThreeWay() {
   return (
-    <div className="rounded-[1.25rem] border border-line bg-white p-4 shadow-float sm:p-5">
+    <div className="rounded-[1.25rem] border border-line bg-white p-4 sm:p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <p className="text-[10px] font-bold tracking-[0.14em] text-ink-3 uppercase">Verification engine</p>

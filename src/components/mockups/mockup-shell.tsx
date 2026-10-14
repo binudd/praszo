@@ -23,7 +23,7 @@ export function MockupShell({
   className?: string;
 }) {
   return (
-    <WindowFrame title={title} action={<MockupThemeToggle />} className={cn("h-full shadow-none", className)}>
+    <WindowFrame title={title} action={<MockupThemeToggle />} className={cn("h-full", className)}>
       <div className="flex h-full flex-col bg-elevated">
         {meta.length ? (
           <ul className="flex shrink-0 flex-wrap items-center gap-1.5 px-3 pt-3">

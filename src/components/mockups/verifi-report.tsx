@@ -3,7 +3,7 @@ import { CircleCheck, FileSpreadsheet, FileText, Sparkles } from "lucide-react";
 /** Sample AI validation report, mirroring the example published on the Verifi page. */
 export function VerifiReport() {
   return (
-    <div className="grid grid-cols-1 gap-4 rounded-[1.25rem] border border-line bg-white p-4 shadow-float sm:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] sm:p-5">
+    <div className="grid grid-cols-1 gap-4 rounded-[1.25rem] border border-line bg-white p-4 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)] sm:p-5">
       <div className="rounded-xl border border-line bg-surface p-4">
         <p className="text-[10px] font-bold tracking-[0.14em] text-ink-3 uppercase">Financial documents</p>
         <ul className="mt-3 space-y-3">

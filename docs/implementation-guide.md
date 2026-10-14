@@ -139,7 +139,7 @@ The data layer drives the pages, and content edits should rarely need component 
 - **Brand:** the logo coral is the primary color. `--brand #f46a4a` (exact logo color: fills, rules, icons, large display text; 3.0:1 on white), `--brand-strong` (#b04c35 light / #ff8a70 dark: **all small brand text**, 5.3:1 on white), `--brand-hover`, `--brand-soft`, `--brand-ink` (white on coral fills, matching the product buttons; the user's choice, 3.0:1, below AA for normal text), hover darkens to `--brand-hover`. `--accent #f55d48` stays for warning flags in mockups. Use `text-brand` only for icons or text ≥24px; use `text-brand-strong` for anything smaller.
 - **Product:** `--product`, `--product-deep`, `--product-soft` (defaults to brand).
 - **Radii:** `--radius-sm .75rem`, `--radius-card 1.5rem`, `--radius-panel 2rem`, `--radius-media 3rem`.
-- **Shadows:** `--shadow-card`, `--shadow-float`, `--shadow-stage` (big layered stage shadow), `--shadow-menu`.
+- **Shadows:** `--shadow-card`, `--shadow-float`, `--shadow-stage`, `--shadow-menu`. **Interface screenshots and mockups never carry a shadow** (window frames, preview rails, spotlights, ecosystem posters, the workflow panel, the phone screenshot, mockup panels). Shadows remain only on floating chrome: dropdown menus, the mobile sheet, back-to-top and the product icon nav marker.
 - **Menu glass:** `--menu-bg` plus `--shadow-menu`. Menus have no borders by design.
 - **Easing:** `--ease-out`, `--ease-expo`, `--ease-nav`. GSAP default `EASE = "power3.out"` (`lib/motion.ts`).
 - **Header height:** `--header-h: 4.5rem` (used for hero and scene top padding).
@@ -159,7 +159,7 @@ The data layer drives the pages, and content edits should rarely need component 
 ### Surfaces
 - **No content cards.** Titled items never sit on a card surface. They use `EditorialItem` (`ui/editorial-item.tsx`): hairline top rule, `label` row (index and/or icon), `display-sm` + `lede` for sets of 2–3 (`size="display"`) or `heading` + `copy` for rails and lists (`size="heading"`). Used by pillars, highlights, audience, feature groups, both card rails and the contact details. Product link grids use `ProductLinks` (`ui/product-links.tsx`): rule, glyph, `heading`, one line of `copy`, hover to brand. The old `ui/card.tsx` was removed. Surfaces remain only for UI depictions (mockups, screenshots, the product posters), menus and buttons.
 - **Menus.** `.menu-surface` (header nav pill and menu button; flat, no shadow) and `.menu-panel` (dropdowns; keeps `--shadow-menu` because it floats over content) are glass. Blur is emitted via `@apply backdrop-blur-xl backdrop-saturate-150`, because Lightning CSS drops the unprefixed property from hand-written rules.
-- **Mockups** follow the contrast rule: flat `bg-elevated` desk, borderless `bg-bg` cards, state shown by a tint (`bg-product-soft`), shadow only while lifted. **No inner borders.**
+- **Mockups** follow the contrast rule: flat `bg-elevated` desk, borderless `bg-bg` cards, state shown by a tint (`bg-product-soft`), no shadows at all (a lifted card only scales). **No inner borders.**
 - **Ecosystem posters** must reach AA (4.5:1) for every text layer: white on the product colour when it passes (Practice 7.06, Docs 4.88), else white on `colorDeep` when that passes (Modifi #1f5fd6, 5.73), else ink on the product colour (Verifi 7.29, Match 8.34). Text is full opacity; the badge uses `bg-black/15` (white text) or `bg-black/10` (ink).
 
 ### Layout utilities
@@ -319,7 +319,7 @@ All five share `MockupShell`: a `WindowFrame` (dots, title pill, optional `actio
 
 | Mockup | Product | Engine | Loop |
 |---|---|---|---|
-| `KanbanBoard` | Practice | **GSAP Flip**, transform-only (`absolute`, `scale: true`, `prune`) | 3 columns (2 on phones). Cards lift (`scale 1.02` + `data-lift` shadow), fly to the top of the target column, counts update, then the moves replay in reverse. In-flight animation is finished on cleanup. |
+| `KanbanBoard` | Practice | **GSAP Flip**, transform-only (`absolute`, `scale: true`, `prune`) | 3 columns (2 on phones). Cards lift (`scale 1.02`, no shadow), fly to the top of the target column, counts update, then the moves replay in reverse. In-flight animation is finished on cleanup. |
 | `VerifiValidator` | Verifi | GSAP timeline `repeat -1` | Checks go pending, then running, then pass or flag. A score ring and counter tween. |
 | `MatchEngine` | Match | GSAP timeline | For each register row, SVG links draw to Invoice, PO and GRN, and results stamp. |
 | `ModifiFlow` | Modifi | GSAP timeline | Placeholders fill, approval stepper advances, signature path draws, "Signed" pops |
@@ -329,7 +329,7 @@ All five share `MockupShell`: a `WindowFrame` (dots, title pill, optional `actio
 
 ### 9.3 `WindowFrame`
 - **Structure.** Browser chrome (`relative isolate overflow-hidden rounded-card`, `bg-surface` bar) wraps every mockup and every rail screenshot. The `relative isolate` makes it the clipping container, so absolutely positioned Flip cards cannot escape it.
-- **Hero frames.** These have no shadow (`shadow-none` in `MockupShell`).
+- **Hero frames.** No shadow: `WindowFrame` itself is flat.
 
 ### 9.4 Header (`layout/site-header.tsx`)
 - **Scroll direction.** `useHeaderReveal(headerRef, { resetKey: pathname })` slides the whole header away while scrolling down and back on scroll up (see §7.5). It only moves the transform, so nothing below shifts, and the hidden header sits fully above the viewport, so it cannot intercept clicks.

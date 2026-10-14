@@ -36,7 +36,7 @@ function ScreenCard({ screen, index }: { screen: Screen; index: number }) {
       className="flex w-[calc(var(--screen-h)*var(--aspect))] flex-col"
       style={{ "--aspect": aspect } as CSSProperties}
     >
-      <WindowFrame title={`Praszo ${screen.title}`} className="shadow-float">
+      <WindowFrame title={`Praszo ${screen.title}`}>
         <figure className="flex h-[var(--screen-h)] items-center overflow-hidden bg-surface">
           {visual.kind === "image" ? (
             <Image src={visual.src} alt={visual.alt} sizes="(min-width: 768px) 70rem, 120vw" placeholder="blur" className="h-full w-full object-cover object-top" />
@@ -76,7 +76,7 @@ export function ProductPreview({ product }: { product: Product }) {
             </h2>
           </RevealBlock>
           <ClipReveal className="mt-10">
-            <ProductVisual visual={product.hero.visual} sizes="(min-width: 1024px) 86rem, 100vw" className="shadow-stage" />
+            <ProductVisual visual={product.hero.visual} sizes="(min-width: 1024px) 86rem, 100vw" />
           </ClipReveal>
           <p className="copy mt-4 text-center text-ink-3">{product.hero.visual.alt}</p>
         </Container>

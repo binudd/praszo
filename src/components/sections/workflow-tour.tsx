@@ -186,7 +186,7 @@ export function WorkflowTour() {
                 ))}
               </div>
               <figure className="relative">
-                <div className="overflow-hidden rounded-media border border-line bg-surface p-3 shadow-stage">
+                <div className="overflow-hidden rounded-media border border-line bg-surface p-3">
                   <WorkflowCanvas className="h-auto w-full rounded-[1.5rem]" />
                 </div>
                 <div className="pointer-events-none absolute top-6 right-6 flex flex-col items-end gap-2">

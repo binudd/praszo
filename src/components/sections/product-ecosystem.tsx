@@ -46,7 +46,7 @@ function ProductPoster({ product, className }: { product: Product; className?: s
     <div
       style={productStyle(product)}
       className={cn(
-        "flex flex-col overflow-hidden rounded-media shadow-stage",
+        "flex flex-col overflow-hidden rounded-media",
         useDeep ? "bg-product-deep" : "bg-product",
         light ? "text-ink" : "text-white",
         className,
@@ -66,7 +66,7 @@ function ProductPoster({ product, className }: { product: Product; className?: s
       </div>
       <p className="px-6 pt-4 pb-5 text-[15px] leading-relaxed">{product.tagline}</p>
       <div className="relative min-h-[14rem] flex-1 overflow-hidden bg-black/10 px-6 pt-5">
-        <div data-poster-preview className={cn("absolute inset-x-6 top-5 bottom-0 overflow-hidden rounded-t-xl text-ink", visual.kind === "image" && "bg-white shadow-float")}>
+        <div data-poster-preview className={cn("absolute inset-x-6 top-5 bottom-0 overflow-hidden rounded-t-xl text-ink", visual.kind === "image" && "bg-white")}>
           {visual.kind === "image" ? (
             <Image src={visual.src} alt="" aria-hidden sizes="560px" className="h-full w-full object-cover object-left-top" />
           ) : Mockup ? (

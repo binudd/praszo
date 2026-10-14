@@ -99,7 +99,7 @@ export function ProductSpotlights({ product }: { product: Product }) {
                     <ProductVisual
                       visual={spotlight.visual}
                       sizes="(min-width: 1024px) 50vw, 100vw"
-                      className="max-h-full w-auto max-w-full shadow-stage [&_img]:max-h-[min(62svh,34rem)] [&_img]:w-auto"
+                      className="max-h-full w-auto max-w-full [&_img]:max-h-[min(62svh,34rem)] [&_img]:w-auto"
                     />
                   </div>
                 ))}

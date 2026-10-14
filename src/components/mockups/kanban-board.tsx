@@ -19,7 +19,7 @@ function Card({ card }: { card: KanbanCard }) {
   return (
     <li
       data-card={card.id}
-      className="rounded-sm bg-bg p-2.5 transition-shadow duration-300 data-[lift]:shadow-float"
+      className="rounded-sm bg-bg p-2.5"
       style={product ? ({ "--product": product.color, "--product-deep": product.colorDeep } as CSSProperties) : undefined}
     >
       <p className="text-[11px] leading-snug font-semibold text-ink">{card.title}</p>
