@@ -30,7 +30,7 @@ export function HeroShell({ id, labelledBy, rootRef, lede, visual, title, aside 
       aria-labelledby={labelledBy}
       className="relative h-[100svh] min-h-[36rem] overflow-hidden"
     >
-      <Container wide className="grid h-full grid-rows-[minmax(0,1fr)_auto] gap-y-5 pt-[5.75rem] pb-5 md:gap-y-8 md:pb-8 lg:pt-28">
+      <Container wide className="grid h-full grid-cols-1 grid-rows-[minmax(0,1fr)_auto] gap-y-5 pt-[5.75rem] pb-5 md:gap-y-8 md:pb-8 lg:pt-28">
         <div className="grid min-h-0 grid-rows-[auto_minmax(0,1fr)] gap-5 lg:grid-cols-12 lg:grid-rows-none lg:items-center lg:gap-12">
           <div className="min-w-0 lg:col-span-5">{lede}</div>
           <div data-hero="visual" className="relative h-full min-h-0 lg:col-span-7">
