@@ -1,0 +1,78 @@
+.home-hero-animation {
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  max-width: 100%;
+}
+
+.home-hero-animation__stage {
+  position: relative;
+  height: 100svh;
+  overflow: clip;
+}
+
+.home-hero-animation .hero {
+  height: 100%;
+  min-height: 100%;
+  overflow: hidden;
+}
+
+.home-hero-animation .hero > div {
+  z-index: auto;
+}
+
+.home-hero-animation [data-hero-fade] {
+  position: relative;
+  z-index: 1;
+}
+
+.home-hero-animation [data-hero-zoom] {
+  position: relative;
+  z-index: 3;
+  background: #121317;
+  border-color: #121317;
+  transform-origin: 50% 50%;
+  will-change: transform;
+}
+
+.home-hero-animation [data-hero-zoom] svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.home-hero-animation.is-static,
+.home-hero-animation.is-static .hero {
+  overflow: visible;
+}
+
+.home-hero-animation.is-static [data-hero-zoom] {
+  will-change: auto;
+}
+
+@media (max-width: 767px) {
+  .home-hero-animation .hero {
+    padding-top: 5.5rem;
+    padding-bottom: 1.25rem;
+    gap: 0;
+  }
+
+  .home-hero-animation [data-hero-zoom] {
+    max-height: 34svh;
+  }
+
+  .home-hero-animation .hero h1 {
+    font-size: clamp(2.2rem, 12vw, 3.2rem);
+  }
+}
+
+@media (max-height: 760px) {
+  .home-hero-animation .hero {
+    padding-top: 5rem;
+    padding-bottom: 0.75rem;
+  }
+
+  .home-hero-animation [data-hero-zoom] {
+    max-height: 28svh;
+  }
+}

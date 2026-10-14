@@ -1,0 +1,14 @@
+:root {
+  --bg: #ffffff;
+  --surface: #f8f9fc;
+  --elevated: #eef1f6;
+  --ink: #121317;
+  --ink-2: #5f666d;
+  --ink-3: #5f6368;
+  --line: #e4e7ec;
+  --accent: #217bfe;
+  --accent-ink: #ffffff;
+  --void: #000000;
+  --paper: #f8f9fc;
+  --paper-ink: #121317;
+}
