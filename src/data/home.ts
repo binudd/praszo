@@ -4,6 +4,11 @@ import hlbHamt from "@/assets/clients/hlb-hamt.png";
 import jumeira from "@/assets/clients/jumeira-consultants.png";
 import nex from "@/assets/clients/nex-consultants.png";
 import precisionAi from "@/assets/clients/precision-ai-solutions.png";
+// "Who it is for" photos, free under the Unsplash License (https://unsplash.com/license):
+// larger firms: Christel F., https://unsplash.com/photos/mXPcajHbD-M (La Défense, Paris)
+// mid-sized firms: https://images.unsplash.com/photo-1522071820081-009f0129c71c (Unsplash free library; photographer not yet confirmed)
+import largerFirmsPhoto from "@/assets/segments/larger-firms.jpg";
+import midSizedFirmsPhoto from "@/assets/segments/mid-sized-firms.jpg";
 import type { IconName } from "@/lib/icons";
 
 export const home = {
@@ -125,8 +130,11 @@ export const home = {
         ],
         href: "https://praszo.com/large-firms/",
         icon: "Building" satisfies IconName,
-        /** Cutout illustration shown in the "Who it is for" section. */
-        art: "large",
+        /** Photo shown in the "Who it is for" section. */
+        image: {
+          src: largerFirmsPhoto,
+          alt: "Glass facades of high-rise office towers reflecting one another in a business district",
+        },
       },
       {
         title: "Mid-sized audit firms",
@@ -141,7 +149,10 @@ export const home = {
         ],
         href: "https://praszo.com/mid-sized-business/",
         icon: "TrendingUp" satisfies IconName,
-        art: "mid",
+        image: {
+          src: midSizedFirmsPhoto,
+          alt: "A small team working on laptops around a shared table in an office",
+        },
       },
     ],
   },

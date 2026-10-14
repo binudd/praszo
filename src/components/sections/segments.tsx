@@ -1,11 +1,11 @@
 "use client";
 
 import { ArrowUpRight } from "lucide-react";
+import Image from "next/image";
 import { useRef } from "react";
 
 import { scrollToTarget } from "@/components/motion/smooth-scroll";
 import { useScene } from "@/components/motion/use-scene";
-import { FirmCutout } from "@/components/illustrations/firm-cutout";
 import { Container } from "@/components/ui/container";
 import { SectionHeader } from "@/components/ui/section-header";
 import { home } from "@/data/home";
@@ -28,21 +28,28 @@ function SegmentPanel({ segment, scene = false }: { segment: Segment; scene?: bo
   return (
     <div
       className={cn(
-        "grid gap-8 p-6 sm:p-10 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-center lg:gap-14 lg:p-12",
-        scene ? "h-full" : "rounded-panel bg-surface",
+        // No surface: content sits on the page grid, framed by hairline rules like the pillar columns.
+        "grid gap-8 lg:grid-cols-[minmax(0,0.85fr)_minmax(0,1.15fr)] lg:items-center lg:gap-14",
+        scene ? "h-full py-8 lg:py-10" : "border-t border-line-strong pt-8 pb-12",
       )}
     >
       <div className="flex flex-col">
-        <div data-seg-icon className="w-48 origin-bottom-left sm:w-60 lg:w-[min(18rem,24svh*1.53)]">
-          <FirmCutout size={segment.art} />
+        <div data-seg-icon className="w-48 origin-bottom-left overflow-hidden rounded-card bg-elevated shadow-card sm:w-60 lg:w-[min(18rem,21svh*1.53)]">
+          <Image
+            src={segment.image.src}
+            alt={segment.image.alt}
+            sizes="(min-width: 1024px) 18rem, (min-width: 640px) 15rem, 12rem"
+            placeholder="blur"
+            className="aspect-[3/2] h-auto w-full object-cover"
+          />
         </div>
         <h3 data-seg-part className="display-sm mt-5 text-ink">
           {segment.title}
         </h3>
-        <p data-seg-part className="mt-3 text-[15px] font-semibold text-brand">
+        <p data-seg-part className="label mt-4 leading-relaxed text-brand">
           {segment.subtitle}
         </p>
-        <p data-seg-part className="mt-4 text-[16.5px] leading-relaxed text-ink-2">
+        <p data-seg-part className="copy mt-4">
           {segment.body}
         </p>
         <a
@@ -50,20 +57,22 @@ function SegmentPanel({ segment, scene = false }: { segment: Segment; scene?: bo
           href={segment.href}
           target="_blank"
           rel="noreferrer"
-          className="group mt-7 inline-flex w-fit items-center gap-1 text-sm font-bold text-ink transition-colors hover:text-brand"
+          className="label group mt-6 inline-flex w-fit items-center gap-1.5 text-ink transition-colors hover:text-brand"
         >
           Read more on praszo.com
-          <ArrowUpRight size={16} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden />
+          <ArrowUpRight size={14} className="transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5" aria-hidden />
         </a>
       </div>
-      <ul className="divide-y divide-line">
-        {segment.points.map((text) => (
-          <li key={text} data-seg-point className="flex gap-3 py-3.5 text-[15px] leading-relaxed text-ink-2 first:pt-0 last:pb-0">
-            <span aria-hidden className="mt-[0.6em] h-1.5 w-1.5 shrink-0 rounded-full bg-brand" />
-            {text}
+      <ol className="border-b border-line-strong">
+        {segment.points.map((text, index) => (
+          <li key={text} data-seg-point className="flex gap-5 border-t border-line-strong py-3.5">
+            <span aria-hidden className="label mt-[0.3em] shrink-0 text-ink-3 tabular-nums">
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <span className="copy text-ink">{text}</span>
           </li>
         ))}
-      </ul>
+      </ol>
     </div>
   );
 }
@@ -82,8 +91,8 @@ function away(s: number, order: number, total: number, leaving: boolean) {
 
 /**
  * "Who it is for" as a sticky scroll scene. The card stays put and its content
- * is choreographed by scroll: the outgoing firm size lifts out (its cutout
- * illustration tilts and shrinks, copy rises, points slide left, each staggered), then the incoming
+ * is choreographed by scroll: the outgoing firm size lifts out (its photo
+ * tilts and shrinks, copy rises, points slide left, each staggered), then the incoming
  * one builds in from below and the right. A progress rule along the card
  * tracks the scene. Everything is GSAP transforms scrubbed by ScrollTrigger on
  * the shared Lenis loop. Tabs jump to their step. Below lg, under reduced
@@ -171,13 +180,13 @@ export function Segments() {
                 ))}
               </ol>
             </div>
-            <div className="relative mt-6 h-[min(36rem,calc(100svh-11rem))] overflow-hidden rounded-panel bg-surface">
+            <div className="relative mt-6 h-[min(36rem,calc(100svh-11rem))] overflow-hidden border-t border-line-strong">
               {segments.map((segment) => (
                 <div key={segment.title} data-scene-item className="absolute inset-0">
                   <SegmentPanel segment={segment} scene />
                 </div>
               ))}
-              <span aria-hidden className="absolute inset-x-0 bottom-0 h-1 bg-line">
+              <span aria-hidden className="absolute inset-x-0 bottom-0 h-0.5 bg-line-strong">
                 <span data-seg-progress className="block h-full origin-left scale-x-0 bg-brand" />
               </span>
             </div>
@@ -187,7 +196,7 @@ export function Segments() {
 
       <div className="scene-stack pt-12 pb-24 md:pb-32">
         <Container wide>
-          <div className="flex flex-col gap-4">
+          <div className="flex flex-col">
             {segments.map((segment) => (
               <SegmentPanel key={segment.title} segment={segment} />
             ))}

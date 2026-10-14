@@ -102,7 +102,6 @@ src/
     sections/     Homepage sections + shared hero-shell, hero-showcase, statement, faq-section, final-cta
     product/      Product page sections and helpers
     mockups/      Animated product mockups + window chrome + static mockups + registry
-    illustrations/ firm-cutout.tsx (SVG paper-cutout firm illustrations)
     ui/           button, badge, card, container, eyebrow, icon, logo, product-glyph, product-lockup,
                   product-icon-nav, section-header, social-icons
 ```
@@ -124,7 +123,7 @@ The data layer drives the pages, and content edits should rarely need component 
   - `ProductPage` sets `--product` and `--product-deep` inline on `<main data-product>`.
   - Anything inside uses `bg-product`, `text-product-deep` and `bg-product-soft`.
   - `bg-product-soft` is mixed **per element** in `@theme inline` (`color-mix(in srgb, var(--product) 10%, var(--bg))`), so it follows the nearest override. Never define product tints on `:root`. A root-resolved variable ignores overrides.
-- **`home.segments.items[].art`** (`"large" | "mid"`) picks the cutout illustration.
+- **`home.segments.items[].image`** (`{ src, alt }`) is the photo for each firm size. Both are free under the Unsplash License; sources are noted beside their imports in `data/home.ts` (assets in `src/assets/segments/`, cropped 3:2, 1200×800).
 
 ---
 
@@ -148,7 +147,7 @@ The data layer drives the pages, and content edits should rarely need component 
 
 ### Typography
 - **Font.** Manrope through `next/font` (`lib/fonts.ts`) as `--font-manrope`. Body weight is 500.
-- **Display scale** (in `@layer components`): `.display-xl`, `.display-lg` (homepage hero and big section titles), `.display-hero` (product hero), `.display-md`, `.display-sm`, plus `.lede` and `.label` (uppercase tracking).
+- **Display scale** (in `@layer components`): `.display-xl`, `.display-lg` (homepage hero and big section titles), `.display-hero` (product hero), `.display-md`, `.display-sm`, plus `.lede` (intro and short bodies), `.copy` (running text and lists, 16→18px) and `.label` (uppercase tracking: index numbers, kicker lines, compact links).
 - **Layer rule.** Base typography sits in `@layer base`. Unlayered CSS beats Tailwind utilities, which broke `truncate` once, so keep custom rules layered or class-scoped.
 
 ### Surfaces
@@ -256,11 +255,11 @@ gsap.ticker.lagSmoothing(0)
 | 1 | **Hero**: "Run it on Praszo." | `CorporateHero` → `HeroShell` + `HeroShowcase` | **Layout.** 100svh grid: title row at the top (below a header gap), then lede and CTAs on the left with the visual on the right (5/7 columns at lg). **Entrance.** Splash hand-off, word entrance (§7.4), scroll depth. **Visual.** Rotates the five product mockups every 7 s, and hovering or focusing a product icon holds one. Only the visible mockup animates (`paused` prop, `inert` on the others). The caption row shows the product lockup, label and `ProductIconNav`. **Theme.** Dark by default with a local light toggle (§9.6). |
 | 2 | Trusted by | `TrustedBy` | CSS marquee of 6 grayscale client logos |
 | 3 | Statement (dark) | `Statement` | Sticky 100svh stage over a 190svh track, with `WordReveal` scrubbed `top top` to `bottom bottom`. "cannot risk data exposure" is highlighted. Glass chips and a dot-field backdrop. |
-| 4 | Platform pillars: "Praszo OS. One platform." | `PlatformPillars` | `RevealHeading` lines and `RevealGroup` cards overlapping the giant title |
+| 4 | Platform pillars: "Praszo OS. One platform." | `PlatformPillars` | `RevealHeading` lines, then three editorial columns (no card surface) under the giant title: hairline top rule, `label` index with icon, `display-sm` title, `lede` body, staggered by `RevealGroup` |
 | 5 | Five specialized engines (`#products`) | `ProductEcosystem` | `useScene`, 5 steps, 520svh track. Left: product name list (current one expanded). Center: stacked **poster cards filled with the product color** fan in and out (`x d*70`, `rotate d*7`, `scale`). Right: step badge, summary and link crossfade. Clicking a name jumps to its step. Mobile: grid of posters. |
 | 6 | The complete audit firm workflow (`#workflow`, dark) | `WorkflowTour` + `mockups/workflow-canvas.tsx` | Custom ScrollTrigger scene, 440svh, `scrub 0.6`, 6 steps. The SVG layers crossfade (`[data-layer]`), strokes draw (`strokeDashoffset`), a dot travels the pipeline via **MotionPathPlugin**, copy and chips crossfade, step tabs track progress, and a progress line scales. |
 | 7 | Why Praszo (`#why-praszo`) | `WhyPraszo` | `HorizontalScroll` rail with a `WordReveal` intro and `RevealHeading` |
-| 8 | Who it is for: "Built for firms that cannot risk data exposure" | `Segments` + `illustrations/firm-cutout.tsx` | `useScene`, 2 steps, `count*130+40` svh. One persistent card. Each step holds for most of its slice. Inside a `SWITCH = 0.32` window the outgoing content leaves in reading order (cutout tilts and shrinks, copy rises 42px, points slide left 64px, stagger 0.07). Then the incoming content builds in from below and the right, with no overlap. A progress rule fills along the card bottom, and tabs jump to settled points. The **paper-cutout SVG illustrations** (towers for large firms, single office for mid-sized) use theme tokens and hard offset shadows. |
+| 8 | Who it is for: "Built for firms that cannot risk data exposure" | `Segments` (photos from `src/assets/segments/`) | `useScene`, 2 steps, `count*130+40` svh. One persistent frame with no surface (hairline top rule, progress rule at the bottom, content on the page grid; it still clips content moving in and out). Each step holds for most of its slice. Inside a `SWITCH = 0.32` window the outgoing content leaves in reading order (photo tilts and shrinks, copy rises 42px, points slide left 64px, stagger 0.07). Then the incoming content builds in from below and the right, with no overlap. A progress rule fills along the frame bottom, and tabs jump to settled points. Type matches the pillars: `display-sm` title, `label` subtitle in brand teal, `copy` body, numbered points (`label` index, `copy` text) between hairline rules, and a `label` link. Each firm size shows a **photo** (glass towers for larger firms, a mid-rise office for mid-sized firms) in a 3:2 rounded frame that tilts and shrinks with the content. |
 | 9 | Testimonials | `Testimonials` | `HorizontalScroll` rail of 4 quotes |
 | 10 | FAQ (`#faq`) | `FaqSection` | Native `<details>` accordion, plus FAQPage JSON-LD |
 | 11 | Final CTA (dark) | `FinalCta` | `RevealHeading` plus `RevealBlock` |
@@ -429,6 +428,8 @@ Measured on a `NEXT_PUBLIC_QA_HOOKS=1` production build served by `next start`, 
 - All 7 routes at 1440 and 390: no console errors, failed requests, broken images or horizontal overflow; one h1, description, canonical and OG image each.
 
 - **Route change during wheel momentum.** Clicking a link while Lenis was still easing landed the next page mid-scroll, because Lenis kept animating toward the old target. A `useLayoutEffect` on pathname in `smooth-scroll.tsx` now stops (resets) Lenis before Next applies the new route's scroll, then re-applies the scroll holds.
+
+- **Stale build cache.** One CSS edit was not picked up by `next build` until `.next/cache/turbopack` was cleared. If a style change does not show after a build, clear that folder and rebuild.
 
 **Remaining risks**
 - Verifi (#0f8f5c, 4.11:1) and Match (#c4640a, 4.06:1) deep shades with white text, used by product buttons and `text-product-deep` on white, are below 4.5:1 for normal text. Needs a brand decision on darker deep shades.

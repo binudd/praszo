@@ -151,6 +151,15 @@
     color: var(--ink-2);
   }
 
+  /* Running text: the tier below .lede, for multi-sentence bodies and lists. */
+  .copy {
+    font-size: clamp(1rem, 0.85rem + 0.35vw, 1.125rem);
+    line-height: 1.55;
+    letter-spacing: -0.005em;
+    font-weight: 500;
+    color: var(--ink-2);
+  }
+
   .lede strong,
   .lede b {
     font-weight: 600;

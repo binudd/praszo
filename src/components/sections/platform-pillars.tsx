@@ -1,5 +1,4 @@
 import { RevealGroup, RevealHeading } from "@/components/motion/reveal";
-import { Card } from "@/components/ui/card";
 import { Container } from "@/components/ui/container";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { Icon } from "@/components/ui/icon";
@@ -17,15 +16,17 @@ export function PlatformPillars() {
           <RevealHeading>Praszo OS.</RevealHeading>
           <RevealHeading>One platform.</RevealHeading>
         </h2>
-        <RevealGroup className="relative z-10 mt-[-0.55em] grid gap-4 md:grid-cols-3">
-          {home.pillars.items.map((item) => (
-            <Card key={item.title} data-reveal hover className="p-7 md:p-8">
-              <span className="inline-flex h-12 w-12 items-center justify-center rounded-sm bg-brand-soft text-brand">
-                <Icon name={item.icon} size={24} aria-hidden />
-              </span>
-              <h3 className="mt-8 text-2xl text-ink">{item.title}</h3>
-              <p className="mt-3 text-[15.5px] leading-relaxed text-ink-2">{item.body}</p>
-            </Card>
+        {/* Editorial columns (no card surface): a hairline rule, index label, display title and lede body. */}
+        <RevealGroup className="mt-14 grid gap-x-10 gap-y-12 md:mt-20 md:grid-cols-3">
+          {home.pillars.items.map((item, index) => (
+            <article key={item.title} data-reveal className="border-t border-line-strong pt-6">
+              <p className="label flex items-center gap-3 text-ink-3">
+                <span className="tabular-nums">{String(index + 1).padStart(2, "0")}</span>
+                <Icon name={item.icon} size={18} className="text-brand" aria-hidden />
+              </p>
+              <h3 className="display-sm mt-6 text-ink">{item.title}</h3>
+              <p className="lede mt-4">{item.body}</p>
+            </article>
           ))}
         </RevealGroup>
       </Container>
