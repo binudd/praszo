@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRef, type CSSProperties } from "react";
 
+import { gsap, useGSAP } from "@/components/motion/gsap";
 import { scrollToTarget } from "@/components/motion/smooth-scroll";
 import { applySceneItems, stepOpacity, useScene } from "@/components/motion/use-scene";
 import { mockups } from "@/components/mockups/registry";
@@ -65,7 +66,7 @@ function ProductPoster({ product, className }: { product: Product; className?: s
       </div>
       <p className="px-6 pt-4 pb-5 text-[15px] leading-relaxed">{product.tagline}</p>
       <div className="relative min-h-[14rem] flex-1 overflow-hidden bg-black/10 px-6 pt-5">
-        <div className={cn("absolute inset-x-6 top-5 bottom-0 overflow-hidden rounded-t-xl text-ink", visual.kind === "image" && "bg-white shadow-float")}>
+        <div data-poster-preview className={cn("absolute inset-x-6 top-5 bottom-0 overflow-hidden rounded-t-xl text-ink", visual.kind === "image" && "bg-white shadow-float")}>
           {visual.kind === "image" ? (
             <Image src={visual.src} alt="" aria-hidden sizes="560px" className="h-full w-full object-cover object-left-top" />
           ) : Mockup ? (
@@ -107,6 +108,45 @@ export function ProductEcosystem() {
     },
   });
 
+  // Entrance while the scene approaches its pin: the scene itself starts at "top top", so without this
+  // the first card simply scrolls in static. Scrubbed on the same track, ending exactly where the scene
+  // takes over. Only touches elements the scene never writes (deck wrapper, poster preview, tab rows,
+  // copy column), so the two never fight over transforms.
+  useGSAP(
+    () => {
+      const root = rootRef.current;
+      const stage = stageRef.current;
+      const track = root?.querySelector<HTMLElement>("[data-scene-track]");
+      if (!root || !stage || !track) return;
+      const mm = gsap.matchMedia();
+      mm.add("(min-width: 1024px) and (prefers-reduced-motion: no-preference)", () => {
+        const deck = stage.querySelector("[data-eco-deck]");
+        const preview = stage.querySelector("[data-scene-card] [data-poster-preview]");
+        const tabs = stage.querySelectorAll("[data-scene-tab]");
+        const copy = stage.querySelector("[data-eco-copy]");
+        const tl = gsap.timeline({
+          defaults: { ease: "none" },
+          scrollTrigger: { trigger: track, start: "top 92%", end: "top top", scrub: 0.6, invalidateOnRefresh: true },
+        });
+        if (deck) {
+          tl.fromTo(
+            deck,
+            { y: 160, rotate: -9, scale: 0.84, opacity: 0, transformOrigin: "50% 100%" },
+            { y: 0, rotate: 0, scale: 1, opacity: 1, ease: "power2.out", duration: 1 },
+            0,
+          );
+        }
+        if (preview) tl.fromTo(preview, { yPercent: 38 }, { yPercent: 0, ease: "power2.out", duration: 0.8 }, 0.2);
+        if (tabs.length) {
+          tl.fromTo(tabs, { x: -36, opacity: 0 }, { x: 0, opacity: 1, ease: "power2.out", duration: 0.45, stagger: 0.08 }, 0.25);
+        }
+        if (copy) tl.fromTo(copy, { y: 48, opacity: 0 }, { y: 0, opacity: 1, ease: "power2.out", duration: 0.5 }, 0.45);
+      });
+      return () => mm.revert();
+    },
+    { scope: rootRef },
+  );
+
   const jumpTo = (index: number) => {
     const track = rootRef.current?.querySelector<HTMLElement>("[data-scene-track]");
     if (!track) return;
@@ -121,7 +161,9 @@ export function ProductEcosystem() {
       <div data-scene-track className="scene-track" style={{ height: "520svh" }}>
         <div ref={stageRef} data-scene-stage className="scene-stage">
           <Container>
-            <Eyebrow className="justify-center">{home.ecosystem.eyebrow}</Eyebrow>
+            <div className="text-center">
+              <Eyebrow>{home.ecosystem.eyebrow}</Eyebrow>
+            </div>
             <h2 id="products-title" className="display-lg mt-4 text-center text-ink">
               {home.ecosystem.title}
             </h2>
@@ -146,7 +188,7 @@ export function ProductEcosystem() {
                 ))}
               </ol>
 
-              <div className="relative mx-auto h-[min(66svh,34rem)] w-full max-w-[28rem]">
+              <div data-eco-deck className="relative mx-auto h-[min(66svh,34rem)] w-full max-w-[28rem]">
                 {productList.map((product) => (
                   <div key={product.slug} data-scene-card className="absolute inset-0">
                     <ProductPoster product={product} className="h-full" />
@@ -154,7 +196,7 @@ export function ProductEcosystem() {
                 ))}
               </div>
 
-              <div className="relative min-h-[14rem]">
+              <div data-eco-copy className="relative min-h-[14rem]">
                 {productList.map((product) => (
                   <div key={product.slug} data-scene-item className="scene-item" style={productStyle(product)}>
                     <Badge tone="product">

@@ -242,15 +242,6 @@
 
 /* Fixed ambient layers --------------------------------------------------------- */
 
-.brand-bar {
-  position: fixed;
-  inset-inline: 0;
-  top: 0;
-  height: 4px;
-  z-index: 70;
-  background: linear-gradient(90deg, var(--brand) 0%, var(--brand) 62%, #ff9a80 100%);
-}
-
 .background-grid {
   position: fixed;
   inset: 0;

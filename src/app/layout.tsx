@@ -75,7 +75,6 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <style>{`[data-entrance] [data-hero]{opacity:1;transform:none}.scene-stack{display:block}.word-reveal .word{color:var(--ink)}.splash{display:none!important}html{overflow:auto!important}`}</style>
         </noscript>
         <SkipLink />
-        <div aria-hidden className="brand-bar" />
         <BackgroundGrid />
         <ThemeObserver />
         <PointerField />
