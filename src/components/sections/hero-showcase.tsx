@@ -30,7 +30,7 @@ export function HeroShowcase() {
 
   return (
     <div className="ml-auto w-full max-w-[calc(50svh*1.3846+1.5rem)]">
-      <figure className="overflow-hidden rounded-media border border-line bg-surface p-3 shadow-stage">
+      <figure>
         <div className={cn("relative", showcaseAspect)}>
           {productList.map((item, itemIndex) => {
             const Showcase = productShowcases[item.slug].component;

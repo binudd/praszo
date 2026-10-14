@@ -1,6 +1,5 @@
 "use client";
 
-import { House } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -11,7 +10,7 @@ import { navLinkClass } from "@/components/layout/nav-styles";
 import { ProductsMenu } from "@/components/layout/products-menu";
 import { findVisible, scrollToTarget } from "@/components/motion/smooth-scroll";
 import { Button } from "@/components/ui/button";
-import { Logo } from "@/components/ui/logo";
+import { BrandMark, Logo } from "@/components/ui/logo";
 import { ProductLockup } from "@/components/ui/product-lockup";
 import { demoCta, primaryNav } from "@/data/company";
 import { productSections } from "@/data/product-sections";
@@ -34,7 +33,7 @@ function Follower({ active, reduced }: { active: boolean; reduced: boolean | nul
       layoutId="nav-follower"
       aria-hidden
       transition={reduced ? { duration: 0 } : { type: "spring", stiffness: 420, damping: 38, mass: 0.6 }}
-      className="absolute inset-0 -z-10 rounded-full bg-bg shadow-[0_1px_2px_rgba(0,0,0,0.06)] dark:bg-elevated"
+      className="absolute inset-0 -z-10 rounded-full bg-bg shadow-[0_1px_2px_rgba(0,0,0,0.08)] dark:bg-surface"
     />
   );
 }
@@ -47,39 +46,45 @@ function Follower({ active, reduced }: { active: boolean; reduced: boolean | nul
 export function SiteHeader() {
   const pathname = usePathname();
   const reduced = useReducedMotion();
-  const [scrolled, setScrolled] = useState(false);
   const [section, setSection] = useState<string | null>(null);
   const product = productForPath(pathname);
   const isHome = pathname === "/";
   const spyIds = product ? productSections[product.slug].map((item) => item.id) : isHome ? homeSectionIds : [];
   const spyKey = spyIds.join("|");
 
+  // Scroll-spy: the section covering a line 40% down the viewport is current.
+  // (Works for pinned and multi-screen sections, unlike intersection ratios.)
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  useEffect(() => {
-    if (!spyKey) return;
+    if (!spyKey) {
+      setSection(null);
+      return;
+    }
     const root = findVisible("main") ?? document;
-    const nodes = spyKey
-      .split("|")
-      .map((id) => root.querySelector<HTMLElement>(`#${CSS.escape(id)}`))
-      .filter((node): node is HTMLElement => Boolean(node));
-    if (nodes.length === 0) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        const visible = entries
-          .filter((entry) => entry.isIntersecting)
-          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0];
-        if (visible?.target.id) setSection(visible.target.id);
-      },
-      { rootMargin: "-30% 0px -55% 0px", threshold: [0.05, 0.25, 0.5] },
-    );
-    nodes.forEach((node) => observer.observe(node));
-    return () => observer.disconnect();
+    const ids = spyKey.split("|");
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const line = window.innerHeight * 0.4;
+      let current: string | null = null;
+      for (const id of ids) {
+        const node = root.querySelector<HTMLElement>(`#${CSS.escape(id)}`);
+        if (!node) continue;
+        const rect = node.getBoundingClientRect();
+        if (rect.top <= line && rect.bottom > line * 0.5) current = id;
+      }
+      setSection((previous) => (previous === current ? previous : current));
+    };
+    const schedule = () => {
+      if (!frame) frame = requestAnimationFrame(update);
+    };
+    update();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    return () => {
+      if (frame) cancelAnimationFrame(frame);
+      window.removeEventListener("scroll", schedule);
+      window.removeEventListener("resize", schedule);
+    };
   }, [spyKey, pathname]);
 
   const onHomeHashClick = (event: MouseEvent<HTMLAnchorElement>, href: string) => {
@@ -102,20 +107,14 @@ export function SiteHeader() {
     ? ({ "--product": product.color, "--product-deep": product.colorDeep } as CSSProperties)
     : undefined;
 
-  const pillClass = cn(
-    "hidden items-center gap-0.5 rounded-full p-1.5 transition-[background-color,box-shadow,border-color] duration-500 lg:flex",
-    scrolled ? "glass shadow-card" : "border border-transparent bg-surface/70",
-  );
+  const pillClass = "menu-surface hidden items-center gap-0.5 rounded-full p-1.5 transition-[background-color,box-shadow] duration-500 lg:flex";
 
   return (
     <header
       style={productStyle}
-      className={cn(
-        "site-header fixed inset-x-0 top-1 z-50 transition-[background-color,border-color] duration-300",
-        scrolled && "max-lg:border-b max-lg:border-line max-lg:bg-bg/85 max-lg:backdrop-blur-md",
-      )}
+      className="site-header pointer-events-none fixed inset-x-0 top-1 z-50"
     >
-      <div className="mx-auto flex h-[4.5rem] w-full max-w-wide items-center justify-between gap-4 px-5 md:px-8 lg:px-10">
+      <div className="mx-auto flex h-[4.5rem] w-full max-w-wide items-center justify-between gap-4 px-5 md:px-8 lg:px-10 [&>*]:pointer-events-auto">
         {product ? (
           <Link
             href={`/${product.slug}`}
@@ -137,9 +136,9 @@ export function SiteHeader() {
         <nav aria-label="Primary" className={pillClass}>
           {product ? (
             <>
-              <Link href="/" className={cn(navLinkClass, "text-ink")}>
-                <House size={15} aria-hidden />
-                Praszo home
+              <Link href="/" aria-label="Praszo home" className={cn(navLinkClass, "gap-2 text-ink")}>
+                <BrandMark className="h-4 w-auto" />
+                Home
               </Link>
               {productSections[product.slug].map((item) => {
                 const current = section === item.id;
@@ -183,7 +182,7 @@ export function SiteHeader() {
         <div className="flex items-center gap-3">
           {product ? (
             <div className="hidden xl:block">
-              <ProductsMenu />
+              <ProductsMenu align="end" />
             </div>
           ) : null}
           <Button href={demoCta.href} size="sm" variant={product ? "product" : "primary"} className="hidden sm:inline-flex">

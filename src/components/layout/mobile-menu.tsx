@@ -2,13 +2,13 @@
 
 import * as Dialog from "@radix-ui/react-dialog";
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
-import { House, Menu, Phone, X } from "lucide-react";
+import { Menu, Phone, X } from "lucide-react";
 import Link from "next/link";
 import { useEffect, useState, type CSSProperties } from "react";
 
 import { findVisible, scrollToTarget } from "@/components/motion/smooth-scroll";
 import { Button } from "@/components/ui/button";
-import { Logo } from "@/components/ui/logo";
+import { BrandMark, Logo } from "@/components/ui/logo";
 import { ProductGlyph } from "@/components/ui/product-glyph";
 import { ProductLockup } from "@/components/ui/product-lockup";
 import { company, demoCta, primaryNav } from "@/data/company";
@@ -41,7 +41,7 @@ export function MobileMenu({ product }: { product?: Product }) {
   return (
     <Dialog.Root open={open} onOpenChange={setOpen}>
       <Dialog.Trigger
-        className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line bg-bg text-ink lg:hidden"
+        className="menu-surface inline-flex h-11 w-11 items-center justify-center rounded-full text-ink lg:hidden"
         aria-label="Open menu"
       >
         <Menu size={20} />
@@ -100,8 +100,8 @@ export function MobileMenu({ product }: { product?: Product }) {
                 </div>
                 <div>
                   <Dialog.Close asChild>
-                    <Link href="/" className="inline-flex items-center gap-2 rounded-xl py-2.5 text-[15px] font-bold text-ink">
-                      <House size={16} aria-hidden /> Praszo home
+                    <Link href="/" aria-label="Praszo home" className="inline-flex items-center gap-2.5 rounded-xl py-2.5 text-[15px] font-bold text-ink">
+                      <BrandMark className="h-4 w-auto" /> Home
                     </Link>
                   </Dialog.Close>
                 </div>

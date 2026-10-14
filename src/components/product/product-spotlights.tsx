@@ -75,7 +75,7 @@ export function ProductSpotlights({ product }: { product: Product }) {
         <div ref={stageRef} data-scene-stage className="scene-stage">
           <Container wide className="w-full">
             <div className="flex justify-center">
-              <ol className="scene-tabs glass" aria-label="Spotlights">
+              <ol className="scene-tabs" aria-label="Spotlights">
                 {product.spotlights.map((spotlight, index) => (
                   <li key={spotlight.id} data-scene-tab className="scene-tab">
                     <button type="button" onClick={() => jumpTo(index)}>

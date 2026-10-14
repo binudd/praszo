@@ -13,7 +13,7 @@ import { cn } from "@/lib/cn";
 import { isFinePointer } from "@/lib/motion";
 
 /** Disclosure-style Products menu: hover intent on fine pointers, click/keyboard everywhere. */
-export function ProductsMenu() {
+export function ProductsMenu({ align = "start" }: { align?: "start" | "end" }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const reduced = useReducedMotion();
@@ -88,14 +88,17 @@ export function ProductsMenu() {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={reduced ? { opacity: 0 } : { opacity: 0, y: 6, scale: 0.98 }}
             transition={{ duration: 0.18, ease: "easeOut" }}
-            className="glass absolute top-full left-0 z-50 mt-3 w-[41rem] origin-top-left rounded-panel p-2 shadow-float"
+            className={cn(
+              "menu-panel absolute top-full z-50 mt-3 w-[min(41rem,calc(100vw-2.5rem))] rounded-panel p-2",
+              align === "end" ? "right-0 origin-top-right" : "left-0 origin-top-left",
+            )}
           >
             <ul className="grid grid-cols-2 gap-1">
               {productList.map((product) => (
                 <li key={product.slug}>
                   <Link
                     href={`/${product.slug}`}
-                    className="flex items-start gap-3 rounded-[1rem] p-3 transition-colors hover:bg-elevated focus-visible:bg-elevated"
+                    className="flex items-start gap-3 rounded-[1rem] p-3 transition-colors hover:bg-bg focus-visible:bg-bg"
                     onClick={() => setOpen(false)}
                   >
                     <ProductGlyph slug={product.slug} size={40} className="mt-0.5" />
@@ -111,7 +114,7 @@ export function ProductsMenu() {
                 <Link
                   href="/#workflow"
                   onClick={() => setOpen(false)}
-                  className="flex items-center justify-between gap-4 rounded-[1rem] bg-elevated/70 px-4 py-3 text-sm text-ink-2 transition-colors hover:bg-elevated"
+                  className="flex items-center justify-between gap-4 rounded-[1rem] bg-bg/60 px-4 py-3 text-sm text-ink-2 transition-colors hover:bg-bg"
                 >
                   <span>Each product works on its own. Together they form one operating cycle.</span>
                   <span className="shrink-0 font-semibold text-brand">See the workflow →</span>

@@ -6,7 +6,7 @@ import { cn } from "@/lib/cn";
 export function ProductShowcase({ product, className }: { product: Product; className?: string }) {
   const { component: Showcase, label } = productShowcases[product.slug];
   return (
-    <figure className={cn("overflow-hidden rounded-media border border-line bg-surface p-3 shadow-stage", className)}>
+    <figure className={className}>
       <div className={cn("relative", showcaseAspect)}>
         <Showcase className="absolute inset-0" />
       </div>

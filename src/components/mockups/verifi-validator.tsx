@@ -67,9 +67,9 @@ export function VerifiValidator({ paused, className }: MockupProps) {
   return (
     <div ref={rootRef} className={className}>
       <MockupShell title={data.title} meta={data.meta}>
-        <div className="grid h-full grid-cols-1 gap-2.5 p-2.5 sm:grid-cols-[11rem_1fr]">
+        <div className="grid h-full grid-cols-[6.5rem_1fr] gap-2.5 p-2.5 sm:grid-cols-[11rem_1fr]">
           <div className="flex flex-col items-center justify-center rounded-sm border border-line bg-surface p-3 text-center">
-            <div className="relative h-20 w-20">
+            <div className="relative h-16 w-16 sm:h-20 sm:w-20">
               <svg viewBox="0 0 80 80" className="h-full w-full -rotate-90" aria-hidden>
                 <circle cx="40" cy="40" r="34" fill="none" stroke="var(--elevated)" strokeWidth="6" />
                 <circle
@@ -85,13 +85,13 @@ export function VerifiValidator({ paused, className }: MockupProps) {
                   strokeDashoffset={RING}
                 />
               </svg>
-              <span data-score className="absolute inset-0 flex items-center justify-center text-2xl font-extrabold text-ink tabular-nums">
+              <span data-score className="absolute inset-0 flex items-center justify-center text-xl font-extrabold text-ink tabular-nums sm:text-2xl">
                 0
               </span>
             </div>
-            <p className="label mt-3 text-[9px] text-ink-3">{data.scoreLabel}</p>
+            <p className="label mt-3 hidden text-[9px] text-ink-3 sm:block">{data.scoreLabel}</p>
           </div>
-          <ul className="flex flex-col gap-1.5">
+          <ul className="flex min-w-0 flex-col gap-1.5">
             {data.checks.map((check) => (
               <li
                 key={check.id}

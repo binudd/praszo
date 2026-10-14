@@ -36,6 +36,10 @@
     -2rem 4.5rem 4.5rem rgba(0, 0, 0, 0.08),
     -2.5rem 10rem 6rem rgba(0, 0, 0, 0.05);
 
+  /* Menu surfaces (nav pill, dropdown panels, tab pills): background + soft shadow, no border. */
+  --menu-bg: #f3f5f8;
+  --shadow-menu: 0 1px 2px rgba(15, 23, 42, 0.05), 0 10px 28px -14px rgba(15, 23, 42, 0.18);
+
   --ease-out: cubic-bezier(0.4, 1, 0.7, 1);
   --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-nav: cubic-bezier(0.22, 0.31, 0, 1);
@@ -71,5 +75,7 @@
     -1.5rem 1.125rem 2.5rem rgba(0, 0, 0, 0.35),
     -2rem 4.5rem 4.5rem rgba(0, 0, 0, 0.3),
     -2.5rem 10rem 6rem rgba(0, 0, 0, 0.2);
+  --menu-bg: #1d2529;
+  --shadow-menu: 0 1px 2px rgba(0, 0, 0, 0.4), 0 12px 32px -14px rgba(0, 0, 0, 0.65);
   color-scheme: dark;
 }

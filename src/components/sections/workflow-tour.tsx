@@ -156,7 +156,7 @@ export function WorkflowTour() {
         <div data-scene-stage className="scene-stage">
           <Container wide className="w-full">
             <div className="flex justify-center">
-              <ol className="scene-tabs glass" aria-label="Workflow steps">
+              <ol className="scene-tabs" aria-label="Workflow steps">
                 {steps.map((step, index) => (
                   <li key={step.id} data-scene-tab className="scene-tab">
                     <button type="button" onClick={() => jumpTo(index)} className="inline-flex items-center gap-2">
