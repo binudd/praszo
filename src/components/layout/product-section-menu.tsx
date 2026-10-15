@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useRef, type CSSProperties } from "react";
 
 import { NavDropdown } from "@/components/layout/nav-dropdown";
+import { ProductGroupLinks } from "@/components/layout/products-menu";
 import { gsap } from "@/components/motion/gsap";
 import { findVisible } from "@/components/motion/smooth-scroll";
 import { HEADER_EVENT } from "@/components/motion/use-header-reveal";
@@ -15,7 +16,8 @@ import { prefersReducedMotion } from "@/lib/motion";
 
 /**
  * Product pages only: the page's section menu in the global header, next to the Praszo logo (no
- * background): product icon · current section · chevron, opening the sections.
+ * background): product icon · current section · chevron, opening a mega menu with the page's sections
+ * and every Praszo product (ProductGroupLinks, the same data as the Products menu).
  *
  * Two layers, two motions (GSAP on the shared Lenis loop):
  *   inner ("appear")  scrubbed to the in-page section pill (ProductSubNav under the hero): as the pill
@@ -114,7 +116,7 @@ export function ProductSectionMenu() {
       <div ref={innerRef} className="invisible opacity-0">
         <NavDropdown
           ariaLabel={`${product.fullName} sections, current: ${current.label}`}
-          width="17rem"
+          width="36rem"
           align="start"
           buttonClassName="inline-flex h-10 items-center gap-2.5 rounded-full px-1 text-[15px] font-semibold text-ink transition-colors hover:text-ink-2"
           label={
@@ -128,26 +130,37 @@ export function ProductSectionMenu() {
           }
         >
           {(close) => (
-            <ul className="flex flex-col gap-0.5">
-              {sections.map((section, index) => (
-                <li key={section.id}>
-                  <a
-                    href={`#${section.id}`}
-                    aria-current={active === section.id ? "location" : undefined}
-                    onClick={(event) => {
-                      event.preventDefault();
-                      close();
-                      scrollToSection(section.id, index);
-                    }}
-                    style={{ "--product": product.color } as CSSProperties}
-                    className="flex items-center justify-between gap-3 rounded-[0.9rem] px-3 py-2.5 text-[15px] font-semibold text-ink-2 transition-colors hover:bg-bg hover:text-ink aria-[current]:bg-bg aria-[current]:text-ink"
-                  >
-                    {section.label}
-                    {active === section.id ? <span aria-hidden className="h-2 w-2 rounded-full bg-product" /> : null}
-                  </a>
-                </li>
-              ))}
-            </ul>
+            // Mega menu: this page's sections, then every Praszo product (same data as the Products menu).
+            <div className="grid gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
+              <div>
+                <p className="label px-3 pt-2 pb-1 text-ink-3">On this page</p>
+                <ul className="flex flex-col gap-0.5">
+                  {sections.map((section, index) => (
+                    <li key={section.id}>
+                      <a
+                        href={`#${section.id}`}
+                        aria-current={active === section.id ? "location" : undefined}
+                        onClick={(event) => {
+                          event.preventDefault();
+                          close();
+                          scrollToSection(section.id, index);
+                        }}
+                        style={{ "--product": product.color } as CSSProperties}
+                        className="flex items-center justify-between gap-3 rounded-[0.9rem] px-3 py-2.5 text-[15px] font-semibold text-ink-2 transition-colors hover:bg-bg hover:text-ink aria-[current]:bg-bg aria-[current]:text-ink"
+                      >
+                        {section.label}
+                        {active === section.id ? (
+                          <span aria-hidden className="h-2 w-2 rounded-full bg-product" />
+                        ) : null}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div className="rounded-[1rem] bg-bg/60 p-1 pb-2">
+                <ProductGroupLinks variant="compact" onNavigate={close} />
+              </div>
+            </div>
           )}
         </NavDropdown>
       </div>

@@ -46,6 +46,8 @@
 
   /* Menu surfaces (nav pill, dropdown panels, tab pills): background + soft shadow, no border. */
   --menu-bg: #f3f5f8;
+  /* The sliding highlight in nav pills (header, section pill). */
+  --nav-pill: #ffffff;
   --shadow-menu: 0 1px 2px rgba(15, 23, 42, 0.05), 0 10px 28px -14px rgba(15, 23, 42, 0.18);
 
   --ease-out: cubic-bezier(0.4, 1, 0.7, 1);
@@ -86,6 +88,39 @@
     -2rem 4.5rem 4.5rem rgba(0, 0, 0, 0.3),
     -2.5rem 10rem 6rem rgba(0, 0, 0, 0.2);
   --menu-bg: #1d2529;
+  --nav-pill: #161c20;
   --shadow-menu: 0 1px 2px rgba(0, 0, 0, 0.4), 0 12px 32px -14px rgba(0, 0, 0, 0.65);
   color-scheme: dark;
 }
+
+/*
+ * Light scenes inside a dark context (e.g. the header over light content while the page is dark,
+ * or a light mockup in a dark section): the colour tokens re-declared, so the nearest data-theme wins.
+ */
+[data-theme="light"] {
+  --bg: #ffffff;
+  --surface: #f6f8fa;
+  --elevated: #eef2f5;
+  --ink: #121317;
+  --ink-2: #4b5563;
+  --ink-3: #6b7280;
+  --line: #e3e8ee;
+  --line-strong: #cbd5e1;
+  --brand: #f46a4a;
+  --brand-strong: #b04c35;
+  --brand-hover: #e2583a;
+  --brand-soft: #fef0ed;
+  --accent: #f55d48;
+  --accent-soft: #ffe4df;
+  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 12px 32px -16px rgba(15, 23, 42, 0.16);
+  --shadow-float: 0 24px 64px -24px rgba(15, 23, 42, 0.28), 0 2px 8px rgba(15, 23, 42, 0.06);
+  --shadow-stage:
+    -1.5rem 1.125rem 2.5rem rgba(0, 0, 0, 0.1),
+    -2rem 4.5rem 4.5rem rgba(0, 0, 0, 0.08),
+    -2.5rem 10rem 6rem rgba(0, 0, 0, 0.05);
+  --menu-bg: #f3f5f8;
+  --shadow-menu: 0 1px 2px rgba(15, 23, 42, 0.05), 0 10px 28px -14px rgba(15, 23, 42, 0.18);
+  --nav-pill: #ffffff;
+  color-scheme: light;
+}
+

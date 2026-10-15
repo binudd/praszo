@@ -7,6 +7,69 @@ import { NavDropdown } from "@/components/layout/nav-dropdown";
 import { ProductGlyph } from "@/components/ui/product-glyph";
 import { productGroups, productMenuLinks } from "@/data/navigation";
 import { products } from "@/data/products";
+import { cn } from "@/lib/cn";
+
+/**
+ * The grouped product links (data/navigation.ts), shared by the Products mega menu and the product
+ * section menu. "full": three group columns, glyph + name + tagline. "compact": one stacked column,
+ * glyph + name + category, for a narrower side column.
+ */
+export function ProductGroupLinks({
+  variant = "full",
+  onNavigate,
+}: {
+  variant?: "full" | "compact";
+  onNavigate?: () => void;
+}) {
+  const pathname = usePathname();
+  const compact = variant === "compact";
+  return (
+    <div className={cn("grid gap-x-2", compact ? "gap-y-1" : "gap-y-3 sm:grid-cols-3")}>
+      {productGroups.map((group) => (
+        <div key={group.title}>
+          <p className={"label px-3 pt-2 pb-1 text-ink-3"}>{group.title}</p>
+          <ul className="flex flex-col gap-0.5">
+            {group.slugs.map((slug) => {
+              const product = products[slug];
+              return (
+                <li key={slug}>
+                  <Link
+                    href={`/${slug}`}
+                    onClick={onNavigate}
+                    aria-current={pathname === `/${slug}` ? "page" : undefined}
+                    className={cn(
+                      "flex items-start rounded-[1rem] transition-colors hover:bg-bg focus-visible:bg-bg aria-[current]:bg-bg",
+                      compact ? "items-center gap-2.5 px-3 py-2" : "gap-3 p-3",
+                    )}
+                  >
+                    <ProductGlyph
+                      slug={slug}
+                      size={compact ? 28 : 36}
+                      className={cn("shrink-0", !compact && "mt-0.5")}
+                    />
+                    <span className="min-w-0">
+                      <span className={cn("block font-bold text-ink", compact ? "text-sm" : "text-[15px]")}>
+                        {product.name}
+                      </span>
+                      <span
+                        className={cn(
+                          "block text-ink-2",
+                          compact ? "text-[12px] leading-snug" : "mt-1 text-[13px] leading-snug",
+                        )}
+                      >
+                        {compact ? product.category : product.tagline}
+                      </span>
+                    </span>
+                  </Link>
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 /** Products mega menu: products grouped by what they do, plus Praszo OS links. Data: data/navigation.ts. */
 export function ProductsMenu() {
@@ -16,34 +79,7 @@ export function ProductsMenu() {
     <NavDropdown label="Products" current={current}>
       {(close) => (
         <div className="grid gap-2 md:grid-cols-[minmax(0,1fr)_14rem]">
-          <div className="grid gap-x-2 gap-y-3 sm:grid-cols-3">
-            {productGroups.map((group) => (
-              <div key={group.title}>
-                <p className="label px-3 pt-2 pb-1 text-ink-3">{group.title}</p>
-                <ul className="flex flex-col gap-1">
-                  {group.slugs.map((slug) => {
-                    const product = products[slug];
-                    return (
-                      <li key={slug}>
-                        <Link
-                          href={`/${slug}`}
-                          onClick={close}
-                          aria-current={pathname === `/${slug}` ? "page" : undefined}
-                          className="flex items-start gap-3 rounded-[1rem] p-3 transition-colors hover:bg-bg focus-visible:bg-bg aria-[current]:bg-bg"
-                        >
-                          <ProductGlyph slug={slug} size={36} className="mt-0.5 shrink-0" />
-                          <span className="min-w-0">
-                            <span className="block text-[15px] font-bold text-ink">{product.name}</span>
-                            <span className="mt-1 block text-[13px] leading-snug text-ink-2">{product.tagline}</span>
-                          </span>
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            ))}
-          </div>
+          <ProductGroupLinks onNavigate={close} />
           <ul className="flex flex-col gap-1 rounded-[1rem] bg-bg/60 p-2">
             <li className="label px-3 pt-2 pb-1 text-ink-3">Praszo OS</li>
             {productMenuLinks.map((item) => (

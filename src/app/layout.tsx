@@ -66,7 +66,9 @@ const organizationJsonLd = {
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html lang="en" data-theme="light" className={`${manrope.variable} h-full antialiased`} suppressHydrationWarning>
-      <body className="relative min-h-full font-sans text-ink">
+      {/* suppressHydrationWarning covers <body>'s own attributes only: browser extensions (Grammarly,
+          ColorZilla, password managers) add attributes here before React hydrates. Children are still checked. */}
+      <body className="relative min-h-full font-sans text-ink" suppressHydrationWarning>
         {/* Decides before first paint whether the first-load splash shows (see lib/splash.ts). */}
         <script dangerouslySetInnerHTML={{ __html: splashBootScript }} />
         <Splash />

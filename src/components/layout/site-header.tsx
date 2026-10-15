@@ -64,7 +64,7 @@ export function SiteHeader() {
           <span
             ref={pillRef}
             aria-hidden
-            className="absolute top-0 left-0 -z-10 rounded-full bg-bg opacity-0 shadow-[0_1px_2px_rgba(0,0,0,0.08)] dark:bg-surface"
+            className="absolute top-0 left-0 -z-10 rounded-full bg-[var(--nav-pill)] opacity-0 shadow-[0_1px_2px_rgba(0,0,0,0.08)]"
           />
           <ProductsMenu />
           <LinkMenu label="Solutions" items={solutionLinks} />

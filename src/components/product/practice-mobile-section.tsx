@@ -12,7 +12,7 @@ const bullets = ["Real-time data", "Secure access"];
 /** Practice-only section: the mobile app, as shown on praszo.com/practice. */
 export function PracticeMobileSection() {
   return (
-    <section id="practice-mobile" aria-labelledby="practice-mobile-title" className="border-t border-line bg-white py-20 md:py-28">
+    <section id="practice-mobile" aria-labelledby="practice-mobile-title" className="border-t border-line py-20 md:py-28">
       <Container>
         <div className="grid items-center gap-12 lg:grid-cols-2 lg:gap-20">
           <RevealBlock>
