@@ -16,8 +16,8 @@ export function SiteFooter() {
             <Link href="/" aria-label="Praszo home" className="inline-flex">
               <Logo />
             </Link>
-            <p className="mt-4 text-[15px] font-semibold text-ink">{company.footerTagline}</p>
-            <p className="mt-3 text-sm leading-relaxed text-ink-2">{company.description}</p>
+            <p className="copy mt-4 font-semibold text-ink">{company.footerTagline}</p>
+            <p className="copy mt-3">{company.description}</p>
             <ul className="mt-6 flex items-center gap-2">
               {company.social.map((item) => (
                 <li key={item.href}>
@@ -26,7 +26,7 @@ export function SiteFooter() {
                     target="_blank"
                     rel="noreferrer"
                     aria-label={`Praszo on ${item.label}`}
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line bg-white text-ink-2 transition-colors hover:border-brand hover:text-brand"
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line bg-bg text-ink-2 transition-colors hover:border-brand hover:text-brand"
                   >
                     <SocialIcon name={item.icon as SocialIconName} />
                   </a>
@@ -36,13 +36,13 @@ export function SiteFooter() {
           </div>
 
           <div>
-            <p className="text-[11px] font-bold tracking-[0.16em] text-ink-3 uppercase">Products</p>
+            <p className="label text-ink-3">Products</p>
             <ul className="mt-4 flex flex-col gap-2.5">
               {productList.map((product) => (
                 <li key={product.slug}>
                   <Link
                     href={`/${product.slug}`}
-                    className="inline-flex items-center gap-2.5 text-[15px] font-semibold text-ink-2 transition-colors hover:text-ink"
+                    className="copy inline-flex items-center gap-2.5 font-semibold transition-colors hover:text-ink"
                   >
                     <ProductGlyph slug={product.slug} size={22} />
                     Praszo {product.name}
@@ -53,11 +53,11 @@ export function SiteFooter() {
           </div>
 
           <div>
-            <p className="text-[11px] font-bold tracking-[0.16em] text-ink-3 uppercase">Company</p>
+            <p className="label text-ink-3">Company</p>
             <ul className="mt-4 flex flex-col gap-2.5">
               {companyLinks.map((item) => (
                 <li key={item.href}>
-                  <Link href={item.href} className="text-[15px] font-semibold text-ink-2 transition-colors hover:text-ink">
+                  <Link href={item.href} className="copy font-semibold transition-colors hover:text-ink">
                     {item.label}
                   </Link>
                 </li>
@@ -66,8 +66,8 @@ export function SiteFooter() {
           </div>
 
           <div>
-            <p className="text-[11px] font-bold tracking-[0.16em] text-ink-3 uppercase">Contact</p>
-            <address className="mt-4 flex flex-col gap-2.5 text-[15px] not-italic text-ink-2">
+            <p className="label text-ink-3">Contact</p>
+            <address className="copy mt-4 flex flex-col gap-2.5 not-italic">
               <a href={company.phone.href} className="font-semibold transition-colors hover:text-ink">
                 {company.phone.display}
               </a>
@@ -77,7 +77,7 @@ export function SiteFooter() {
               <a href={`mailto:${company.emails.support}`} className="font-semibold transition-colors hover:text-ink">
                 {company.emails.support}
               </a>
-              <span className="mt-1 text-sm leading-relaxed">
+              <span className="mt-1">
                 {company.address.name}
                 <br />
                 {company.address.lines[0]}
@@ -88,7 +88,7 @@ export function SiteFooter() {
           </div>
         </div>
 
-        <div className="mt-14 flex flex-col gap-3 border-t border-line pt-6 text-sm text-ink-3 md:flex-row md:items-center md:justify-between">
+        <div className="copy mt-14 flex flex-col gap-3 border-t border-line pt-6 text-ink-3 md:flex-row md:items-center md:justify-between">
           <p>© 2026 Praszo. All rights reserved. {company.legalNote}</p>
           <ul className="flex items-center gap-4">
             {legalLinks.map((item) => (
