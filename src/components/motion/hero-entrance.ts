@@ -1,6 +1,5 @@
 "use client";
 
-import { useReducedMotion } from "motion/react";
 import type { RefObject } from "react";
 
 import { gsap, useGSAP } from "@/components/motion/gsap";
@@ -16,14 +15,13 @@ const played = new Set<string>();
  * CSS in globals.css hides those targets until the root gets .is-ready or .is-static.
  */
 export function useHeroEntrance(rootRef: RefObject<HTMLElement | null>, key: string) {
-  const reduced = useReducedMotion();
 
   useGSAP(
     () => {
       const root = rootRef.current;
       if (!root) return;
 
-      if (reduced || prefersReducedMotion()) {
+      if (prefersReducedMotion()) {
         root.classList.add("is-static");
         return () => root.classList.remove("is-static");
       }
@@ -63,7 +61,9 @@ export function useHeroEntrance(rootRef: RefObject<HTMLElement | null>, key: str
         { y: 0, yPercent: 0, rotate: 0, opacity: 1, filter: "blur(0px)", duration: 1.15, ease: "expo.out", stagger: 0.075, clearProps: "filter" },
         "-=0.25",
       );
-      step('[data-hero="copy"]', { y: 16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5 }, "-=0.5");
+      // The hero copy is the LCP element: it slides but never fades, because text at opacity 0 does not
+      // count as painted and the LCP would wait for the entrance (≈3s render delay on throttled mobile).
+      step('[data-hero="copy"]', { y: 16 }, { y: 0, duration: 0.5 }, "-=0.5");
       step('[data-hero="cta"]', { y: 12, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4 }, "-=0.3");
       step(
         '[data-hero="visual"]',
@@ -96,6 +96,6 @@ export function useHeroEntrance(rootRef: RefObject<HTMLElement | null>, key: str
         root.classList.remove("is-ready");
       };
     },
-    { scope: rootRef, dependencies: [reduced, key] },
+    { scope: rootRef, dependencies: [key] },
   );
 }

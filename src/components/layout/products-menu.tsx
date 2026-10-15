@@ -1,7 +1,6 @@
 "use client";
 
 import { ChevronDown } from "lucide-react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useId, useRef, useState } from "react";
@@ -16,7 +15,6 @@ import { isFinePointer } from "@/lib/motion";
 export function ProductsMenu({ align = "start" }: { align?: "start" | "end" }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
-  const reduced = useReducedMotion();
   const rootRef = useRef<HTMLDivElement | null>(null);
   const buttonRef = useRef<HTMLButtonElement | null>(null);
   const timer = useRef<number | null>(null);
@@ -80,19 +78,16 @@ export function ProductsMenu({ align = "start" }: { align?: "start" | "end" }) {
         Products
         <ChevronDown size={16} className={cn("transition-transform duration-200", open && "rotate-180")} />
       </button>
-      <AnimatePresence>
-        {open ? (
-          <motion.div
-            id={panelId}
-            initial={reduced ? false : { opacity: 0, y: 8, scale: 0.98 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            exit={reduced ? { opacity: 0 } : { opacity: 0, y: 6, scale: 0.98 }}
-            transition={{ duration: 0.18, ease: "easeOut" }}
-            className={cn(
-              "menu-panel absolute top-full z-50 mt-3 w-[min(41rem,calc(100vw-2.5rem))] rounded-panel p-2",
-              align === "end" ? "right-0 origin-top-right" : "left-0 origin-top-left",
-            )}
-          >
+      {/* Always mounted, so it can transition out (CSS, no animation library); inert while closed. */}
+      <div
+        id={panelId}
+        inert={!open}
+        className={cn(
+          "menu-panel absolute top-full z-50 mt-3 w-[min(41rem,calc(100vw-2.5rem))] rounded-panel p-2 transition-[opacity,translate,scale,visibility] duration-200 ease-out motion-reduce:transition-none",
+          align === "end" ? "right-0 origin-top-right" : "left-0 origin-top-left",
+          open ? "visible translate-y-0 scale-100 opacity-100" : "pointer-events-none invisible translate-y-2 scale-[0.98] opacity-0",
+        )}
+      >
             <ul className="grid grid-cols-2 gap-1">
               {productList.map((product) => (
                 <li key={product.slug}>
@@ -121,9 +116,7 @@ export function ProductsMenu({ align = "start" }: { align?: "start" | "end" }) {
                 </Link>
               </li>
             </ul>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
+      </div>
     </div>
   );
 }

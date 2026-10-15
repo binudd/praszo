@@ -1,15 +1,14 @@
 "use client";
 
 import { ArrowUp } from "lucide-react";
-import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { useEffect, useState } from "react";
 
 import { ScrollTrigger } from "@/components/motion/gsap";
 import { scrollToTarget } from "@/components/motion/smooth-scroll";
+import { cn } from "@/lib/cn";
 
 export function BackToTop() {
   const [visible, setVisible] = useState(false);
-  const reduced = useReducedMotion();
 
   // Shown once the page is scrolled past 900px. A ScrollTrigger (on the shared Lenis loop) toggles
   // state only when that threshold is crossed, not on every scroll event.
@@ -22,22 +21,19 @@ export function BackToTop() {
     };
   }, []);
 
+  // Always mounted so it can fade out with a CSS transition; inert (unfocusable, hidden from AT) while hidden.
   return (
-    <AnimatePresence>
-      {visible ? (
-        <motion.button
-          type="button"
-          aria-label="Back to top"
-          initial={reduced ? false : { opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={reduced ? { opacity: 0 } : { opacity: 0, y: 12 }}
-          transition={{ duration: 0.25 }}
-          onClick={() => scrollToTarget(0)}
-          className="fixed right-5 bottom-5 z-40 inline-flex h-11 w-11 items-center justify-center rounded-full border border-line bg-bg text-ink shadow-float transition-colors hover:bg-elevated md:right-8 md:bottom-8"
-        >
-          <ArrowUp size={18} />
-        </motion.button>
-      ) : null}
-    </AnimatePresence>
+    <button
+      type="button"
+      aria-label="Back to top"
+      inert={!visible}
+      onClick={() => scrollToTarget(0)}
+      className={cn(
+        "fixed right-5 bottom-5 z-40 inline-flex h-11 w-11 items-center justify-center rounded-full border border-line bg-bg text-ink shadow-float transition-[background-color,opacity,translate,visibility] duration-250 hover:bg-elevated motion-reduce:transition-none md:right-8 md:bottom-8",
+        visible ? "visible translate-y-0 opacity-100" : "pointer-events-none invisible translate-y-3 opacity-0",
+      )}
+    >
+      <ArrowUp size={18} />
+    </button>
   );
 }

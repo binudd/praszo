@@ -1,14 +1,13 @@
 "use client";
 
-import { motion, useReducedMotion } from "motion/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useRef, useState, type CSSProperties, type MouseEvent } from "react";
+import { useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type MouseEvent, type RefObject } from "react";
 
 import { MobileMenu } from "@/components/layout/mobile-menu";
 import { navLinkClass } from "@/components/layout/nav-styles";
 import { ProductsMenu } from "@/components/layout/products-menu";
-import { ScrollTrigger } from "@/components/motion/gsap";
+import { gsap, ScrollTrigger } from "@/components/motion/gsap";
 import { findVisible, scrollToTarget } from "@/components/motion/smooth-scroll";
 import { useHeaderReveal } from "@/components/motion/use-header-reveal";
 import { Button } from "@/components/ui/button";
@@ -18,6 +17,7 @@ import { demoCta, primaryNav } from "@/data/company";
 import { productSections } from "@/data/product-sections";
 import { productList, type Product } from "@/data/products";
 import { cn } from "@/lib/cn";
+import { prefersReducedMotion } from "@/lib/motion";
 
 const homeSectionIds = primaryNav
   .filter((item) => item.href.startsWith("/#"))
@@ -27,17 +27,31 @@ function productForPath(pathname: string): Product | undefined {
   return productList.find((product) => pathname === `/${product.slug}`);
 }
 
-/** The sliding highlight behind the current pill item. */
-function Follower({ active, reduced }: { active: boolean; reduced: boolean | null }) {
-  if (!active) return null;
-  return (
-    <motion.span
-      layoutId="nav-follower"
-      aria-hidden
-      transition={reduced ? { duration: 0 } : { type: "spring", stiffness: 420, damping: 38, mass: 0.6 }}
-      className="absolute inset-0 -z-10 rounded-full bg-bg shadow-[0_1px_2px_rgba(0,0,0,0.08)] dark:bg-surface"
-    />
-  );
+/**
+ * The sliding highlight behind the current nav item: one element GSAP moves and resizes to the item
+ * with aria-current (re-measured on resize), fading out when nothing is current. Instant under
+ * reduced motion and on its first placement.
+ */
+function useNavFollower(navRef: RefObject<HTMLElement | null>, pillRef: RefObject<HTMLSpanElement | null>, key: string) {
+  useLayoutEffect(() => {
+    const nav = navRef.current;
+    const pill = pillRef.current;
+    if (!nav || !pill) return;
+    const place = (animate: boolean) => {
+      const item = nav.querySelector<HTMLElement>(":scope > [aria-current], :scope > * > [aria-current]");
+      const instant = !animate || prefersReducedMotion() || Number(gsap.getProperty(pill, "opacity")) === 0;
+      if (!item || item.offsetParent === null) {
+        gsap.to(pill, { opacity: 0, duration: instant ? 0 : 0.2, overwrite: true });
+        return;
+      }
+      const box = { x: item.offsetLeft, y: item.offsetTop, width: item.offsetWidth, height: item.offsetHeight };
+      gsap.to(pill, { ...box, opacity: 1, duration: instant ? 0 : 0.45, ease: "power3.out", overwrite: true });
+    };
+    place(true);
+    const resize = new ResizeObserver(() => place(false));
+    resize.observe(nav);
+    return () => resize.disconnect();
+  }, [navRef, pillRef, key]);
 }
 
 /**
@@ -48,7 +62,8 @@ function Follower({ active, reduced }: { active: boolean; reduced: boolean | nul
  */
 export function SiteHeader() {
   const pathname = usePathname();
-  const reduced = useReducedMotion();
+  const navRef = useRef<HTMLElement | null>(null);
+  const pillRef = useRef<HTMLSpanElement | null>(null);
   const headerRef = useRef<HTMLElement | null>(null);
   useHeaderReveal(headerRef, { resetKey: pathname });
   const [section, setSection] = useState<string | null>(null);
@@ -57,6 +72,7 @@ export function SiteHeader() {
   const spyIds = product ? productSections[product.slug].map((item) => item.id) : isHome ? homeSectionIds : [];
   const spyKey = spyIds.join("|");
   const activeSection = spyKey ? section : null;
+  useNavFollower(navRef, pillRef, `${pathname}|${activeSection ?? ""}`);
 
   // Scroll-spy: the section covering a line 40% down the viewport is current (the last such
   // section in page order wins). One ScrollTrigger per section, driven by the shared Lenis loop,
@@ -136,7 +152,12 @@ export function SiteHeader() {
           </Link>
         )}
 
-        <nav aria-label="Primary" className={pillClass}>
+        <nav ref={navRef} aria-label="Primary" className={cn(pillClass, "relative isolate")}>
+          <span
+            ref={pillRef}
+            aria-hidden
+            className="absolute top-0 left-0 -z-10 rounded-full bg-bg opacity-0 shadow-[0_1px_2px_rgba(0,0,0,0.08)] dark:bg-surface"
+          />
           {product ? (
             <>
               <Link href="/" aria-label="Praszo home" className={cn(navLinkClass, "gap-2 text-ink")}>
@@ -153,7 +174,6 @@ export function SiteHeader() {
                     className={cn(navLinkClass, current && "text-product-deep dark:text-ink")}
                     onClick={(event) => onSectionClick(event, item.id)}
                   >
-                    <Follower active={current} reduced={reduced} />
                     {item.label}
                   </a>
                 );
@@ -173,7 +193,6 @@ export function SiteHeader() {
                     className={navLinkClass}
                     onClick={(event) => onHomeHashClick(event, item.href)}
                   >
-                    <Follower active={Boolean(current)} reduced={reduced} />
                     {item.label}
                   </Link>
                 );

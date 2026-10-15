@@ -45,7 +45,7 @@ The design language is modeled on sports.withgoogle.com/teamusa. It uses giant d
 | `gsap` | ^3.15 | **All scroll and timeline animation.** Plugins: ScrollTrigger, Flip (MotionPathPlugin was dropped on 2026-10-15; nothing needs it) | `src/components/motion/*`, sections, mockups, splash | Import only from `@/components/motion/gsap`, never from `gsap` directly. That file registers plugins once. |
 | `@gsap/react` | ^2.1 | `useGSAP({ scope })` hook for automatic cleanup | every GSAP component | Every GSAP effect must live inside `useGSAP` or an effect with cleanup. |
 | `lenis` | ^1.3.26 | Smooth scrolling. It drives ScrollTrigger. | `src/components/motion/smooth-scroll.tsx` only | One instance, ticked by `gsap.ticker`. Use `getLenis()` and `scrollToTarget()`. Never create a second instance or call `window.scrollTo` for in-page jumps. |
-| `motion` (motion/react) | ^14 | Small UI micro-interactions only: nav follower pill, menus, back-to-top, `useReducedMotion` | `site-header`, `products-menu`, `back-to-top`, `hero-entrance` (hook only) | Do not use it for scroll-linked animation. That is GSAP's job. |
+| ~~`motion` (motion/react)~~ | removed 2026-10-15 | Uninstalled for performance (≈48 KiB of unused JS at load). Its four uses are now: nav pill → GSAP (`useNavFollower`), products menu and back-to-top → CSS transitions on always-mounted, `inert`-when-closed elements, `useReducedMotion` → `prefersReducedMotion()`. Do not reintroduce it for micro-interactions. | | |
 | `@radix-ui/react-dialog` | ^1.2 | Mobile menu sheet (focus trap, Escape, aria) | `layout/mobile-menu.tsx` | |
 | `@radix-ui/react-visually-hidden` | ^1.2 | Dialog title for screen readers | `layout/mobile-menu.tsx` | |
 | `@radix-ui/react-slot` | ^1.4 | `asChild` on `Button` | `ui/button.tsx` | |
@@ -209,7 +209,7 @@ gsap.ticker.lagSmoothing(0)
 
 ### 7.4 First-load sequence (timeline)
 1. **Boot script** (inline, first in `<body>`, from `lib/splash.ts`) sets `<html data-splash="on">` before first paint, on every full load. Client navigation never replays it.
-2. **Splash** (`layout/splash.tsx`). Timings: minimum 0.6 s, contraction 1.05 s, settle 0.7 s (about 2.8 s total on a fast load; was 3.5 s). A 7 s watchdog always hands the site over. React Strict Mode safe: the effect cleanup only finalises if no remount follows within 50 ms (before, development showed the splash for about 0.4 s). Under reduced motion it waits only for fonts and fades in 0.25 s (about 0.45 s total). The screen is the Praszo mark as a vector, traced from `praszo-mark.png` as two polygons in coral `#f46a4a`.
+2. **Splash** (`layout/splash.tsx`). Timings: minimum 0.35 s, contraction 0.8 s, settle 0.5 s. It waits for **fonts only** (max 1.2 s), never for the full window load: waiting for every image held the hero back ~3 s on throttled mobile. A 7 s watchdog always hands the site over. React Strict Mode safe: the effect cleanup only finalises if no remount follows within 50 ms (before, development showed the splash for about 0.4 s). Under reduced motion it waits only for fonts and fades in 0.25 s (about 0.45 s total). The screen is the Praszo mark as a vector, traced from `praszo-mark.png` as two polygons in coral `#f46a4a`.
    - **Cover.** The mark is scaled up around a point inside its solid wedge, so it covers the viewport. A CSS fallback paints solid coral until JS places it.
    - **Wait.** It waits for `window.load` plus `document.fonts.ready`, with a minimum of 0.9 s and a maximum of 4 s.
    - **Contract.** GSAP contracts the shape into a 96px "Z" (1.25 s `expo.inOut`). It is driven by one proxy object `{x, y, fx, fy, s}` and an SVG `transform` written in `onUpdate`.
@@ -222,7 +222,7 @@ gsap.ticker.lagSmoothing(0)
    - **Title words** (`[data-hero="word"]` from `HeroTitle`) rise from per-word masks: `yPercent 115→0`, `rotate 7→0`, `blur 12px→0`, `opacity 0→1`, 1.15 s `expo.out`, stagger 0.075. Note the explicit `y: 0` in both states, because GSAP otherwise reads the CSS gating `translateY(110%)` as pixels and leaves words offset.
    - Copy, then the hero's secondary action ("See the workflow" / "See the features").
    - Visual (`y 28→0`, `scale .985→1`, `clearProps: transform`).
-   - When it finishes, the root gets `.is-ready`, and the CSS gating (`[data-entrance]:not(.is-ready) [data-hero]{opacity:0}`) releases.
+   - When it finishes, the root gets `.is-ready`. **There is no CSS gating any more** (removed for LCP): the hero is painted from the first frame, and the timeline applies its own from-state when created (under the splash, or before paint on client navigation). The hero copy (`[data-hero="copy"]`, the LCP element) only slides and never fades, because text at opacity 0 does not count as painted.
 4. **Hero scroll depth** (`motion/hero-scroll.ts`). A scrubbed timeline (`top top` to `bottom top`, `scrub: true`) on wrapper elements `[data-hero-depth]`:
    - **Title** `yPercent 55, scale .9, opacity 0`.
    - **Lede** `y 90, opacity 0`.
@@ -249,8 +249,8 @@ gsap.ticker.lagSmoothing(0)
 | `ProductIconNav` | `ui/product-icon-nav.tsx` | `gsap.to` indicator | Sliding highlight behind hovered or focused product glyph, tooltips, links | |
 | `PointerField` | `layout/pointer-field.tsx` | rAF-throttled pointermove | Updates `--mx` and `--my` for the ambient glow | off for coarse pointers and reduced motion |
 | Logo marquee | CSS `.marquee` | CSS keyframes 42 s, pauses on hover | Client logos scroll | duplicates hidden, static under reduced motion |
-| Nav follower | `site-header.tsx` | motion `layoutId="nav-follower"` spring | Pill highlight slides between nav items | |
-| Products menu, back-to-top | motion `AnimatePresence` | | Fade and slide in and out | |
+| Nav follower | `site-header.tsx` (`useNavFollower`) | One absolutely positioned pill; GSAP tweens its x/y/width/height to the `[aria-current]` item (0.45s `power3.out`), re-measured by a ResizeObserver; fades out when nothing is current; instant under reduced motion | Pill highlight slides between nav items | |
+| Products menu, back-to-top | CSS transitions (opacity, translate, scale, visibility) on always-mounted elements, `inert` while hidden | | Fade and slide in and out | |
 | Mobile menu | Radix Dialog + CSS `sheet-in` keyframes | | Slide-in sheet, focus trap; stops Lenis while open | |
 
 ---
@@ -416,6 +416,22 @@ All five share `MockupShell`: a `WindowFrame` (dots, title pill, optional `actio
 - **New product capture.** Resize to about 2000px wide with `sharp`, add it to `src/assets/products/`, then add `{ title, visual }` to `product.screens`.
 
 ---
+
+## 11b. Performance notes (2026-10-15)
+
+Lighthouse 12.8, home page. "Deployed" was praszo-three.vercel.app before these changes; "local" is the production build.
+
+| Run | Score | FCP | LCP | Speed Index | JS transfer |
+|---|---|---|---|---|---|
+| Desktop, deployed before | 95 | 0.3 s | 0.8 s | 2.2 s | 395 KiB |
+| Desktop, local after | 97–98 | 0.3 s | 0.7 s | 1.6 s | 340 KiB |
+| Mobile (simulated), deployed before | 82 | 2.3 s | 3.7 s | 5.7 s | 348 KiB |
+| Mobile (simulated), local after | 89 | 1.2 s | 3.4 s | 4.3 s | 295 KiB |
+| Mobile (applied throttling), local after | 87 | 1.7 s | **1.7 s** | 5.8 s | |
+
+- With real throttling the LCP (hero copy) paints with the first paint. Lighthouse's default *simulated* mobile LCP stays ~3.4 s because its model counts all JS seen before LCP in the unthrottled trace; PageSpeed Insights uses the same model, so it improves mainly by shipping less JS.
+- The remaining Speed Index cost is the splash itself (a full coral screen until it contracts). Options, not yet taken: show it once per session, or skip it on touch/mobile.
+- Next candidates: mount only the visible hero mockup (DOM was 1,836 nodes; GSAP setup ~800 ms of mobile CPU), load the mobile menu (Radix Dialog) on first open, batch load-time layout reads (~100 ms forced reflow), right-size client logo images.
 
 ## 12. Verification and QA
 

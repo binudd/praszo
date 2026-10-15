@@ -21,14 +21,17 @@ const MARK = {
 
 /** Height the mark settles at in the middle of the screen before it moves to the header. */
 const REST_HEIGHT = 96;
-/** Shortest time the coral screen stays up, and the longest it waits for the page to finish loading. */
-const MIN_MS = 600;
-const MAX_MS = 4000;
+/**
+ * Shortest time the coral screen stays up, and the longest it waits for fonts. It no longer waits for the
+ * full window load (every image): that held the hero back by ~3s on throttled mobile (LCP render delay).
+ */
+const MIN_MS = 350;
+const MAX_MS = 1200;
 /** Hard ceiling: whatever happens (stalled load, thrown error, lost tween), the site is handed over by then. */
 const WATCHDOG_MS = 7000;
 /** Phase durations (seconds). Contract into the mark, pause, then settle into the header. */
-const CONTRACT = 1.05;
-const SETTLE = 0.7;
+const CONTRACT = 0.8;
+const SETTLE = 0.5;
 
 /**
  * React Strict Mode (development) mounts, unmounts and remounts effects. The
@@ -44,12 +47,6 @@ function releaseSite(state: "landing" | "done") {
   root.dataset.splash = state;
   if (wasLocked) window.dispatchEvent(new Event(SPLASH_EVENT));
 }
-
-const pageLoaded = () =>
-  new Promise<void>((resolve) => {
-    if (document.readyState === "complete") resolve();
-    else window.addEventListener("load", () => resolve(), { once: true });
-  });
 
 /** The visible header logo mark to land on, if there is one at this width. */
 function headerMark() {
@@ -150,8 +147,8 @@ export function Splash() {
     };
 
     const begin = performance.now();
-    // Reduced motion only waits for fonts (no choreography to protect); otherwise wait for the full load.
-    const loaded = reduced ? Promise.resolve(document.fonts?.ready) : Promise.all([pageLoaded(), document.fonts?.ready]);
+    // Wait for fonts only (the hero type), never for images: the hero must not wait on the full load.
+    const loaded = Promise.resolve(document.fonts?.ready);
     const ready = Promise.race([loaded, new Promise((resolve) => setTimeout(resolve, MAX_MS))]);
     let outroTimer: ReturnType<typeof setTimeout> | undefined;
     void ready.then(() => {

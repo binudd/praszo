@@ -367,28 +367,9 @@ section[data-theme="dark"] {
   -webkit-backdrop-filter: blur(24px);
 }
 
-/* Entrance gating: hidden until the GSAP timeline marks the root ready. ------ */
-
-[data-entrance]:not(.is-ready):not(.is-static) [data-hero] {
-  opacity: 0;
-}
-
-[data-entrance]:not(.is-ready):not(.is-static) [data-hero="headline"],
-[data-entrance]:not(.is-ready):not(.is-static) [data-hero="word"] {
-  transform: translateY(110%);
-}
-
-[data-entrance].is-ready [data-hero],
-[data-entrance].is-static [data-hero] {
-  opacity: 1;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  [data-entrance] [data-hero] {
-    opacity: 1;
-    transform: none;
-  }
-}
+/* No CSS entrance gating: the hero is painted from the first frame so the browser can count it for LCP.
+   The entrance timeline (useHeroEntrance) applies its own from-state when it is created, which happens
+   under the splash on a first load and before paint on client navigation, so nothing visibly flashes. */
 
 .mask-reveal {
   overflow: hidden;
