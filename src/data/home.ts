@@ -82,44 +82,6 @@ export const home = {
       badge: "Manual and high risk",
     },
   },
-  why: {
-    eyebrow: "Why Praszo",
-    title: "Because audit firms deserve better practice management",
-    description:
-      "Audit work demands precision, accountability, and confidentiality. Praszo OS is a suite of audit automation tools built to replace scattered systems. Designed specifically for the unique needs of professional firms, it replaces chaos with consistency.",
-    items: [
-      {
-        title: "One system to run your practice",
-        body: "Projects, people, performance, and profitability are managed in one unified operating system, giving your firm clear and real-time visibility.",
-        icon: "LayoutDashboard" satisfies IconName,
-      },
-      {
-        title: "Data security at the core",
-        body: "On-premise deployment and role-based access control give you complete control over client data. Confidentiality and security are built into the system.",
-        icon: "Lock" satisfies IconName,
-      },
-      {
-        title: "Built around audit reality",
-        body: "Praszo aligns with audit realities, bringing recurring engagements, review cycles, and compliance requirements together in a single, seamless workflow.",
-        icon: "Repeat" satisfies IconName,
-      },
-      {
-        title: "Compliance without headaches",
-        body: "Audit trails, time logs, approvals, and review histories are built in by default. Your firm stays inspection-ready at all times, without manual tracking or last-minute scrambling.",
-        icon: "ClipboardCheck" satisfies IconName,
-      },
-      {
-        title: "Smarter audit work",
-        body: "AI-powered verification and matching free auditors from repetitive checks, allowing them to focus on high-value analysis.",
-        icon: "BrainCircuit" satisfies IconName,
-      },
-      {
-        title: "Scalable growth",
-        body: "Maintain absolute sovereignty over sensitive information across high-risk, high-volume engagements, and grow engagement capacity without multiplying headcount.",
-        icon: "TrendingUp" satisfies IconName,
-      },
-    ],
-  },
   segments: {
     eyebrow: "Who it is for",
     title: "Built for firms that cannot risk data exposure",

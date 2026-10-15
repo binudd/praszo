@@ -9,10 +9,10 @@ import { createSceneSetter, stepOpacity } from "@/components/motion/use-scene";
 import { Badge } from "@/components/ui/badge";
 import { Container } from "@/components/ui/container";
 import { Eyebrow } from "@/components/ui/eyebrow";
+import { ProductGlyph } from "@/components/ui/product-glyph";
 import { ProductLockup } from "@/components/ui/product-lockup";
 import { home } from "@/data/home";
 import { workflowSteps, type WorkflowStep } from "@/data/workflow";
-import { cn } from "@/lib/cn";
 import { prefersReducedMotion } from "@/lib/motion";
 
 const steps = workflowSteps;
@@ -130,6 +130,35 @@ export function WorkflowTour() {
         };
       });
 
+      // Below desktop: the compact timeline. The coral line draws down as the visitor scrolls and each
+      // step brightens when the line reaches it. Without this (reduced motion, no JS) every step is lit.
+      mm.add("(max-width: 1023px) and (prefers-reduced-motion: no-preference)", () => {
+        const list = root.querySelector<HTMLElement>("[data-tl]");
+        if (!list) return;
+        const line = list.querySelector<HTMLElement>("[data-tl-progress]");
+        const items = gsap.utils.toArray<HTMLElement>(list.querySelectorAll("[data-tl-step]"));
+        list.classList.add("tl-live");
+        if (line) {
+          gsap.fromTo(
+            line,
+            { scaleY: 0 },
+            { scaleY: 1, ease: "none", scrollTrigger: { trigger: list, start: "top 65%", end: "bottom 65%", scrub: 0.5 } },
+          );
+        }
+        items.forEach((item) => {
+          ScrollTrigger.create({
+            trigger: item,
+            start: "top 68%",
+            onEnter: () => item.classList.add("is-on"),
+            onLeaveBack: () => item.classList.remove("is-on"),
+          });
+        });
+        return () => {
+          list.classList.remove("tl-live");
+          items.forEach((item) => item.classList.remove("is-on"));
+        };
+      });
+
       return () => mm.revert();
     },
     { scope: rootRef },
@@ -209,19 +238,57 @@ export function WorkflowTour() {
         </div>
       </div>
 
-      {/* Static stacked fallback (mobile, reduced motion, no JS) */}
+      {/* Below desktop (and reduced motion / no JS): a compact vertical timeline instead of the stage.
+          Each step is a product glyph on the line, a label, a heading-tier title, one line of copy and a link. */}
       <div className="scene-stack">
-        <Container className="pb-20 md:pb-28">
-          <ol className="mt-12 flex flex-col gap-12 md:gap-16">
-            {steps.map((step, index) => (
+        <Container className="pb-16 md:pb-24">
+          <ol data-tl className="relative mt-12 md:mx-auto md:max-w-2xl">
+            <span aria-hidden className="absolute top-5 bottom-5 left-5 w-px -translate-x-1/2 bg-line" />
+            <span
+              aria-hidden
+              data-tl-progress
+              className="absolute top-5 bottom-5 left-5 w-px origin-top -translate-x-1/2 bg-brand"
+            />
+            {steps.map((step) => (
               <li
                 key={step.id}
-                className={cn("grid gap-6 md:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] md:items-center", index > 0 && "border-t border-line pt-12 md:pt-16")}
+                data-tl-step
+                className="relative grid grid-cols-[2.5rem_minmax(0,1fr)] gap-x-4 pb-10 transition-opacity duration-500 last:pb-0 [.tl-live_&:not(.is-on)]:opacity-40"
               >
-                <StepCopy step={step} />
-                <figure className="overflow-hidden rounded-media border border-line bg-surface p-3">
-                  <WorkflowCanvas activeLayer={index} className="h-auto w-full rounded-[1.5rem]" />
-                </figure>
+                <span className="relative z-10 flex h-10 w-10 items-center justify-center rounded-xl bg-bg">
+                  {step.product ? (
+                    <ProductGlyph slug={step.product.slug} size={40} />
+                  ) : (
+                    <span className="label flex h-10 w-10 items-center justify-center rounded-full border border-accent/50 text-accent tabular-nums">
+                      00
+                    </span>
+                  )}
+                </span>
+                <div className="pt-0.5">
+                  <p className="label text-ink-3">
+                    {step.product ? (
+                      <>
+                        <span className="tabular-nums">Step {String(step.index).padStart(2, "0")}</span> · Praszo {step.product.name}
+                      </>
+                    ) : (
+                      "Starting point"
+                    )}
+                  </p>
+                  <h3 className="heading mt-2 text-ink">{step.label}</h3>
+                  <p className="copy mt-2">{step.body}</p>
+                  {step.product ? (
+                    <a
+                      href={`/${step.product.slug}`}
+                      className="label mt-3 inline-flex min-h-6 items-center text-brand-strong hover:underline"
+                    >
+                      Explore Praszo {step.product.name} →
+                    </a>
+                  ) : (
+                    <Badge tone="accent" className="mt-3">
+                      {step.badge}
+                    </Badge>
+                  )}
+                </div>
               </li>
             ))}
           </ol>

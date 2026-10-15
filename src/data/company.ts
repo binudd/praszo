@@ -43,7 +43,7 @@ export type NavLink = { label: string; href: string };
 
 /** Primary header navigation (Products is rendered as a menu, not a link). */
 export const primaryNav: NavLink[] = [
-  { label: "Why Praszo", href: "/#why-praszo" },
+  { label: "Why Praszo", href: "/why-praszo" },
   { label: "Workflow", href: "/#workflow" },
   { label: "Contact", href: "/contact" },
 ];
@@ -51,7 +51,7 @@ export const primaryNav: NavLink[] = [
 /** Footer company column. Every link is an internal page. */
 export const companyLinks: NavLink[] = [
   { label: "About Praszo", href: "/about" },
-  { label: "Why Praszo", href: "/#why-praszo" },
+  { label: "Why Praszo", href: "/why-praszo" },
   { label: "Larger audit firms", href: "/large-firms" },
   { label: "Mid-sized audit firms", href: "/mid-sized-firms" },
   { label: "Insights", href: "/insights" },
@@ -68,6 +68,7 @@ export const routes = [
   { path: "/match", priority: 0.9, changeFrequency: "monthly" },
   { path: "/modifi", priority: 0.9, changeFrequency: "monthly" },
   { path: "/docs", priority: 0.9, changeFrequency: "monthly" },
+  { path: "/why-praszo", priority: 0.8, changeFrequency: "monthly" },
   { path: "/about", priority: 0.7, changeFrequency: "yearly" },
   { path: "/large-firms", priority: 0.8, changeFrequency: "monthly" },
   { path: "/mid-sized-firms", priority: 0.8, changeFrequency: "monthly" },

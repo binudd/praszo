@@ -3,7 +3,7 @@
 import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRef, type CSSProperties } from "react";
+import { useRef, useState, type CSSProperties } from "react";
 
 import { gsap, useGSAP } from "@/components/motion/gsap";
 import { scrollToTarget } from "@/components/motion/smooth-scroll";
@@ -77,6 +77,79 @@ function ProductPoster({ product, className }: { product: Product; className?: s
         </div>
       </div>
     </div>
+  );
+}
+
+/**
+ * Below md (phones): a swipeable rail of posters with scroll snapping, the next card peeking in, and
+ * position dots. From md up the same list is the two-column grid. Used only by the stacked fallback,
+ * so the desktop scroll scene is untouched.
+ */
+function ProductRail() {
+  const railRef = useRef<HTMLOListElement | null>(null);
+  const [active, setActive] = useState(0);
+  const frame = useRef(0);
+
+  const onScroll = () => {
+    cancelAnimationFrame(frame.current);
+    frame.current = requestAnimationFrame(() => {
+      const rail = railRef.current;
+      const first = rail?.firstElementChild as HTMLElement | null;
+      if (!rail || !first) return;
+      const step = first.offsetWidth + parseFloat(getComputedStyle(rail).columnGap || "0");
+      setActive(Math.min(productList.length - 1, Math.max(0, Math.round(rail.scrollLeft / step))));
+    });
+  };
+
+  const goTo = (index: number) => {
+    const rail = railRef.current;
+    const item = rail?.children[index] as HTMLElement | undefined;
+    if (rail && item) rail.scrollTo({ left: item.offsetLeft - rail.offsetLeft - parseFloat(getComputedStyle(rail).paddingLeft), behavior: "smooth" });
+  };
+
+  return (
+    <>
+      <ol
+        ref={railRef}
+        onScroll={onScroll}
+        aria-label="Praszo products"
+        className="-mx-5 mt-10 flex snap-x snap-mandatory scroll-px-5 gap-4 overflow-x-auto px-5 pb-2 [scrollbar-width:none] md:mx-0 md:mt-12 md:grid md:grid-cols-2 md:gap-6 md:overflow-visible md:px-0 md:pb-0 [&::-webkit-scrollbar]:hidden"
+      >
+        {productList.map((product) => (
+          <li key={product.slug} className="w-[80vw] max-w-[21rem] shrink-0 snap-start md:w-auto md:max-w-none">
+            <Link href={`/${product.slug}`} className="group block">
+              <ProductPoster product={product} className="h-[26rem] transition-transform duration-500 group-hover:-translate-y-1 md:h-auto" />
+              <span className="mt-4 inline-flex min-h-6 items-center gap-2 text-[15px] font-bold text-brand-strong">
+                Explore Praszo {product.name}
+                <ArrowRight size={16} aria-hidden />
+              </span>
+            </Link>
+          </li>
+        ))}
+      </ol>
+      <div data-rail-controls className="mt-5 flex items-center justify-between md:hidden">
+        <p className="label text-ink-3 tabular-nums" aria-live="polite">
+          {String(active + 1).padStart(2, "0")} / {String(productList.length).padStart(2, "0")}
+        </p>
+        <div className="flex items-center gap-1">
+          {productList.map((product, index) => (
+            <button
+              key={product.slug}
+              type="button"
+              onClick={() => goTo(index)}
+              aria-label={`Go to the Praszo ${product.name} card`}
+              aria-current={index === active || undefined}
+              className="inline-flex h-8 w-8 items-center justify-center"
+            >
+              <span
+                aria-hidden
+                className={cn("block h-2 rounded-full transition-all duration-300", index === active ? "w-6 bg-ink" : "w-2 bg-line-strong")}
+              />
+            </button>
+          ))}
+        </div>
+      </div>
+    </>
   );
 }
 
@@ -158,7 +231,7 @@ export function ProductEcosystem() {
   return (
     <section ref={rootRef} id="products" aria-labelledby="products-title" className="scene relative">
       {/* Sticky scene: desktop + motion allowed */}
-      <div data-scene-track className="scene-track" style={{ height: "520svh" }}>
+      <div data-scene-track className="scene-track" style={{ height: "420svh" }}>
         <div ref={stageRef} data-scene-stage className="scene-stage">
           <Container>
             <div className="text-center">
@@ -219,24 +292,12 @@ export function ProductEcosystem() {
       </div>
 
       {/* Stacked fallback: mobile, reduced motion, no JS */}
-      <div className="scene-stack py-20 md:py-28">
+      <div className="scene-stack py-16 md:py-28">
         <Container>
           <Eyebrow>{home.ecosystem.eyebrow}</Eyebrow>
           <h2 className="display-md mt-4 text-ink">{home.ecosystem.title}</h2>
           <p className="lede mt-5 max-w-2xl">{home.ecosystem.description}</p>
-          <ol className="mt-12 grid gap-6 md:grid-cols-2">
-            {productList.map((product) => (
-              <li key={product.slug}>
-                <Link href={`/${product.slug}`} className="group block">
-                  <ProductPoster product={product} className="transition-transform duration-500 group-hover:-translate-y-1" />
-                  <span className="mt-4 inline-flex items-center gap-2 text-[15px] font-bold text-brand-strong">
-                    Explore Praszo {product.name}
-                    <ArrowRight size={16} aria-hidden />
-                  </span>
-                </Link>
-              </li>
-            ))}
-          </ol>
+          <ProductRail />
         </Container>
       </div>
     </section>

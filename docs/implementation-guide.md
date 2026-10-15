@@ -17,6 +17,7 @@ The corporate site for **Praszo** (praszo.com), an on-premise practice-managemen
 | `/modifi` | Praszo Modifi (engagement letter automation) | `#2874ff` |
 | `/docs` | Praszo Docs (on-premise document management) | `#d72d2d` |
 | `/contact` | Contact and "Book a demo" | Brand coral |
+| `/why-praszo` | Why Praszo (pillars, statement, differentiators, impact, segments, FAQ) | Brand coral |
 | `/about` | About Praszo (mission, team, values) | Brand coral |
 | `/large-firms` | Solution: larger audit firms | Brand coral |
 | `/mid-sized-firms` | Solution: mid-sized audit firms | Brand coral |
@@ -256,19 +257,35 @@ gsap.ticker.lagSmoothing(0)
 
 ### 8.1 Homepage (`src/app/page.tsx`), top to bottom
 
+Kept short on purpose (decided 2026-10-15: visitors don't scroll that far). Only the essentials stay; the long-form case moved to `/why-praszo` (8.1b). Header nav "Why Praszo" and the footer link go to that page.
+
+**Mobile-first below desktop (decided 2026-10-15).** The desktop scroll scenes (≥1024px, motion allowed) are untouched; everything below uses purpose-built layouts in the scenes' stacked fallbacks. Homepage height at 390×844 went from 10,250px to 6,173px.
+- **Products** (`ProductRail` in `product-ecosystem.tsx`): below md a horizontal scroll-snap rail (cards 80vw, max 21rem, 26rem tall, next card peeking, bleeding to the screen edge) with a "01 / 05" counter and tappable dots (32px targets, `aria-current`, labels "Go to the Praszo X card"). From md it is the two-column grid, no dots.
+- **Workflow** (stack in `workflow-tour.tsx`): a vertical timeline, product glyph on the line, "Step 0N · Praszo X" label, `heading` title, `copy` body, link. No canvas illustrations. Below 1024px with motion a coral line draws down (`[data-tl-progress]`, scaleY scrubbed `top 65%`→`bottom 65%`) and steps brighten as it reaches them (`.tl-live` + `.is-on`); reduced motion / no JS show it fully lit. Centered at max-w-2xl on tablets.
+
 | # | Section | Component | Animation |
 |---|---|---|---|
 | 1 | **Hero**: "Run it on Praszo." | `CorporateHero` → `HeroShell` + `HeroShowcase` | **Layout.** 100svh grid: title row at the top (below a header gap), then lede and CTAs on the left with the visual on the right (5/7 columns at lg). **Entrance.** Splash hand-off, word entrance (§7.4), scroll depth. **Visual.** Rotates the five product mockups every 7 s, and hovering or focusing a product icon holds one. Only the visible mockup animates (`paused` prop, `inert` on the others). The caption row shows the product lockup, label and `ProductIconNav`. **Theme.** Dark by default with a local light toggle (§9.6). |
 | 2 | Trusted by | `TrustedBy` | CSS marquee of 6 grayscale client logos |
+| 3 | Five specialized engines (`#products`) | `ProductEcosystem` | `useScene`, 5 steps, 420svh track. Left: product name list (current one expanded). Center: stacked **poster cards filled with the product color** fan in and out (`x d*70`, `rotate d*7`, `scale`). Right: step badge, summary and link crossfade. Clicking a name jumps to its step. **Entrance** (scrubbed from track `top 92%` to `top top`, ending exactly where the scene starts): the deck rises 160px, untilts from -9° and scales up from 0.84; the first poster's preview slides up inside it; the names stagger in from the left; the copy column rises. It only animates `[data-eco-deck]`, `[data-poster-preview]`, tab rows and `[data-eco-copy]`, which the scene never writes. Mobile: grid of posters. |
+| 4 | The complete audit firm workflow (`#workflow`, dark) | `WorkflowTour` + `mockups/workflow-canvas.tsx` | Custom ScrollTrigger scene, 440svh, `scrub 0.6`, 6 steps. The SVG layers crossfade (`[data-layer]`), strokes draw (`strokeDashoffset`), a dot travels the pipeline via **MotionPathPlugin**, copy and chips crossfade, step tabs track progress, and a progress line scales. |
+| 5 | Testimonials | `Testimonials` | `HorizontalScroll` rail of 4 quotes |
+| 6 | Final CTA (dark) | `FinalCta` | `RevealHeading` plus `RevealBlock` |
+
+### 8.1b Why Praszo (`/why-praszo`), top to bottom
+
+Copy from praszo.com/why-praszo (page data in `data/pages/why-praszo.ts`; the shared blocks still read `data/home.ts`). `WhyPraszo` takes its content as props.
+
+| # | Section | Component | Animation |
+|---|---|---|---|
+| 1 | Hero: "Because audit firms deserve better practice management" | `PageHero` | `RevealBlock` |
+| 2 | Platform pillars: "Praszo OS. One platform." | `PlatformPillars` | `RevealHeading` lines, then three editorial columns (no card surface) under the giant title: hairline top rule, `label` index with icon, `display-sm` title, `lede` body, staggered by `RevealGroup` |
 | 3 | Statement (dark) | `Statement` | Sticky 100svh stage over a 190svh track, with `WordReveal` scrubbed `top top` to `bottom bottom`. "cannot risk data exposure" is highlighted. Glass chips and a dot-field backdrop. |
-| 4 | Platform pillars: "Praszo OS. One platform." | `PlatformPillars` | `RevealHeading` lines, then three editorial columns (no card surface) under the giant title: hairline top rule, `label` index with icon, `display-sm` title, `lede` body, staggered by `RevealGroup` |
-| 5 | Five specialized engines (`#products`) | `ProductEcosystem` | `useScene`, 5 steps, 520svh track. Left: product name list (current one expanded). Center: stacked **poster cards filled with the product color** fan in and out (`x d*70`, `rotate d*7`, `scale`). Right: step badge, summary and link crossfade. Clicking a name jumps to its step. **Entrance** (scrubbed from track `top 92%` to `top top`, ending exactly where the scene starts): the deck rises 160px, untilts from -9° and scales up from 0.84; the first poster's preview slides up inside it; the names stagger in from the left; the copy column rises. It only animates `[data-eco-deck]`, `[data-poster-preview]`, tab rows and `[data-eco-copy]`, which the scene never writes. Mobile: grid of posters. |
-| 6 | The complete audit firm workflow (`#workflow`, dark) | `WorkflowTour` + `mockups/workflow-canvas.tsx` | Custom ScrollTrigger scene, 440svh, `scrub 0.6`, 6 steps. The SVG layers crossfade (`[data-layer]`), strokes draw (`strokeDashoffset`), a dot travels the pipeline via **MotionPathPlugin**, copy and chips crossfade, step tabs track progress, and a progress line scales. |
-| 7 | Why Praszo (`#why-praszo`) | `WhyPraszo` | `HorizontalScroll` rail with a `WordReveal` intro and `RevealHeading` |
-| 8 | Who it is for: "Built for firms that cannot risk data exposure" | `Segments` (photos from `src/assets/segments/`) | `useScene`, 2 steps, `count*130+40` svh. One persistent frame with no surface (hairline top rule, progress rule at the bottom, content on the page grid; it still clips content moving in and out). Each step holds for most of its slice. Inside a `SWITCH = 0.32` window the outgoing content leaves in reading order (photo tilts and shrinks, copy rises 42px, points slide left 64px, stagger 0.07). Then the incoming content builds in from below and the right, with no overlap. A progress rule fills along the frame bottom, and tabs jump to settled points. Type matches the pillars: `display-sm` title, `label` subtitle in brand coral (`brand-strong`), `copy` body, numbered points (`label` index, `copy` text) between hairline rules, and a `label` link. Each firm size shows a **photo** (glass towers for larger firms, a mid-rise office for mid-sized firms) in a 3:2 rounded frame that tilts and shrinks with the content. |
-| 9 | Testimonials | `Testimonials` | `HorizontalScroll` rail of 4 quotes |
-| 10 | FAQ (`#faq`) | `FaqSection` | Native `<details>` accordion, plus FAQPage JSON-LD |
-| 11 | Final CTA (dark) | `FinalCta` | `RevealHeading` plus `RevealBlock` |
+| 4 | What makes Praszo different (`#why-praszo`, dark) | `WhyPraszo` | `HorizontalScroll` rail with a `WordReveal` intro and `RevealHeading` |
+| 5 | From chaos to clarity: the Praszo impact (`#why-impact`) | `PageSection` + `FeatureGrid` | `RevealGroup` stagger |
+| 6 | Who it is for: "Built for firms that cannot risk data exposure" | `Segments` (photos from `src/assets/segments/`) | `useScene`, 2 steps, `count*130+40` svh. One persistent frame with no surface (hairline top rule, progress rule at the bottom, content on the page grid; it still clips content moving in and out). Each step holds for most of its slice. Inside a `SWITCH = 0.32` window the outgoing content leaves in reading order (photo tilts and shrinks, copy rises 42px, points slide left 64px, stagger 0.07). Then the incoming content builds in from below and the right, with no overlap. A progress rule fills along the frame bottom, and tabs jump to settled points. Type matches the pillars: `display-sm` title, `label` subtitle in brand coral (`brand-strong`), `copy` body, numbered points (`label` index, `copy` text) between hairline rules, and a `label` link. Each firm size shows a **photo** (glass towers for larger firms, a mid-rise office for mid-sized firms) in a 3:2 rounded frame that tilts and shrinks with the content. |
+| 7 | FAQ (`#why-faq`) | `FaqSection` | Native `<details>` accordion, plus FAQPage JSON-LD |
+| 8 | Final CTA (dark) | `FinalCta` (`id="why-cta"`) | `RevealHeading` plus `RevealBlock` |
 
 ### 8.2 Product pages (`src/app/<slug>/page.tsx`)
 Every page is wrapped by `ProductPage`, which provides the product color scope, SoftwareApplication JSON-LD and `RelatedProducts` at the end. The header switches to the product lockup and that product's section menu (§9). Pages compose shared sections in this order (✓ = used):

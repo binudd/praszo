@@ -3,25 +3,38 @@ import { RevealHeading } from "@/components/motion/reveal";
 import { WordReveal } from "@/components/motion/word-reveal";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { EditorialItem } from "@/components/ui/editorial-item";
-import { home } from "@/data/home";
+import type { IconName } from "@/lib/icons";
 
-export function WhyPraszo() {
+type Props = {
+  /** Section anchor; unique per route (routes stay mounted). */
+  id?: string;
+  eyebrow: string;
+  title: string;
+  description: string;
+  highlights?: ReadonlyArray<string>;
+  items: ReadonlyArray<{ title: string; body: string; icon: IconName }>;
+};
+
+/** Dark pinned rail of differentiators: a scroll-revealed intro, a heading, then the items. */
+export function WhyPraszo({ id = "why-praszo", eyebrow, title, description, highlights, items }: Props) {
   return (
     <HorizontalScroll
-      id="why-praszo"
+      id={id}
       theme="dark"
-      label="Why Praszo"
+      label={eyebrow}
       header={
         <div className="mx-auto max-w-3xl text-center">
-          <Eyebrow className="justify-center">{home.why.eyebrow}</Eyebrow>
-          <WordReveal text={home.why.description} highlights={["replaces chaos with consistency"]} className="lede mt-5" />
-          <h2 id="why-title" className="display-md mt-8 text-ink">
-            <RevealHeading>{home.why.title}</RevealHeading>
+          <div className="text-center">
+            <Eyebrow>{eyebrow}</Eyebrow>
+          </div>
+          <WordReveal text={description} highlights={highlights} className="lede mt-5" />
+          <h2 id={`${id}-title`} className="display-md mt-8 text-ink">
+            <RevealHeading>{title}</RevealHeading>
           </h2>
         </div>
       }
     >
-      {home.why.items.map((item, index) => (
+      {items.map((item, index) => (
         <HorizontalCard key={item.title} className="w-[min(20rem,78vw)] md:w-[22rem]">
           <EditorialItem as="div" index={index} icon={item.icon} title={item.title} body={item.body} />
         </HorizontalCard>
