@@ -36,7 +36,7 @@ const LOOP_TRANSFORM = "translate(50 76) rotate(-3) scale(1.07 1.05) translate(-
  */
 export function TeamGrid({ members, idPrefix = "team" }: { members: ReadonlyArray<TeamMember>; idPrefix?: string }) {
   return (
-    <ul className="mx-auto grid max-w-sm grid-cols-1 gap-y-12 sm:max-w-none sm:grid-cols-2 sm:gap-x-6 md:gap-x-8 lg:grid-cols-4">
+    <ul className="mx-auto grid max-w-[16.5rem] grid-cols-1 gap-y-10 sm:max-w-none sm:gap-y-12 sm:grid-cols-2 sm:gap-x-6 md:gap-x-8 lg:grid-cols-4">
       {members.map((member, index) => {
         const blob = BLOBS[index % BLOBS.length];
         // Unique per route: routes stay mounted, so pass a route-specific idPrefix if reused elsewhere.
@@ -83,7 +83,7 @@ export function TeamGrid({ members, idPrefix = "team" }: { members: ReadonlyArra
                       src={member.photo}
                       alt={`Portrait of ${member.name}`}
                       fill
-                      sizes="(min-width: 1024px) 22vw, (min-width: 640px) 46vw, 92vw"
+                      sizes="(min-width: 1024px) 22vw, (min-width: 640px) 46vw, 264px"
                       className="object-contain object-bottom"
                     />
                   </div>
@@ -98,7 +98,7 @@ export function TeamGrid({ members, idPrefix = "team" }: { members: ReadonlyArra
               </div>
             </div>
 
-            <div className="mt-5">
+            <div className="mt-5 text-center sm:text-left">
               <h3 className="heading text-ink">{member.name}</h3>
               <p className="label mt-2 text-ink-3">{member.role}</p>
             </div>
