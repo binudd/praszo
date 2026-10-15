@@ -334,6 +334,12 @@ Data-driven and built from one kit in `components/page/`, so new pages need no n
 - **Before changing the hero**, re-run the hero-fit check (§12) at 1440×900, 1366×768, 1280×720, 1024×768, 834×1194, 390×844 and 360×780.
 
 ### 9.2 Animated product mockups (`components/mockups/`)
+
+**Liveliness layer (2026-10-15).** Every mockup gets the same playful, interactive layer through two shared pieces, so the five stay consistent:
+- **`MockupShell`** renders coloured window dots (`WindowFrame dots="color"`: accent / warning / success tokens), a product-colour wash on the desk, a pulsing **Live** chip, and the effects overlay `[data-fx]` (labelled collaborator cursor, click ripple, toast). `toastAt="left" | "right"` puts the toast in the corner that layout leaves empty (checked: it covers no card, row, step or badge).
+- **`mockup-fx.ts`**: `createMockupFx(root)` → `cursorTo(el)`, `cursorAt(x, y)`, `click()`, `toast(text, tone)`, `burst(el)` (confetti in the five product colours); `bindHoverHold(root, fx, onHold)` pauses a demo while the pointer is over it. All no-ops under reduced motion. No shadows anywhere (toast is a flat ink pill; cursor has a `--bg` stroke).
+- **Per mockup**: the cursor visits what is about to change and clicks it; milestones toast; completions burst. Each has one hands-on interaction: Practice, click a card to advance it (moves are serialised with the loop); Verifi, the score card re-runs the checks; Match, rows are buttons that match that row; Modifi, "Click to sign" jumps to signing and the cursor traces the signature path; Docs, click a file to re-run OCR. Clicking releases the hover hold.
+- The homepage showcase also holds its 7s product rotation while the pointer is over the mockup.
 All five share `MockupShell`: a `WindowFrame` (dots, title pill, optional `action` slot) plus a meta-chip toolbar on an `bg-elevated` desk. They take `{ paused?, className? }`, and pausing holds the loop. All are static under reduced motion.
 
 | Mockup | Product | Engine | Loop |

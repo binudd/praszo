@@ -3,15 +3,34 @@
 import { FileText } from "lucide-react";
 import { useEffect, useRef } from "react";
 
+import { bindHoverHold, createMockupFx } from "@/components/mockups/mockup-fx";
 import { MockupShell, type MockupProps } from "@/components/mockups/mockup-shell";
 import { gsap, useGSAP } from "@/components/motion/gsap";
 import { matchShowcase as data } from "@/data/showcases";
 import { prefersReducedMotion } from "@/lib/motion";
 
-/** Praszo Match: each register row is linked to its invoice, PO and GRN and stamped with a result. */
+const STEP = 2.4;
+
+/** What the toast says once a row's three documents are compared. */
+function verdict(index: number) {
+  const row = data.rows[index];
+  const partial = row.results.findIndex((result) => result === "partial");
+  return partial === -1
+    ? { text: `Full 3-way match · ${row.vendor}`, tone: "success" as const, full: true }
+    : { text: `${data.documents[partial]} at 85% · flagged for review`, tone: "accent" as const, full: false };
+}
+
+/**
+ * Praszo Match: each register row is linked to its invoice, PO and GRN and stamped with a result. The
+ * collaborator cursor picks each row, a toast reports the verdict and full matches pop. Hovering pauses
+ * the demo; rows are buttons that jump the matching to that row.
+ */
 export function MatchEngine({ paused, className }: MockupProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
+  const pausedRef = useRef(Boolean(paused));
+  const heldRef = useRef(false);
+  const sync = () => tlRef.current?.paused(pausedRef.current || heldRef.current);
 
   useGSAP(
     () => {
@@ -52,9 +71,17 @@ export function MatchEngine({ paused, className }: MockupProps) {
         return;
       }
 
+      const fx = createMockupFx(root);
       const tl = gsap.timeline({ repeat: -1, repeatDelay: 0.8, paused: Boolean(paused) });
       data.rows.forEach((_, index) => {
-        const at = index * 2.4;
+        const at = index * STEP;
+        tl.add(
+          () => {
+            fx.cursorTo(rows[index], { x: 0.35 });
+          },
+          Math.max(0, at - 0.5),
+        );
+        tl.add(() => fx.click(), Math.max(0, at - 0.05));
         tl.add(() => {
           setResults(null);
           rows[index].dataset.state = "active";
@@ -68,11 +95,21 @@ export function MatchEngine({ paused, className }: MockupProps) {
           });
         }, at);
         tl.to(links, { strokeDashoffset: 0, duration: 0.7, ease: "power2.inOut", stagger: 0.12 }, at + 0.1);
-        tl.add(() => setResults(index), at + 1.0);
+        tl.add(() => {
+          setResults(index);
+          const result = verdict(index);
+          fx.toast(result.text, result.tone);
+          if (result.full) fx.burst(rows[index]);
+        }, at + 1.0);
         tl.to(links, { opacity: 0, duration: 0.3 }, at + 2.0);
       });
       tlRef.current = tl;
+      const unbind = bindHoverHold(root, fx, (held) => {
+        heldRef.current = held;
+        sync();
+      });
       return () => {
+        unbind();
         tl.kill();
         tlRef.current = null;
       };
@@ -81,31 +118,47 @@ export function MatchEngine({ paused, className }: MockupProps) {
   );
 
   useEffect(() => {
-    tlRef.current?.paused(Boolean(paused));
+    pausedRef.current = Boolean(paused);
+    sync();
   }, [paused]);
+
+  /** A click is an explicit request to watch: release the hover pause and match that row now. */
+  const matchRow = (index: number) => {
+    const tl = tlRef.current;
+    if (!tl) return;
+    heldRef.current = false;
+    tl.play(index * STEP + 0.01);
+  };
 
   return (
     <div ref={rootRef} className={className}>
       <MockupShell title={data.title} meta={data.meta}>
-        <div data-body className="relative grid h-full min-h-0 grid-cols-[1.25fr_1fr] grid-rows-[minmax(0,1fr)] gap-3 p-3 sm:gap-6">
+        <div
+          data-body
+          className="relative grid h-full min-h-0 grid-cols-[1.25fr_1fr] grid-rows-[minmax(0,1fr)] gap-3 p-3 sm:gap-6"
+        >
           <svg className="pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden>
             {data.documents.map((doc) => (
               <path key={doc} data-link fill="none" stroke="var(--product)" strokeWidth="1.5" opacity="0" />
             ))}
           </svg>
           <ul className="flex min-h-0 flex-col gap-2 overflow-hidden">
-            {data.rows.map((row) => (
-              <li
-                key={row.id}
-                data-row={row.id}
-                data-state="idle"
-                className="rounded-sm bg-bg px-2.5 py-2 transition-[background-color,opacity] duration-300 data-[state=active]:bg-product-soft data-[state=done]:opacity-55"
-              >
-                <p className="truncate text-[11px] font-semibold text-ink">{row.vendor}</p>
-                <p className="flex justify-between gap-2 text-[10px] text-ink-3">
-                  <span className="truncate font-mono">{row.ref}</span>
-                  <span className="tabular-nums">{row.amount}</span>
-                </p>
+            {data.rows.map((row, index) => (
+              <li key={row.id}>
+                <button
+                  type="button"
+                  data-row={row.id}
+                  data-state="idle"
+                  onClick={() => matchRow(index)}
+                  aria-label={`Match ${row.vendor} ${row.ref}`}
+                  className="block w-full rounded-sm bg-bg px-2.5 py-2 text-left transition-[background-color,opacity,scale] duration-300 hover:bg-product-soft active:scale-[0.98] data-[state=active]:bg-product-soft data-[state=done]:opacity-55 data-[state=done]:hover:opacity-100"
+                >
+                  <span className="block truncate text-[11px] font-semibold text-ink">{row.vendor}</span>
+                  <span className="flex justify-between gap-2 text-[10px] text-ink-3">
+                    <span className="truncate font-mono">{row.ref}</span>
+                    <span className="tabular-nums">{row.amount}</span>
+                  </span>
+                </button>
               </li>
             ))}
           </ul>
@@ -122,9 +175,15 @@ export function MatchEngine({ paused, className }: MockupProps) {
                   <span className="truncate">{doc}</span>
                 </span>
                 <span className="shrink-0 text-[9px] font-bold">
-                  <span className="hidden rounded-full bg-elevated px-1.5 py-0.5 text-ink-3 group-data-[state=idle]:inline">…</span>
-                  <span className="hidden rounded-full bg-success/12 px-1.5 py-0.5 text-success group-data-[state=match]:inline">Match</span>
-                  <span className="hidden rounded-full bg-bg px-1.5 py-0.5 text-product-deep dark:text-product group-data-[state=partial]:inline">85%</span>
+                  <span className="hidden rounded-full bg-elevated px-1.5 py-0.5 text-ink-3 group-data-[state=idle]:inline">
+                    …
+                  </span>
+                  <span className="hidden rounded-full bg-success/12 px-1.5 py-0.5 text-success group-data-[state=match]:inline">
+                    Match
+                  </span>
+                  <span className="hidden rounded-full bg-bg px-1.5 py-0.5 text-product-deep dark:text-product group-data-[state=partial]:inline">
+                    85%
+                  </span>
                 </span>
               </li>
             ))}

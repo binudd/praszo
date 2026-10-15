@@ -3,15 +3,26 @@
 import { Check, Lock } from "lucide-react";
 import { useEffect, useRef } from "react";
 
+import { bindHoverHold, createMockupFx } from "@/components/mockups/mockup-fx";
 import { MockupShell, type MockupProps } from "@/components/mockups/mockup-shell";
 import { gsap, useGSAP } from "@/components/motion/gsap";
 import { modifiShowcase as data } from "@/data/showcases";
 import { prefersReducedMotion } from "@/lib/motion";
 
-/** Praszo Modifi: placeholders fill from CRM data, approvals advance, the letter gets signed. */
+const SIGN_AT = 4.6;
+
+/**
+ * Praszo Modifi: placeholders fill from CRM data, approvals advance, the letter gets signed. The
+ * collaborator cursor fills each field, clicks through the approvals and then traces the signature
+ * itself; signing ends with a toast and a confetti pop. Hovering pauses the demo; the signature line
+ * is a button that jumps straight to signing.
+ */
 export function ModifiFlow({ paused, className }: MockupProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
+  const pausedRef = useRef(Boolean(paused));
+  const heldRef = useRef(false);
+  const sync = () => tlRef.current?.paused(pausedRef.current || heldRef.current);
 
   useGSAP(
     () => {
@@ -38,27 +49,64 @@ export function ModifiFlow({ paused, className }: MockupProps) {
       }
 
       reset();
+      const fx = createMockupFx(root);
       const tl = gsap.timeline({ repeat: -1, repeatDelay: 1.8, paused: Boolean(paused) });
       tl.add(reset, 0);
       tl.add(() => (steps[0].dataset.state = "active"), 0.2);
-      fields.forEach((field, index) => tl.add(() => (field.dataset.state = "filled"), 0.6 + index * 0.55));
+      fields.forEach((field, index) => {
+        const at = 0.6 + index * 0.55;
+        tl.add(() => fx.cursorTo(field, { duration: 0.45 }), at - 0.4);
+        tl.add(() => {
+          fx.click();
+          field.dataset.state = "filled";
+        }, at);
+      });
+      const advance = (from: number, at: number, message: string) => {
+        tl.add(() => fx.cursorTo(steps[from + 1], { x: 0.2 }), at - 0.45);
+        tl.add(() => {
+          fx.click();
+          steps[from].dataset.state = "done";
+          steps[from + 1].dataset.state = "active";
+          fx.toast(message, "product");
+        }, at);
+      };
+      advance(0, 2.6, "Sent for partner review");
+      advance(1, 3.6, "Review complete");
+      advance(2, SIGN_AT, `Approved · ${data.meta[1]}`);
+      if (signature) {
+        // The cursor holds the pen: it follows the signature path as the stroke draws.
+        const point = { progress: 0 };
+        tl.to(
+          point,
+          {
+            progress: 1,
+            duration: 1.1,
+            ease: "power2.inOut",
+            onUpdate: () => {
+              gsap.set(signature, { strokeDashoffset: length * (1 - point.progress) });
+              const matrix = signature.getScreenCTM();
+              if (!matrix) return;
+              const at = signature.getPointAtLength(length * point.progress);
+              const screen = new DOMPoint(at.x, at.y).matrixTransform(matrix);
+              fx.cursorAt(screen.x, screen.y);
+            },
+          },
+          SIGN_AT + 0.1,
+        );
+      }
       tl.add(() => {
-        steps[0].dataset.state = "done";
-        steps[1].dataset.state = "active";
-      }, 2.6);
-      tl.add(() => {
-        steps[1].dataset.state = "done";
-        steps[2].dataset.state = "active";
-      }, 3.6);
-      tl.add(() => {
-        steps[2].dataset.state = "done";
-        steps[3].dataset.state = "active";
-      }, 4.6);
-      if (signature) tl.to(signature, { strokeDashoffset: 0, duration: 1.1, ease: "power2.inOut" }, 4.7);
-      tl.add(() => (steps[3].dataset.state = "done"), 5.9);
-      if (badge) tl.to(badge, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.6)" }, 5.9);
+        steps[3].dataset.state = "done";
+        fx.toast(`Letter signed · ${data.fields[0].value}`, "success");
+        fx.burst(badge);
+      }, SIGN_AT + 1.3);
+      if (badge) tl.to(badge, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.6)" }, SIGN_AT + 1.3);
       tlRef.current = tl;
+      const unbind = bindHoverHold(root, fx, (held) => {
+        heldRef.current = held;
+        sync();
+      });
       return () => {
+        unbind();
         tl.kill();
         tlRef.current = null;
       };
@@ -67,12 +115,21 @@ export function ModifiFlow({ paused, className }: MockupProps) {
   );
 
   useEffect(() => {
-    tlRef.current?.paused(Boolean(paused));
+    pausedRef.current = Boolean(paused);
+    sync();
   }, [paused]);
+
+  /** A click is an explicit request to watch: release the hover pause and sign now. */
+  const signNow = () => {
+    const tl = tlRef.current;
+    if (!tl) return;
+    heldRef.current = false;
+    tl.play(SIGN_AT - 0.5);
+  };
 
   return (
     <div ref={rootRef} className={className}>
-      <MockupShell title={data.title} meta={data.meta}>
+      <MockupShell title={data.title} meta={data.meta} toastAt="right">
         <div className="grid h-full grid-cols-1 gap-3 p-3 sm:grid-cols-[1.3fr_1fr]">
           <div className="relative flex flex-col rounded-sm bg-bg p-3">
             <div className="h-2 w-24 rounded bg-product/70" />
@@ -101,17 +158,30 @@ export function ModifiFlow({ paused, className }: MockupProps) {
               <Lock size={10} aria-hidden /> {data.clause}
             </div>
             <div className="mt-auto flex items-end justify-between pt-3">
-              <svg viewBox="0 0 120 32" className="h-8 w-28 overflow-visible" aria-hidden>
-                <path
-                  data-signature
-                  d="M4 24 C 14 6, 22 30, 32 14 S 48 4, 54 20 S 70 26, 78 12 S 96 8, 104 20 S 112 22, 116 16"
-                  fill="none"
-                  stroke="var(--ink)"
-                  strokeWidth="1.6"
-                  strokeLinecap="round"
-                />
-              </svg>
-              <span data-signed className="rounded-full bg-success px-2 py-0.5 text-[9px] font-bold text-white opacity-0">
+              <button
+                type="button"
+                onClick={signNow}
+                aria-label="Sign the engagement letter"
+                className="group/sign relative -m-1 rounded p-1 transition-colors hover:bg-product-soft"
+              >
+                <span className="absolute -top-3.5 left-1 hidden text-[8px] font-bold tracking-[0.12em] text-product-deep uppercase group-hover/sign:block dark:text-product">
+                  Click to sign
+                </span>
+                <svg viewBox="0 0 120 32" className="h-8 w-28 overflow-visible" aria-hidden>
+                  <path
+                    data-signature
+                    d="M4 24 C 14 6, 22 30, 32 14 S 48 4, 54 20 S 70 26, 78 12 S 96 8, 104 20 S 112 22, 116 16"
+                    fill="none"
+                    stroke="var(--ink)"
+                    strokeWidth="1.6"
+                    strokeLinecap="round"
+                  />
+                </svg>
+              </button>
+              <span
+                data-signed
+                className="rounded-full bg-success px-2 py-0.5 text-[9px] font-bold text-white opacity-0"
+              >
                 Signed
               </span>
             </div>
@@ -129,7 +199,10 @@ export function ModifiFlow({ paused, className }: MockupProps) {
                   <Check size={10} className="hidden group-data-[state=done]:block" aria-hidden />
                 </span>
                 <span className="text-[11px] font-semibold text-ink">{step}</span>
-                <span className="ml-auto hidden h-1.5 w-1.5 animate-pulse rounded-full bg-product group-data-[state=active]:block" aria-hidden />
+                <span
+                  className="ml-auto hidden h-1.5 w-1.5 animate-pulse rounded-full bg-product group-data-[state=active]:block"
+                  aria-hidden
+                />
               </li>
             ))}
           </ol>

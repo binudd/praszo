@@ -16,26 +16,34 @@ const DWELL = 7000;
 /**
  * Hero visual: the five product mockups stacked in one frame that fills the
  * height it is given. They rotate on a timer; hovering or focusing a product
- * icon shows that product and holds. Only the visible mockup animates, and
+ * icon shows that product and holds, and so does pointing at the mockup itself (its demo pauses so it
+ * can be played with). Only the visible mockup animates, and
  * nothing animates (or rotates) while the hero is scrolled out of view.
  */
 export function HeroShowcase() {
   const [index, setIndex] = useState(0);
   const [hovered, setHovered] = useState<ProductSlug | null>(null);
+  // The pointer is over the mockup (the visitor is playing with it): hold the rotation.
+  const [engaged, setEngaged] = useState(false);
   const current = hovered ? productList.findIndex((product) => product.slug === hovered) : index;
   const product = productList[current];
   const frameRef = useRef<HTMLDivElement | null>(null);
   const onScreen = useOnScreen(frameRef);
 
   useEffect(() => {
-    if (hovered || !onScreen || prefersReducedMotion()) return;
+    if (hovered || engaged || !onScreen || prefersReducedMotion()) return;
     const timer = window.setInterval(() => setIndex((value) => (value + 1) % productList.length), DWELL);
     return () => window.clearInterval(timer);
-  }, [hovered, onScreen]);
+  }, [hovered, engaged, onScreen]);
 
   return (
     <div className="grid h-full min-h-0 grid-cols-[minmax(0,1fr)] grid-rows-[minmax(0,1fr)_auto] gap-3">
-      <div ref={frameRef} className="fit-box fit-box-end">
+      <div
+        ref={frameRef}
+        className="fit-box fit-box-end"
+        onPointerEnter={() => setEngaged(true)}
+        onPointerLeave={() => setEngaged(false)}
+      >
         <MockupThemeProvider>
           {(theme) => (
             <figure className="fit-frame" data-theme={theme} data-theme-local>

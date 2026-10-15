@@ -1,19 +1,31 @@
 "use client";
 
-import { CircleAlert, CircleCheck } from "lucide-react";
+import { CircleAlert, CircleCheck, RotateCcw } from "lucide-react";
 import { useEffect, useRef } from "react";
 
+import { bindHoverHold, createMockupFx, type MockupFx } from "@/components/mockups/mockup-fx";
 import { MockupShell, type MockupProps } from "@/components/mockups/mockup-shell";
 import { gsap, useGSAP } from "@/components/motion/gsap";
 import { verifiShowcase as data } from "@/data/showcases";
 import { prefersReducedMotion } from "@/lib/motion";
 
 const RING = 2 * Math.PI * 34;
+const FINAL = data.checks[data.checks.length - 1];
+const FLAGGED = data.checks.filter((check) => check.result === "flag").length;
+const SUMMARY = `${data.checks.length - FLAGGED} passed · ${FLAGGED} flagged · score ${FINAL.score}`;
 
-/** Praszo Verifi: checks run one by one and the verification score fills in. */
+/**
+ * Praszo Verifi: checks run one by one and the verification score fills in. The collaborator cursor
+ * visits each check, the run ends with a summary toast and a confetti pop at the score. Hovering pauses
+ * the demo; the score card is a button that re-runs the checks.
+ */
 export function VerifiValidator({ paused, className }: MockupProps) {
   const rootRef = useRef<HTMLDivElement | null>(null);
   const tlRef = useRef<gsap.core.Timeline | null>(null);
+  const fxRef = useRef<MockupFx | null>(null);
+  const pausedRef = useRef(Boolean(paused));
+  const heldRef = useRef(false);
+  const sync = () => tlRef.current?.paused(pausedRef.current || heldRef.current);
 
   useGSAP(
     () => {
@@ -40,6 +52,9 @@ export function VerifiValidator({ paused, className }: MockupProps) {
 
       rows.forEach((row) => setState(row, "pending"));
       render();
+      const fx = createMockupFx(root);
+      fxRef.current = fx;
+      const scoreCard = root.querySelector<HTMLElement>("[data-score-card]");
       const tl = gsap.timeline({ repeat: -1, repeatDelay: 1.6, paused: Boolean(paused) });
       tl.add(() => {
         rows.forEach((row) => setState(row, "pending"));
@@ -47,28 +62,59 @@ export function VerifiValidator({ paused, className }: MockupProps) {
       tl.to(counter, { value: 0, duration: 0.4, ease: "power2.out", onUpdate: render }, 0);
       data.checks.forEach((check, index) => {
         const at = 0.6 + index * 1.1;
+        tl.add(() => fx.cursorTo(rows[index], { x: 0.82 }), Math.max(0, at - 0.45));
+        tl.add(() => fx.click(), at - 0.05);
         tl.add(() => setState(rows[index], "running"), at);
         tl.add(() => setState(rows[index], check.result), at + 0.75);
         tl.to(counter, { value: check.score, duration: 0.5, ease: "power2.out", onUpdate: render }, at + 0.75);
       });
+      const end = 0.6 + (data.checks.length - 1) * 1.1 + 1.3;
+      tl.add(() => {
+        fx.cursorTo(scoreCard, { x: 0.7, y: 0.75 });
+        fx.toast(SUMMARY, FLAGGED ? "accent" : "success");
+        fx.burst(scoreCard?.querySelector("[data-ring]")?.closest("div") ?? scoreCard);
+      }, end);
+      tl.add(() => undefined, end + 0.8);
       tlRef.current = tl;
+      const unbind = bindHoverHold(root, fx, (held) => {
+        heldRef.current = held;
+        sync();
+      });
       return () => {
+        unbind();
         tl.kill();
         tlRef.current = null;
+        fxRef.current = null;
       };
     },
     { scope: rootRef },
   );
 
   useEffect(() => {
-    tlRef.current?.paused(Boolean(paused));
+    pausedRef.current = Boolean(paused);
+    sync();
   }, [paused]);
+
+  const rerun = () => {
+    const tl = tlRef.current;
+    if (!tl) return;
+    // A click is an explicit request to watch: release the hover pause and play from the start.
+    heldRef.current = false;
+    tl.restart();
+    fxRef.current?.toast("Re-running 5 checks", "product");
+  };
 
   return (
     <div ref={rootRef} className={className}>
-      <MockupShell title={data.title} meta={data.meta}>
+      <MockupShell title={data.title} meta={data.meta} toastAt="right">
         <div className="grid h-full min-h-0 grid-cols-[6.5rem_minmax(0,1fr)] grid-rows-[minmax(0,1fr)] gap-3 p-3 sm:grid-cols-[11rem_minmax(0,1fr)]">
-          <div className="flex flex-col items-center justify-center rounded-sm bg-bg p-3 text-center">
+          <button
+            type="button"
+            data-score-card
+            onClick={rerun}
+            aria-label="Re-run the verification checks"
+            className="group/score flex flex-col items-center justify-center rounded-sm bg-bg p-3 text-center transition-[background-color,scale] duration-300 hover:bg-product-soft active:scale-[0.98]"
+          >
             <div className="relative h-16 w-16 sm:h-20 sm:w-20">
               <svg viewBox="0 0 80 80" className="h-full w-full -rotate-90" aria-hidden>
                 <circle cx="40" cy="40" r="34" fill="none" stroke="var(--elevated)" strokeWidth="6" />
@@ -85,12 +131,18 @@ export function VerifiValidator({ paused, className }: MockupProps) {
                   strokeDashoffset={RING}
                 />
               </svg>
-              <span data-score className="absolute inset-0 flex items-center justify-center text-xl font-extrabold text-ink tabular-nums sm:text-2xl">
+              <span
+                data-score
+                className="absolute inset-0 flex items-center justify-center text-xl font-extrabold text-ink tabular-nums sm:text-2xl"
+              >
                 0
               </span>
             </div>
             <p className="label mt-3 hidden text-[9px] text-ink-3 sm:block">{data.scoreLabel}</p>
-          </div>
+            <span className="mt-2 hidden items-center gap-1 rounded-full bg-elevated px-2 py-0.5 text-[9px] font-bold text-ink-2 transition-colors group-hover/score:bg-product group-hover/score:text-product-ink sm:inline-flex">
+              <RotateCcw size={9} aria-hidden /> Re-run
+            </span>
+          </button>
           <ul className="flex min-h-0 min-w-0 flex-col gap-2 overflow-hidden">
             {data.checks.map((check) => (
               <li
