@@ -3,7 +3,6 @@ import { ProductAudience } from "@/components/product/product-audience";
 import { ProductComparison } from "@/components/product/product-comparison";
 import { ProductCta } from "@/components/product/product-cta";
 import { ProductFeatureGrid } from "@/components/product/product-feature-grid";
-import { ProductHero } from "@/components/product/product-hero";
 import { ProductPage } from "@/components/product/product-page";
 import { ProductPreview } from "@/components/product/product-preview";
 import { ProductSpotlights } from "@/components/product/product-spotlights";
@@ -18,7 +17,6 @@ export const metadata = buildMetadata({ ...product.meta, path: "/modifi" });
 export default function ModifiPage() {
   return (
     <ProductPage product={product}>
-      <ProductHero product={product} />
       <ProductPreview product={product} />
       <ProductSpotlights product={product} />
       <ProductFeatureGrid product={product} section={product.featureSections[0]} />

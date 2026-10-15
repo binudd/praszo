@@ -5,6 +5,12 @@ import type { RefObject } from "react";
 import { gsap, ScrollTrigger, useGSAP } from "@/components/motion/gsap";
 import { prefersReducedMotion } from "@/lib/motion";
 
+/**
+ * Fired on window whenever the global header hides or shows ({ detail: { hidden } }), so dependent
+ * bars (ProductSubNav) can follow it without a second scroll listener.
+ */
+export const HEADER_EVENT = "praszo:header";
+
 export type HeaderRevealOptions = {
   /** Distance (px) scrolled in one direction before the header reacts. Filters trackpad jitter. */
   delta?: number;
@@ -52,6 +58,7 @@ export function useHeaderReveal(ref: RefObject<HTMLElement | null>, options: Hea
         if (next === hidden) return;
         hidden = next;
         header.dataset.headerHidden = String(next);
+        window.dispatchEvent(new CustomEvent(HEADER_EVENT, { detail: { hidden: next } }));
         gsap.to(header, {
           // -100% of its own height, plus a little more so the menu shadow clears the viewport too.
           yPercent: next ? -100 : 0,
@@ -115,6 +122,7 @@ export function useHeaderReveal(ref: RefObject<HTMLElement | null>, options: Hea
         gsap.killTweensOf(header);
         gsap.set(header, { clearProps: "transform" });
         delete header.dataset.headerHidden;
+        if (hidden) window.dispatchEvent(new CustomEvent(HEADER_EVENT, { detail: { hidden: false } }));
       };
     },
     { scope: ref, dependencies: [delta, topOffset, duration, resetKey], revertOnUpdate: true },

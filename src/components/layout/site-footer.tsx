@@ -2,7 +2,6 @@ import Link from "next/link";
 
 import { Container } from "@/components/ui/container";
 import { Logo } from "@/components/ui/logo";
-import { ProductGlyph } from "@/components/ui/product-glyph";
 import { SocialIcon, type SocialIconName } from "@/components/ui/social-icons";
 import { company, companyLinks, legalLinks } from "@/data/company";
 import { productList } from "@/data/products";
@@ -40,11 +39,7 @@ export function SiteFooter() {
             <ul className="mt-4 flex flex-col gap-2.5">
               {productList.map((product) => (
                 <li key={product.slug}>
-                  <Link
-                    href={`/${product.slug}`}
-                    className="copy inline-flex items-center gap-2.5 font-semibold transition-colors hover:text-ink"
-                  >
-                    <ProductGlyph slug={product.slug} size={22} />
+                  <Link href={`/${product.slug}`} className="copy font-semibold transition-colors hover:text-ink">
                     Praszo {product.name}
                   </Link>
                 </li>

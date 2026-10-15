@@ -2,7 +2,6 @@ import { FaqSection } from "@/components/sections/faq-section";
 import { ProductAudience } from "@/components/product/product-audience";
 import { ProductCta } from "@/components/product/product-cta";
 import { ProductFeatureGrid } from "@/components/product/product-feature-grid";
-import { ProductHero } from "@/components/product/product-hero";
 import { ProductHighlights } from "@/components/product/product-highlights";
 import { ProductPage } from "@/components/product/product-page";
 import { ProductPreview } from "@/components/product/product-preview";
@@ -18,7 +17,6 @@ export const metadata = buildMetadata({ ...product.meta, path: "/match" });
 export default function MatchPage() {
   return (
     <ProductPage product={product}>
-      <ProductHero product={product} />
       <ProductPreview product={product} />
       <ProductHighlights product={product} />
       <ProductSpotlights product={product} />

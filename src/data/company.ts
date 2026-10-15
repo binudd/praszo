@@ -41,13 +41,6 @@ export const demoMailto = `mailto:${company.emails.demo}?subject=${encodeURIComp
 
 export type NavLink = { label: string; href: string };
 
-/** Primary header navigation (Products is rendered as a menu, not a link). */
-export const primaryNav: NavLink[] = [
-  { label: "Why Praszo", href: "/why-praszo" },
-  { label: "Workflow", href: "/#workflow" },
-  { label: "Contact", href: "/contact" },
-];
-
 /** Footer company column. Every link is an internal page. */
 export const companyLinks: NavLink[] = [
   { label: "About Praszo", href: "/about" },

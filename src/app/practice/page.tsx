@@ -3,7 +3,6 @@ import { PracticeMobileSection } from "@/components/product/practice-mobile-sect
 import { ProductAudience } from "@/components/product/product-audience";
 import { ProductCta } from "@/components/product/product-cta";
 import { ProductFeatureGrid } from "@/components/product/product-feature-grid";
-import { ProductHero } from "@/components/product/product-hero";
 import { ProductPage } from "@/components/product/product-page";
 import { ProductPreview } from "@/components/product/product-preview";
 import { ProductProblem } from "@/components/product/product-problem";
@@ -17,7 +16,6 @@ export const metadata = buildMetadata({ ...product.meta, path: "/practice" });
 export default function PracticePage() {
   return (
     <ProductPage product={product}>
-      <ProductHero product={product} />
       <ProductPreview product={product} />
       <ProductProblem product={product} />
       <ProductFeatureGrid product={product} section={product.featureSections[0]} />

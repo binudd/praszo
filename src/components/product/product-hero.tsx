@@ -5,46 +5,60 @@ import Link from "next/link";
 import { useRef } from "react";
 
 import { useHeroEntrance } from "@/components/motion/hero-entrance";
+import { useHeroScroll } from "@/components/motion/hero-scroll";
 import { HeroTitle } from "@/components/motion/hero-title";
 import { scrollToTarget } from "@/components/motion/smooth-scroll";
 import { ProductShowcase } from "@/components/product/product-showcase";
-import { HeroShell } from "@/components/sections/hero-shell";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eyebrow } from "@/components/ui/eyebrow";
+import { Container } from "@/components/ui/container";
+import { ProductGlyph } from "@/components/ui/product-glyph";
 import type { Product } from "@/data/products";
 
-/** Hero CTAs: compact on phones (both fit one row), regular on tablets, large on desktop. */
-const heroButton = "max-sm:h-10 max-sm:px-4 max-sm:text-sm lg:h-12 lg:px-6 lg:text-base";
-
+/**
+ * Minimal product hero (Workspace product-page pattern): the product identity (glyph + "Praszo X") sits
+ * once, above the headline; then the description and one action on the left, the live mockup on the
+ * right. The section pill (ProductSubNav) follows directly below. Entrance (useHeroEntrance) and scroll
+ * depth (useHeroScroll) are the shared hero motion.
+ */
 export function ProductHero({ product }: { product: Product }) {
   const rootRef = useRef<HTMLElement | null>(null);
   useHeroEntrance(rootRef, `product:${product.slug}`);
+  useHeroScroll(rootRef);
   const featuresId = `${product.slug}-features`;
+  const titleId = `${product.slug}-hero-title`;
 
   const jumpToFeatures = () => {
-    const node = rootRef.current?.closest("[data-product]")?.querySelector<HTMLElement>(`#${featuresId}`);
-    if (node) scrollToTarget(node);
+    const node = rootRef.current?.closest("main")?.querySelector<HTMLElement>(`#${featuresId}`);
+    if (node) scrollToTarget(node, -88);
   };
 
   return (
-    <HeroShell
-      rootRef={rootRef}
+    <section
+      ref={rootRef}
       id={`${product.slug}-overview`}
-      labelledBy={`${product.slug}-hero-title`}
-      lede={
-        <>
-          <Eyebrow tone="product" data-hero="eyebrow">
-            {product.hero.eyebrow}
-          </Eyebrow>
-          <p data-hero="copy" className="lede mt-4 max-w-[34rem] max-lg:line-clamp-5 lg:line-clamp-4 max-lg:text-[0.98rem] max-lg:leading-snug lg:mt-5">
+      data-entrance
+      aria-labelledby={titleId}
+      className="relative flex min-h-[min(100svh,58rem)] items-center overflow-hidden pt-[calc(var(--header-h)+2rem)] pb-10 lg:min-h-[calc(100svh-5rem)] lg:pb-12"
+    >
+      <Container className="grid w-full items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-14">
+        <div data-hero-depth="lede" className="min-w-0">
+          <p data-hero="eyebrow" className="inline-flex items-center gap-3">
+            <ProductGlyph slug={product.slug} size={44} />
+            <span className="text-[clamp(1.5rem,1.1rem+1.2vw,2.25rem)] font-semibold tracking-[-0.02em] text-ink">
+              {product.fullName}
+            </span>
+          </p>
+          <h1 id={titleId} className="display-md mt-6 max-w-[18ch] text-ink lg:text-[min(4.25rem,5vw,8svh)]">
+            <HeroTitle text={product.hero.headline} />
+          </h1>
+          <p data-hero="copy" className="lede mt-6 max-w-[34rem] line-clamp-4">
             {product.hero.description}
           </p>
-          <div data-hero="cta" className="mt-5 flex flex-wrap items-center gap-3 lg:mt-7">
+          <div data-hero="cta" className="mt-8 flex flex-wrap items-center gap-3">
             <Button
               href={`#${featuresId}`}
               variant="secondary"
-              className={heroButton}
+              size="lg"
               onClick={(event) => {
                 event.preventDefault();
                 jumpToFeatures();
@@ -53,26 +67,21 @@ export function ProductHero({ product }: { product: Product }) {
               <Play size={14} className="fill-current" aria-hidden />
               See the features
             </Button>
+            <Link
+              href="/#workflow"
+              className="group inline-flex items-center gap-2 px-2 text-[15px] font-semibold text-ink-2 transition-colors hover:text-ink"
+            >
+              Step {product.workflowStep.order} · {product.workflowStep.label}
+              <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" aria-hidden />
+            </Link>
           </div>
-        </>
-      }
-      visual={<ProductShowcase product={product} />}
-      title={
-        <h1 id={`${product.slug}-hero-title`} className="display-hero max-w-[16ch] text-ink lg:max-w-[24ch] lg:text-[min(5.9rem,6.2vw,9.5svh)]">
-          <HeroTitle text={product.hero.headline} />
-        </h1>
-      }
-      aside={
-        <Link
-          data-hero="cta"
-          href="/#workflow"
-          className="group inline-flex shrink-0 items-center gap-3 rounded-full border border-line bg-bg py-2 pr-4 pl-2 text-sm font-semibold whitespace-nowrap text-ink-2 transition-colors hover:text-ink lg:mb-3"
-        >
-          <Badge tone="product">Step {product.workflowStep.order}</Badge>
-          {product.workflowStep.label} · Praszo workflow
-          <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" aria-hidden />
-        </Link>
-      }
-    />
+        </div>
+        <div data-hero="visual" className="relative h-[19rem] min-w-0 sm:h-[25rem] lg:h-[min(31rem,58svh)]">
+          <div data-hero-depth="visual" className="h-full will-change-transform">
+            <ProductShowcase product={product} className="h-full" />
+          </div>
+        </div>
+      </Container>
+    </section>
   );
 }
