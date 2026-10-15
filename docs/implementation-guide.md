@@ -231,6 +231,8 @@ gsap.ticker.lagSmoothing(0)
 
 ### 7.5 Motion primitives catalogue
 
+- **`scrollToSceneStep(root, index, count)`** (`motion/use-scene.ts`) is the one way scene tabs jump to a step (products, workflow, spotlights, feature groups). Do not re-implement it per component.
+
 | Primitive | File | Trigger and engine | What it does | Fallback |
 |---|---|---|---|---|
 | `useScene(rootRef, { count, onUpdate, media, scrub })` | `motion/use-scene.ts` | ScrollTrigger on `[data-scene-track]` (`top top` to `bottom bottom`), `scrub 0.6`, desktop `(min-width:1024px)` | Sticky step scene. Calls `onUpdate(progress, t, index, set)`, where `set` is a change-only setter (`createSceneSetter()`) scoped to this activation: it writes only properties whose value changed, and parked items are not rewritten every frame, where `t` is a fractional step. Adds `.scene.is-ready`, which shows track and stage and hides `.scene-stack`. Helpers: `stepOpacity(t, i, fade)` and `applySceneItems(stage, t, index)` (crossfade `[data-scene-item]`, toggles `[data-scene-tab]` `.is-current`). | `.scene-stack` static layout |
@@ -297,7 +299,7 @@ Every page is wrapped by `ProductPage`, which provides the product color scope, 
 | Highlights | `ProductHighlights` | `RevealGroup` | | | ✓ | | ✓ |
 | Problem statement | `ProductProblem` → `Statement` | Scrubbed word reveal with pain-point chips | ✓ | ✓ | | | |
 | Spotlights (`<slug>-spotlights`) | `ProductSpotlights` | `useScene` (`count*110+40` svh). Tabs, copy crossfade, visual cards slide and scale. Mobile: alternating rows with `ClipReveal`. | | ✓ | ✓ | ✓ | |
-| Feature section(s) (`<slug>-<sectionId>`) | `ProductFeatureGrid` | A single group renders as a **dark `HorizontalScroll` rail** of icon cards. Multiple groups render as an editorial grouped grid with `RevealGroup`. | ✓ ×2 | ✓ | ✓ | ✓ | ✓ |
+| Feature section(s) (`<slug>-<sectionId>`) | `ProductFeatureGrid` | A single group renders as a **dark `HorizontalScroll` rail** of icon cards. Multiple groups (Practice 5, Modifi 4) render as **`ProductFeatureGroups`**, a sticky `useScene` scene (`count*90+40` svh, same primitives as the homepage products scene): left, eyebrow + title + the groups as numbered tabs with a product-coloured progress line (`[data-feature-progress]` scaleY); right, one panel per group crossfading (`applySceneItems`) with icon, title, description and features that stagger in via CSS (`.feature-scene.is-ready .is-current .feature-row`, `--i` × 70ms). Tabs jump with `scrollToSceneStep`. Below 1024px / reduced motion: the editorial grouped list (`RevealGroup`) is the stacked fallback; its heading has no id (the scene heading owns `<id>-title`). | ✓ ×2 | ✓ | ✓ | ✓ | ✓ |
 | Mobile app (`practice-mobile`) | `PracticeMobileSection` | `RevealBlock` and `ClipReveal` phone capture | ✓ | | | | |
 | Impact before and after (`modifi-impact`) | `ProductComparison` | `RevealGroup` | | | | ✓ | |
 | Workflow (`<slug>-workflow`) | `ProductWorkflow` | Numbered steps plus a connector line scrubbed `scaleX` (`scrub 0.5`) | | ✓ | ✓ | ✓ | ✓ |

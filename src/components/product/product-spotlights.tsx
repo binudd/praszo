@@ -4,8 +4,7 @@ import { CircleCheck } from "lucide-react";
 import { useRef } from "react";
 
 import { RevealBlock } from "@/components/motion/reveal";
-import { scrollToTarget } from "@/components/motion/smooth-scroll";
-import { applySceneItems, stepOpacity, useScene } from "@/components/motion/use-scene";
+import { applySceneItems, scrollToSceneStep, stepOpacity, useScene } from "@/components/motion/use-scene";
 import { ClipReveal } from "@/components/product/clip-reveal";
 import { ProductVisual } from "@/components/product/product-visual";
 import { Container } from "@/components/ui/container";
@@ -61,13 +60,7 @@ export function ProductSpotlights({ product }: { product: Product }) {
 
   if (count === 0) return null;
 
-  const jumpTo = (index: number) => {
-    const track = rootRef.current?.querySelector<HTMLElement>("[data-scene-track]");
-    if (!track) return;
-    const top = track.getBoundingClientRect().top + window.scrollY;
-    const range = track.offsetHeight - window.innerHeight;
-    scrollToTarget(top + (range * index) / Math.max(1, count - 1));
-  };
+  const jumpTo = (index: number) => scrollToSceneStep(rootRef.current, index, count);
 
   return (
     <section ref={rootRef} id={`${product.slug}-spotlights`} aria-label={`${product.fullName} in detail`} className="scene relative">

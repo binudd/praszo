@@ -3,6 +3,7 @@
 import type { RefObject } from "react";
 
 import { gsap, ScrollTrigger, useGSAP } from "@/components/motion/gsap";
+import { scrollToTarget } from "@/components/motion/smooth-scroll";
 import { prefersReducedMotion } from "@/lib/motion";
 
 type SceneValue = number | string;
@@ -118,4 +119,13 @@ export function applySceneItems(stage: HTMLElement, t: number, index: number, fa
     if (tabIndex === index) tab.setAttribute("aria-current", "step");
     else tab.removeAttribute("aria-current");
   });
+}
+
+/** Scrolls the page (through Lenis) to step `index` of a scene's [data-scene-track]. Used by scene tabs. */
+export function scrollToSceneStep(root: HTMLElement | null, index: number, count: number) {
+  const track = root?.querySelector<HTMLElement>("[data-scene-track]");
+  if (!track) return;
+  const top = track.getBoundingClientRect().top + window.scrollY;
+  const range = track.offsetHeight - window.innerHeight;
+  scrollToTarget(top + (range * index) / Math.max(1, count - 1));
 }

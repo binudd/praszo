@@ -3,6 +3,7 @@ import { RevealGroup, RevealHeading } from "@/components/motion/reveal";
 import { Container } from "@/components/ui/container";
 import { Eyebrow } from "@/components/ui/eyebrow";
 import { EditorialItem } from "@/components/ui/editorial-item";
+import { ProductFeatureGroups } from "@/components/product/product-feature-groups";
 import type { FeatureGroup, FeatureSection, Product } from "@/data/products";
 
 function RailCard({ item, index }: { item: FeatureGroup["items"][number]; index: number }) {
@@ -63,22 +64,28 @@ export function ProductFeatureGrid({ product, section }: { product: Product; sec
     );
   }
 
+  // Multi-group: a sticky scroll scene on desktop; the editorial group list is its stacked fallback.
+  // The fallback heading carries no id: the scene's heading owns `${id}-title`.
   return (
-    <section id={id} aria-labelledby={`${id}-title`} className="py-24 md:py-32">
-      <Container>
-        <div className="max-w-3xl">
-          <Eyebrow tone="product">{section.eyebrow}</Eyebrow>
-          <h2 id={`${id}-title`} className="display-md mt-4 text-ink">
-            <RevealHeading>{section.title}</RevealHeading>
-          </h2>
-          {section.description ? <p className="lede mt-5">{section.description}</p> : null}
-        </div>
-        <div className="mt-14 border-b border-line">
-          {section.groups.map((group, index) => (
-            <GroupBlock key={group.title} group={group} index={index} />
-          ))}
-        </div>
-      </Container>
-    </section>
+    <ProductFeatureGroups
+      id={id}
+      section={section}
+      fallback={
+        <Container className="py-24 md:py-32">
+          <div className="max-w-3xl">
+            <Eyebrow tone="product">{section.eyebrow}</Eyebrow>
+            <h2 className="display-md mt-4 text-ink">
+              <RevealHeading>{section.title}</RevealHeading>
+            </h2>
+            {section.description ? <p className="lede mt-5">{section.description}</p> : null}
+          </div>
+          <div className="mt-14 border-b border-line">
+            {section.groups.map((group, index) => (
+              <GroupBlock key={group.title} group={group} index={index} />
+            ))}
+          </div>
+        </Container>
+      }
+    />
   );
 }

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { CSSProperties, ReactNode } from "react";
 
 import { Icon } from "@/components/ui/icon";
 import type { IconName } from "@/lib/icons";
@@ -22,6 +22,7 @@ type Props = {
   /** Adds data-reveal so a surrounding RevealGroup staggers it in. */
   reveal?: boolean;
   className?: string;
+  style?: CSSProperties;
   children?: ReactNode;
 };
 
@@ -41,11 +42,12 @@ export function EditorialItem({
   titleAs: Title = "h3",
   reveal,
   className,
+  style,
   children,
 }: Props) {
   const display = size === "display";
   return (
-    <Tag data-reveal={reveal || undefined} className={cn("border-t border-line-strong", display ? "pt-6" : "pt-5", className)}>
+    <Tag data-reveal={reveal || undefined} style={style} className={cn("border-t border-line-strong", display ? "pt-6" : "pt-5", className)}>
       {index !== undefined || icon ? (
         <p className="label flex items-center gap-3 text-ink-3">
           {index !== undefined ? <span className="tabular-nums">{String(index + 1).padStart(2, "0")}</span> : null}

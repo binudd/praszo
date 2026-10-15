@@ -6,8 +6,7 @@ import Link from "next/link";
 import { useRef, useState, type CSSProperties } from "react";
 
 import { gsap, useGSAP } from "@/components/motion/gsap";
-import { scrollToTarget } from "@/components/motion/smooth-scroll";
-import { applySceneItems, stepOpacity, useScene } from "@/components/motion/use-scene";
+import { applySceneItems, scrollToSceneStep, stepOpacity, useScene } from "@/components/motion/use-scene";
 import { mockups } from "@/components/mockups/registry";
 import { Badge } from "@/components/ui/badge";
 import { Container } from "@/components/ui/container";
@@ -220,13 +219,7 @@ export function ProductEcosystem() {
     { scope: rootRef },
   );
 
-  const jumpTo = (index: number) => {
-    const track = rootRef.current?.querySelector<HTMLElement>("[data-scene-track]");
-    if (!track) return;
-    const top = track.getBoundingClientRect().top + window.scrollY;
-    const range = track.offsetHeight - window.innerHeight;
-    scrollToTarget(top + (range * index) / (count - 1));
-  };
+  const jumpTo = (index: number) => scrollToSceneStep(rootRef.current, index, count);
 
   return (
     <section ref={rootRef} id="products" aria-labelledby="products-title" className="scene relative">

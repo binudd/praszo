@@ -4,8 +4,7 @@ import { useRef } from "react";
 
 import { WorkflowCanvas } from "@/components/mockups/workflow-canvas";
 import { gsap, ScrollTrigger, useGSAP } from "@/components/motion/gsap";
-import { scrollToTarget } from "@/components/motion/smooth-scroll";
-import { createSceneSetter, stepOpacity } from "@/components/motion/use-scene";
+import { createSceneSetter, scrollToSceneStep, stepOpacity } from "@/components/motion/use-scene";
 import { Badge } from "@/components/ui/badge";
 import { Container } from "@/components/ui/container";
 import { Eyebrow } from "@/components/ui/eyebrow";
@@ -164,13 +163,7 @@ export function WorkflowTour() {
     { scope: rootRef },
   );
 
-  const jumpTo = (index: number) => {
-    const track = rootRef.current?.querySelector<HTMLElement>("[data-scene-track]");
-    if (!track) return;
-    const top = track.getBoundingClientRect().top + window.scrollY;
-    const range = track.offsetHeight - window.innerHeight;
-    scrollToTarget(top + (range * index) / (STEP_COUNT - 1));
-  };
+  const jumpTo = (index: number) => scrollToSceneStep(rootRef.current, index, STEP_COUNT);
 
   return (
     <section ref={rootRef} id="workflow" data-theme="dark" aria-labelledby="workflow-title" className="scene relative">

@@ -518,6 +518,22 @@ details[open] .faq-chevron {
   display: none;
 }
 
+/* Feature group scene (ProductFeatureGroups): the current panel's features stagger in. Scoped to an
+   active scene, so the stacked fallback is never hidden. */
+.feature-scene.is-ready .feature-row {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.45s var(--ease-out),
+    transform 0.6s var(--ease-expo);
+  transition-delay: calc(var(--i, 0) * 70ms);
+}
+
+.feature-scene.is-ready .is-current .feature-row {
+  opacity: 1;
+  transform: none;
+}
+
 /* Dialog sheet ---------------------------------------------------------------- */
 
 @keyframes sheet-in {
