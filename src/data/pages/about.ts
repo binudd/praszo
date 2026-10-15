@@ -1,7 +1,8 @@
-import ashanAmeer from "@/assets/team/ashan-ameer.jpg";
-import manuGeorgeMicheal from "@/assets/team/manu-george-micheal.jpg";
-import mohammedLabinash from "@/assets/team/mohammed-labinash.jpg";
-import subeesha from "@/assets/team/subeesha.jpg";
+// Team portraits: transparent PNGs, shown on the frame's --elevated background.
+import ashanAmeer from "@/assets/team/ashan.png";
+import mohammedLabinash from "@/assets/team/labinash.png";
+import manuGeorgeMicheal from "@/assets/team/manu.png";
+import subeesha from "@/assets/team/subeesha.png";
 import type { StaticImageData } from "next/image";
 
 import type { FeatureItem, PageHeroContent, PageMeta } from "@/data/pages/types";
@@ -9,8 +10,10 @@ import type { FeatureItem, PageHeroContent, PageMeta } from "@/data/pages/types"
 /**
  * About page copy, from praszo.com/about-us/.
  * The page's numeric claims (100%, 99%, 10,000+, Zero) are intentionally left out, like the
- * homepage stats. Mohammed Labinash's portrait was supplied directly (praszo.com shows a theme
- * placeholder, member7.webp, for him). TeamGrid still falls back to initials for a member without a photo.
+ * homepage stats. All four portraits were supplied directly (praszo.com shows a theme placeholder,
+ * member7.webp, for Mohammed Labinash). labinash.png arrived with the transparency checkerboard baked
+ * into its pixels; it was converted to a real alpha channel. TeamGrid falls back to initials for a
+ * member without a photo.
  */
 
 export type TeamMember = { name: string; role: string; photo?: StaticImageData };

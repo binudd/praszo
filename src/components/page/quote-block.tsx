@@ -17,7 +17,7 @@ export function QuoteBlock({ text, name, role, photo }: Props) {
             </blockquote>
             <figcaption className="mt-10 flex items-center gap-4">
               {photo ? (
-                <Image src={photo} alt="" sizes="56px" className="h-14 w-14 rounded-full object-cover object-top" />
+                <Image src={photo} alt="" sizes="56px" className="h-14 w-14 rounded-full bg-elevated object-cover object-top" />
               ) : null}
               <span>
                 <span className="heading block text-ink">{name}</span>
