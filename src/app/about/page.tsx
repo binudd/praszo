@@ -21,7 +21,7 @@ export default function AboutPage() {
       </PageSection>
       <TrustedBy id="about-trusted" />
       <PageSection id="about-team" eyebrow={about.team.eyebrow} title={about.team.title} description={about.team.description}>
-        <TeamGrid members={about.team.members} />
+        <TeamGrid members={about.team.members} idPrefix="about-team" />
       </PageSection>
       <PageSection id="about-values" eyebrow={about.values.eyebrow} title={about.values.title} description={about.values.description}>
         <FeatureGrid items={about.values.items} numbered />

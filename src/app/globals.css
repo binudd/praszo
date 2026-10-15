@@ -195,8 +195,7 @@
   }
 
   /* Team cut-out cards (TeamGrid): the same pen stroke as .eyebrow-scribble, drawn as a loose loop
-     round the panel while the card is hovered. On touch screens TeamGrid draws it on scroll instead;
-     with reduced motion as well, it is shown drawn. */
+     round the bubble while the card is hovered. Touch screens have no hover, so it is shown drawn. */
   .team-scribble {
     overflow: visible;
     pointer-events: none;
@@ -223,13 +222,8 @@
 
   @media (hover: none) {
     .team-scribble path {
-      transition: none;
-    }
-  }
-
-  @media (hover: none) and (prefers-reduced-motion: reduce) {
-    .team-scribble path {
       stroke-dashoffset: 0;
+      transition: none;
     }
   }
 
