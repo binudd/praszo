@@ -10,14 +10,14 @@ type Value = { theme: MockupTheme; toggle: () => void };
 const MockupThemeContext = createContext<Value | null>(null);
 
 /**
- * Local theme for the hero's animated mockups only. Dark by default; the
- * toggle lives in each mockup's window bar. Apply the theme with
+ * Local theme for the hero's animated mockups only. Light by default (dark is
+ * optional); the toggle lives in each mockup's window bar. Apply the theme with
  * `data-theme={theme} data-theme-local` on the element that wraps the
  * mockups: the token set flips inside it, and ThemeObserver ignores it so the
  * page chrome stays light.
  */
 export function MockupThemeProvider({ children }: { children: (theme: MockupTheme) => ReactNode }) {
-  const [theme, setTheme] = useState<MockupTheme>("dark");
+  const [theme, setTheme] = useState<MockupTheme>("light");
   const toggle = useCallback(() => setTheme((value) => (value === "dark" ? "light" : "dark")), []);
   const value = useMemo(() => ({ theme, toggle }), [theme, toggle]);
   return <MockupThemeContext.Provider value={value}>{children(theme)}</MockupThemeContext.Provider>;

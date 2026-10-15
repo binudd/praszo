@@ -371,7 +371,7 @@ All five share `MockupShell`: a `WindowFrame` (dots, title pill, optional `actio
 - Captions show the number, title and a description clamped to 2 lines.
 
 ### 9.6 Local mockup theme (`mockups/mockup-theme.tsx`)
-- **Scope.** `MockupThemeProvider` (in `HeroShowcase` and `ProductShowcase`) holds `"dark" | "light"`, dark by default.
+- **Scope.** `MockupThemeProvider` (in `HeroShowcase` and `ProductShowcase`) holds `"dark" | "light"`, light by default (changed 2026-10-15); dark is optional via the window-bar toggle.
 - **Applying it.** The hero `figure.fit-frame` gets `data-theme={theme} data-theme-local`. Tokens flip inside it, and `ThemeObserver` ignores it (`[data-theme]:not([data-theme-local])`).
 - **Toggle.** `MockupThemeToggle` renders in each window bar via `WindowFrame action` and returns nothing outside a provider. One state covers all five rotating home mockups.
 - **Dark-mode tags.** In dark mode, product tags use `dark:text-product` for contrast.
