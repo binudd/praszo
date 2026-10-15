@@ -2,7 +2,7 @@
 
 import { useRef } from "react";
 
-import { WorkflowCanvas } from "@/components/mockups/workflow-canvas";
+import { TOUR_STAGES, WorkflowCanvas } from "@/components/mockups/workflow-canvas";
 import { gsap, ScrollTrigger, useGSAP } from "@/components/motion/gsap";
 import { createSceneSetter, scrollToSceneStep, stepOpacity } from "@/components/motion/use-scene";
 import { Badge } from "@/components/ui/badge";
@@ -20,7 +20,7 @@ const STEP_COUNT = steps.length;
 function StepCopy({ step, className }: { step: WorkflowStep; className?: string }) {
   return (
     <article className={className}>
-      <p className="label inline-flex items-center gap-3 text-ink-3">
+      <p className="label flex items-center gap-3 text-ink-3">
         <span className="tabular-nums">{String(step.index).padStart(2, "0")}</span>
         <span aria-hidden className="h-px w-6 bg-line-strong" />
         {step.product ? "Praszo step" : "Starting point"}
@@ -64,8 +64,15 @@ export function WorkflowTour() {
         const chips = gsap.utils.toArray<HTMLElement>(stage.querySelectorAll("[data-tour-chip]"));
         const strokes = gsap.utils.toArray<SVGGeometryElement>(stage.querySelectorAll("[data-stroke]"));
         const progressLine = stage.querySelector<HTMLElement>("[data-tour-progress]");
-        const path = stage.querySelector<SVGPathElement>("[data-tour-path]");
-        const dot = stage.querySelector<SVGCircleElement>("[data-tour-dot]");
+        // The pipeline track: a line that fills, a dot per stage, and the audit-file token with its status.
+        const fill = stage.querySelector<SVGLineElement>("[data-tour-fill]");
+        const nodes = gsap.utils.toArray<SVGCircleElement>(stage.querySelectorAll("[data-tour-node]"));
+        const token = stage.querySelector<SVGGElement>("[data-tour-token]");
+        const statuses = gsap.utils.toArray<SVGGElement>(stage.querySelectorAll("[data-tour-status]"));
+        const firstX = TOUR_STAGES[0].x;
+        const span = TOUR_STAGES[TOUR_STAGES.length - 1].x - firstX;
+        if (fill) gsap.set(fill, { scaleX: 0, svgOrigin: `${firstX} 452` });
+        gsap.set(nodes, { scale: 0, transformOrigin: "50% 50%" });
 
         const strokeLengths = strokes.map((stroke) => {
           try {
@@ -77,11 +84,6 @@ export function WorkflowTour() {
         strokes.forEach((stroke, index) => {
           gsap.set(stroke, { strokeDasharray: strokeLengths[index], strokeDashoffset: strokeLengths[index] });
         });
-
-        const dotTween =
-          dot && path
-            ? gsap.to(dot, { motionPath: { path, align: path, alignOrigin: [0.5, 0.5] }, duration: 1, ease: "none", paused: true })
-            : null;
 
         // Change-only writes: parked layers, copies and chips are not rewritten every frame.
         const set = createSceneSetter();
@@ -104,12 +106,16 @@ export function WorkflowTour() {
             tab.classList.toggle("is-done", tabIndex < index);
           });
           if (progressLine) set(progressLine, { scaleX: progress });
+          // Track: fill to the token, light each stage as the token reaches it, slide the token.
+          if (fill) set(fill, { scaleX: progress });
+          nodes.forEach((node, nodeIndex) => set(node, { scale: gsap.utils.clamp(0, 1, (t - nodeIndex) * 2.5 + 1) }));
+          if (token) set(token, { x: firstX + span * progress });
+          statuses.forEach((status, statusIndex) => set(status, { opacity: stepOpacity(t, statusIndex, 0.5) }));
           strokes.forEach((stroke, strokeIndex) => {
             const layerIndex = Number(stroke.closest<SVGGElement>("[data-layer]")?.dataset.layer ?? 0);
             const draw = gsap.utils.clamp(0, 1, 1.4 - Math.abs(t - layerIndex) * 1.6);
             set(stroke, { strokeDashoffset: strokeLengths[strokeIndex] * (1 - draw) });
           });
-          dotTween?.progress(progress);
         };
 
         const trigger = ScrollTrigger.create({
@@ -124,7 +130,6 @@ export function WorkflowTour() {
         ScrollTrigger.refresh();
 
         return () => {
-          dotTween?.kill();
           root.classList.remove("is-ready");
         };
       });
