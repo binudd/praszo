@@ -7,6 +7,7 @@ import { useRef } from "react";
 import { MobileMenu } from "@/components/layout/mobile-menu";
 import { LinkMenu } from "@/components/layout/nav-dropdown";
 import { navLinkClass } from "@/components/layout/nav-styles";
+import { ProductSectionMenu } from "@/components/layout/product-section-menu";
 import { ProductsMenu } from "@/components/layout/products-menu";
 import { useHeaderReveal } from "@/components/motion/use-header-reveal";
 import { useNavFollower } from "@/components/motion/use-nav-follower";
@@ -47,9 +48,13 @@ export function SiteHeader() {
       className="site-header pointer-events-none fixed inset-x-0 top-1 z-50 will-change-transform"
     >
       <div className="mx-auto flex h-[4.5rem] w-full max-w-wide items-center justify-between gap-4 px-5 md:px-8 lg:px-10 [&>*]:pointer-events-auto">
-        <Link href="/" aria-label="Praszo home" className="inline-flex items-center">
-          <Logo />
-        </Link>
+        <div className="flex min-w-0 items-center gap-3 sm:gap-5">
+          <Link href="/" aria-label="Praszo home" className="inline-flex shrink-0 items-center">
+            <Logo />
+          </Link>
+          {/* Product pages: the page's section menu, once the in-page section pill has scrolled away. */}
+          <ProductSectionMenu />
+        </div>
 
         <nav
           ref={navRef}

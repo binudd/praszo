@@ -23,7 +23,7 @@ import type { Product } from "@/data/products";
 export function ProductHero({ product }: { product: Product }) {
   const rootRef = useRef<HTMLElement | null>(null);
   useHeroEntrance(rootRef, `product:${product.slug}`);
-  useHeroScroll(rootRef);
+  useHeroScroll(rootRef, { visualMedia: "(min-width: 1024px)" });
   const featuresId = `${product.slug}-features`;
   const titleId = `${product.slug}-hero-title`;
 
@@ -40,7 +40,7 @@ export function ProductHero({ product }: { product: Product }) {
       aria-labelledby={titleId}
       className="relative flex min-h-[min(100svh,58rem)] items-center overflow-hidden pt-[calc(var(--header-h)+2rem)] pb-10 lg:min-h-[calc(100svh-5rem)] lg:pb-12"
     >
-      <Container className="grid w-full items-center gap-10 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-14">
+      <Container className="grid w-full items-center gap-12 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.05fr)] lg:gap-14">
         <div data-hero-depth="lede" className="min-w-0">
           <p data-hero="eyebrow" className="inline-flex items-center gap-3">
             <ProductGlyph slug={product.slug} size={44} />
@@ -48,10 +48,11 @@ export function ProductHero({ product }: { product: Product }) {
               {product.fullName}
             </span>
           </p>
-          <h1 id={titleId} className="display-md mt-6 max-w-[18ch] text-ink lg:text-[min(4.25rem,5vw,8svh)]">
+          {/* Sized so the (two-line) headline fits the text column at every width; capped by height on short desktops. */}
+          <h1 id={titleId} className="display-md mt-6 text-ink text-[clamp(1.85rem,1.1rem+3.3vw,3.5rem)] lg:text-[min(3.6vw,3.5rem,7.5svh)]">
             <HeroTitle text={product.hero.headline} />
           </h1>
-          <p data-hero="copy" className="lede mt-6 max-w-[34rem] line-clamp-4">
+          <p data-hero="copy" className="lede mt-5 max-w-[36rem]">
             {product.hero.description}
           </p>
           <div data-hero="cta" className="mt-8 flex flex-wrap items-center gap-3">

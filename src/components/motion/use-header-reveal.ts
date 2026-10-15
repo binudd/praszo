@@ -58,7 +58,6 @@ export function useHeaderReveal(ref: RefObject<HTMLElement | null>, options: Hea
         if (next === hidden) return;
         hidden = next;
         header.dataset.headerHidden = String(next);
-        window.dispatchEvent(new CustomEvent(HEADER_EVENT, { detail: { hidden: next } }));
         gsap.to(header, {
           // -100% of its own height, plus a little more so the menu shadow clears the viewport too.
           yPercent: next ? -100 : 0,
@@ -67,6 +66,9 @@ export function useHeaderReveal(ref: RefObject<HTMLElement | null>, options: Hea
           ease: next ? "power2.in" : "power3.out",
           overwrite: true,
         });
+        // Announce after the tween exists, so listeners that read the header's transform see the new
+        // state immediately when it applies instantly (reduced motion).
+        window.dispatchEvent(new CustomEvent(HEADER_EVENT, { detail: { hidden: next } }));
       };
 
       const engaged = () => Boolean(header.querySelector('[aria-expanded="true"], :focus-visible'));

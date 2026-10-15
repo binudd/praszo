@@ -16,6 +16,8 @@ type Props = {
   buttonClassName?: string;
   /** Accessible name when the label is not plain text. */
   ariaLabel?: string;
+  /** "center" under the trigger (default) or "start" (left-aligned, for triggers near the left edge). */
+  align?: "center" | "start";
   /** Marks the trigger current (aria-current), so the nav pill highlights it. */
   current?: boolean;
   /** Panel width (capped at the viewport minus the page gutters). */
@@ -29,7 +31,15 @@ type Props = {
  * The panel stays mounted (CSS transition in and out) and is inert while closed. It is centred under
  * the nav pill (its positioned ancestor) with a viewport-relative width, so it fits from 1024px up.
  */
-export function NavDropdown({ label, buttonClassName, ariaLabel, current, width = "52rem", children }: Props) {
+export function NavDropdown({
+  label,
+  buttonClassName,
+  ariaLabel,
+  align = "center",
+  current,
+  width = "52rem",
+  children,
+}: Props) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const rootRef = useRef<HTMLDivElement | null>(null);
@@ -98,7 +108,8 @@ export function NavDropdown({ label, buttonClassName, ariaLabel, current, width 
         inert={!open}
         style={{ width: `min(${width}, calc(100vw - 2.5rem))` }}
         className={cn(
-          "menu-panel absolute top-full left-1/2 z-50 mt-3 origin-top -translate-x-1/2 rounded-panel p-2 transition-[opacity,translate,scale,visibility] duration-200 ease-out motion-reduce:transition-none",
+          "menu-panel absolute top-full z-50 mt-3 rounded-panel p-2 transition-[opacity,translate,scale,visibility] duration-200 ease-out motion-reduce:transition-none",
+          align === "start" ? "left-0 origin-top-left" : "left-1/2 origin-top -translate-x-1/2",
           open
             ? "visible translate-y-0 scale-100 opacity-100"
             : "pointer-events-none invisible translate-y-2 scale-[0.98] opacity-0",

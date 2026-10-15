@@ -464,8 +464,6 @@ details[open] .faq-chevron {
   position: sticky;
   top: 0;
   height: 100svh;
-  /* Product pages: keep pinned content clear of the product bar (ProductSubNav). 0 elsewhere. */
-  padding-top: var(--subnav-h, 0px);
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -624,13 +622,13 @@ details[open] .faq-chevron {
 
 .hscroll.is-pinned .hscroll-stage {
   min-height: 100svh;
-  padding-block: calc(4.5rem + var(--subnav-h, 0px)) 2.5rem;
+  padding-block: 4.5rem 2.5rem;
 }
 
 /* Short laptop screens: tighten the pinned stage so header + rail fit in one viewport. */
 @media (max-height: 820px) {
   .hscroll.is-pinned .hscroll-stage {
-    padding-block: calc(3.5rem + var(--subnav-h, 0px)) 1.5rem;
+    padding-block: 3.5rem 1.5rem;
     gap: 1.5rem;
   }
 }
@@ -700,6 +698,25 @@ details[open] .faq-chevron {
 @media (min-width: 768px) {
   .screen-rail {
     --screen-h: min(32rem, calc(100svh - 29rem), calc(86vw / 2.1));
+  }
+}
+
+/* Desktop: smaller cards so more screens show at once (≈2.6 from 1024px, ≈3.3 from 1280px, assuming
+   the ~1.6:1 captures), with the next card peeking in and a soft fade at the right edge, so the rail
+   reads as "there is more". */
+@media (min-width: 1024px) {
+  .screen-rail {
+    --screen-h: min(16rem, calc((100vw - 6rem) / 2.6 / 1.6), calc(100svh - 29rem));
+  }
+
+  .screen-rail .hscroll-viewport {
+    mask-image: linear-gradient(to right, #000 86%, transparent);
+  }
+}
+
+@media (min-width: 1280px) {
+  .screen-rail {
+    --screen-h: min(17rem, calc((100vw - 6rem) / 3.3 / 1.6), calc(100svh - 29rem));
   }
 }
 

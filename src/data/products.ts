@@ -122,9 +122,9 @@ const practice: Product = {
   },
   hero: {
     eyebrow: "Govern every engagement. Capture every hour.",
-    headline: "Purpose-built practice management for audit firms",
+    headline: "Practice management for audit firms",
     description:
-      "Praszo Practice is practice management software for auditing firms that demand operational control and complete ownership of their data. It eliminates lost hours, stalled approvals, budget overruns, and compliance risks, ensuring every hour is captured, every engagement stays on track, and every audit remains inspection-ready.",
+      "Capture every hour, keep engagements on track, and stay inspection-ready.",
     visual: {
       kind: "image",
       src: practiceBoard,
@@ -350,9 +350,9 @@ const verifi: Product = {
   },
   hero: {
     eyebrow: "AI-powered validation",
-    headline: "AI financial statement validation built for audit firms",
+    headline: "AI financial statement validation",
     description:
-      "Praszo Verifi is an AI-powered financial statement validation solution built specifically for auditors. It automatically extracts, recalculates, compares, and cross-checks financial statement data, identifying inconsistencies across the Balance Sheet, P&L, Cash Flow, and Notes.",
+      "AI cross-checks your Balance Sheet, P&L, Cash Flow, and Notes for inconsistencies.",
     visual: {
       kind: "image",
       src: verifiDashboard,
@@ -525,9 +525,9 @@ const match: Product = {
   },
   hero: {
     eyebrow: "AI purchase vouching",
-    headline: "AI purchase vouching built for auditors",
+    headline: "AI purchase vouching for auditors",
     description:
-      "Manual purchase verification is slow, repetitive, and prone to oversight. Praszo Match simplifies purchase ledger verification, from data ingestion and intelligent matching to review, validation, and reporting, so audit teams work faster with greater accuracy and control.",
+      "Match registers, invoices, POs, and GRNs faster, with greater accuracy and control.",
     visual: {
       kind: "image",
       src: matchEngine,
@@ -690,9 +690,9 @@ const modifi: Product = {
   },
   hero: {
     eyebrow: "Engagement letter automation",
-    headline: "Stop modifying documents manually. Modifi is the new way.",
+    headline: "Stop modifying documents manually",
     description:
-      "Praszo Modifi is engagement letter automation software that centralizes document creation, review, approval, and signing. Teams reuse approved templates, update only client-specific fields, and generate accurate engagement letters without changing protected clauses. It also supports proposals, agreements, and other structured documents.",
+      "Create, approve, and sign engagement letters from firm-approved templates.",
     visual: {
       kind: "image",
       src: modifiHub,
@@ -880,7 +880,7 @@ const docs: Product = {
     eyebrow: "On-premise document management",
     headline: "Document management built for audit",
     description:
-      "Praszo Docs is automation-first document management software that transforms unstructured files into organized, searchable, and workflow-ready assets. Using OCR and intelligent automation, it captures, classifies, and routes documents efficiently. Local hosting ensures your sensitive documents never live on someone else's computer.",
+      "Capture, classify, and route every file with OCR, hosted on your own servers.",
     visual: {
       kind: "mockup",
       id: "docs-repository",

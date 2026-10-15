@@ -41,3 +41,15 @@ export function MockupThemeToggle() {
     </button>
   );
 }
+
+/**
+ * How mockups are presented: "window" (browser-style frame, the default, used by the homepage
+ * showcase) or "bare" (no frame and no border: the UI sits on a soft, edge-faded background; used by
+ * the product heroes). Set by the showcase that renders the mockup, read by MockupShell.
+ */
+export type MockupFrame = "window" | "bare";
+const MockupFrameContext = createContext<MockupFrame>("window");
+export const MockupFrameProvider = MockupFrameContext.Provider;
+export function useMockupFrame() {
+  return useContext(MockupFrameContext);
+}

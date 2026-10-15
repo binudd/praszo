@@ -1,3 +1,4 @@
+import { ArrowRight } from "lucide-react";
 import Image from "next/image";
 import type { CSSProperties } from "react";
 
@@ -7,8 +8,10 @@ import { HorizontalCard, HorizontalScroll } from "@/components/motion/horizontal
 import { RevealBlock, RevealHeading } from "@/components/motion/reveal";
 import { ClipReveal } from "@/components/product/clip-reveal";
 import { ProductVisual } from "@/components/product/product-visual";
+import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
 import { Eyebrow } from "@/components/ui/eyebrow";
+import { demoCta } from "@/data/company";
 import type { Product, Screen } from "@/data/products";
 
 /** Hero capture first, then each spotlight capture, then extra screens; duplicates dropped. */
@@ -39,7 +42,13 @@ function ScreenCard({ screen, index }: { screen: Screen; index: number }) {
       <WindowFrame title={`Praszo ${screen.title}`}>
         <figure className="flex h-[var(--screen-h)] items-center overflow-hidden bg-surface">
           {visual.kind === "image" ? (
-            <Image src={visual.src} alt={visual.alt} sizes="(min-width: 768px) 70rem, 120vw" placeholder="blur" className="h-full w-full object-cover object-top" />
+            <Image
+              src={visual.src}
+              alt={visual.alt}
+              sizes="(min-width: 768px) 70rem, 120vw"
+              placeholder="blur"
+              className="h-full w-full object-cover object-top"
+            />
           ) : Mockup ? (
             <div role="img" aria-label={visual.alt} className="w-full p-4 sm:p-6">
               <Mockup />
@@ -53,6 +62,25 @@ function ScreenCard({ screen, index }: { screen: Screen; index: number }) {
           <span className="heading block text-ink">{screen.title}</span>
           <span className="copy mt-1 line-clamp-2 text-ink-3">{visual.alt}</span>
         </span>
+      </div>
+    </HorizontalCard>
+  );
+}
+
+/** Closing card of the rail: these captures are a first look, the full application is in a demo. */
+function MoreCard({ product }: { product: Product }) {
+  return (
+    <HorizontalCard className="flex w-[calc(var(--screen-h)*1.15)] min-w-[15rem] flex-col">
+      <div className="flex h-[calc(var(--screen-h)+2.6rem)] flex-col justify-between rounded-card bg-product-soft p-6">
+        <span className="label text-product-deep dark:text-product">And more inside</span>
+        <div>
+          <p className="heading text-ink">There is more to Praszo {product.name} than these screens</p>
+          <p className="copy mt-2 text-ink-2">See the full application in a live demo.</p>
+          <Button href={demoCta.href} variant="product" size="sm" className="mt-5">
+            {demoCta.label}
+            <ArrowRight size={16} aria-hidden />
+          </Button>
+        </div>
       </div>
     </HorizontalCard>
   );
@@ -96,14 +124,19 @@ export function ProductPreview({ product }: { product: Product }) {
             <RevealHeading>{`Inside Praszo ${product.name}`}</RevealHeading>
           </h2>
           <p className="mt-4 text-[15.5px] leading-relaxed text-ink-2">
-            {screens.length} screens from the application. Scroll to move through them.
+            A first look at the application. Scroll to explore, and see everything in a live demo.
           </p>
         </div>
       }
     >
       {screens.map((screen, index) => (
-        <ScreenCard key={screen.visual.kind === "image" ? screen.visual.src.src : screen.visual.id} screen={screen} index={index} />
+        <ScreenCard
+          key={screen.visual.kind === "image" ? screen.visual.src.src : screen.visual.id}
+          screen={screen}
+          index={index}
+        />
       ))}
+      <MoreCard product={product} />
     </HorizontalScroll>
   );
 }
