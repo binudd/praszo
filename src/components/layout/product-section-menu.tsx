@@ -5,6 +5,7 @@ import { useEffect, useRef, type CSSProperties } from "react";
 
 import { NavDropdown } from "@/components/layout/nav-dropdown";
 import { ProductGroupLinks } from "@/components/layout/products-menu";
+import { SUBNAV_HANDOVER } from "@/components/product/product-sub-nav";
 import { gsap } from "@/components/motion/gsap";
 import { findVisible } from "@/components/motion/smooth-scroll";
 import { HEADER_EVENT } from "@/components/motion/use-header-reveal";
@@ -20,9 +21,10 @@ import { prefersReducedMotion } from "@/lib/motion";
  * and every Praszo product (ProductGroupLinks, the same data as the Products menu).
  *
  * Two layers, two motions (GSAP on the shared Lenis loop):
- *   inner ("appear")  scrubbed to the in-page section pill (ProductSubNav under the hero): as the pill
- *                     rises toward the header it shrinks and fades while this menu grows in, and the
- *                     reverse on the way back, so the pill visibly hands over to the header.
+ *   inner ("appear")  scrubbed to the in-page section pill (ProductSubNav under the hero) over the same
+ *                     range the pill fades itself (SUBNAV_HANDOVER), so the pill visibly hands over to
+ *                     the header. This component only reads the pill; it never styles it (the pill is
+ *                     page DOM that may not be hydrated yet when the layout's effects run).
  *   outer ("follow")  stays on screen when the header slides away: it cancels the header's vertical
  *                     slide every frame (so it never bobs) and glides left into the logo's place;
  *                     when the header returns it glides back beside the logo.
@@ -55,15 +57,14 @@ export function ProductSectionMenu() {
     const frame = requestAnimationFrame(() => {
       const pill = findVisible("main")?.querySelector<HTMLElement>("[data-product-subnav]");
       if (!pill) return;
-      const pillNav = pill.querySelector("nav");
       ctx.add(() => {
         const tl = gsap.timeline({
           defaults: { ease: "none" },
           scrollTrigger: {
             trigger: pill,
-            start: "top top+=170",
-            end: "top top+=8",
-            scrub: reduced ? true : 0.6,
+            start: SUBNAV_HANDOVER.start,
+            end: SUBNAV_HANDOVER.end,
+            scrub: reduced ? true : SUBNAV_HANDOVER.scrub,
             invalidateOnRefresh: true,
             onUpdate: (self) => {
               inner.inert = self.progress < 0.6;
@@ -71,7 +72,6 @@ export function ProductSectionMenu() {
           },
         });
         tl.to(inner, { autoAlpha: 1, scale: 1, x: 0, ease: "power2.out" }, 0);
-        if (pillNav) tl.to(pillNav, { scale: 0.9, y: -14, autoAlpha: 0, ease: "power1.in" }, 0);
       });
     });
 

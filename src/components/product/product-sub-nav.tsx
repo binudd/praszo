@@ -2,11 +2,21 @@
 
 import { useRef, type MouseEvent } from "react";
 
+import { gsap, useGSAP } from "@/components/motion/gsap";
 import { useNavFollower } from "@/components/motion/use-nav-follower";
 import { scrollToSection, useSectionSpy } from "@/components/motion/use-section-spy";
 import { productSections } from "@/data/product-sections";
 import type { Product } from "@/data/products";
 import { cn } from "@/lib/cn";
+import { prefersReducedMotion } from "@/lib/motion";
+
+/**
+ * The scroll range over which this pill hands over to the header's section menu (both scrub on it, so
+ * the pill fades exactly as the menu grows in). Each side animates only its own DOM: the header must
+ * never write styles onto this pill, which belongs to the page and may not be hydrated yet when the
+ * layout's effects run (that caused a hydration mismatch on reload with a restored scroll position).
+ */
+export const SUBNAV_HANDOVER = { start: "top top+=170", end: "top top+=8", scrub: 0.6 } as const;
 
 /**
  * Product section tabs as a floating pill directly under the product hero (Workspace product-page
@@ -25,6 +35,29 @@ export function ProductSubNav({ product }: { product: Product }) {
     sections.map((section) => section.id),
   );
   useNavFollower(listRef, pillRef, active ?? "");
+
+  // Hand over to the header menu: shrink, lift and fade as the pill rises toward the header.
+  useGSAP(
+    () => {
+      const bar = barRef.current;
+      const nav = bar?.querySelector("nav");
+      if (!bar || !nav) return;
+      gsap.to(nav, {
+        scale: 0.9,
+        y: -14,
+        autoAlpha: 0,
+        ease: "power1.in",
+        scrollTrigger: {
+          trigger: bar,
+          start: SUBNAV_HANDOVER.start,
+          end: SUBNAV_HANDOVER.end,
+          scrub: prefersReducedMotion() ? true : SUBNAV_HANDOVER.scrub,
+          invalidateOnRefresh: true,
+        },
+      });
+    },
+    { scope: barRef },
+  );
 
   const jump = (event: MouseEvent<HTMLAnchorElement>, id: string, index: number) => {
     event.preventDefault();
