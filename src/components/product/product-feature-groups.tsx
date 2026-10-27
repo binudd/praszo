@@ -18,7 +18,7 @@ type Props = {
 };
 
 /**
- * Multi-group feature sections (Practice, Modifi) as a sticky scroll scene, built on the same
+ * Multi-group feature sections (Practice) as a sticky scroll scene, built on the same
  * primitives as the homepage products scene (useScene + applySceneItems on the shared Lenis loop):
  *   left   eyebrow, title and the groups as numbered tabs; the current one expands with its
  *          description and a product-coloured line fills as the visitor scrolls through the groups;

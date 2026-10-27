@@ -25,18 +25,6 @@ export const matchShowcase = {
   ],
 } as const;
 
-export const modifiShowcase = {
-  title: "Engagement letter · Acme Holdings",
-  meta: ["Template v4", "2 approvers"],
-  fields: [
-    { id: "client", placeholder: "{{client.name}}", value: "Acme Holdings Ltd" },
-    { id: "period", placeholder: "{{period}}", value: "FY2025" },
-    { id: "fee", placeholder: "{{fee}}", value: "AED 48,000" },
-  ],
-  clause: "Protected clause · locked",
-  steps: ["Draft", "Review", "Approved", "Signed"],
-} as const;
-
 export const docsShowcase = {
   title: "Repository",
   meta: ["On-premise", "OCR active"],

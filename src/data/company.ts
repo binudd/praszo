@@ -59,7 +59,6 @@ export const routes = [
   { path: "/practice", priority: 0.9, changeFrequency: "monthly" },
   { path: "/verifi", priority: 0.9, changeFrequency: "monthly" },
   { path: "/match", priority: 0.9, changeFrequency: "monthly" },
-  { path: "/modifi", priority: 0.9, changeFrequency: "monthly" },
   { path: "/docs", priority: 0.9, changeFrequency: "monthly" },
   { path: "/why-praszo", priority: 0.8, changeFrequency: "monthly" },
   { path: "/about", priority: 0.7, changeFrequency: "yearly" },

@@ -10,15 +10,15 @@ export type NavItem = { label: string; href: string; description?: string };
 /** Products grouped by what they do (Products mega menu and mobile accordion). */
 export const productGroups: { title: string; slugs: ProductSlug[] }[] = [
   { title: "Manage", slugs: ["practice"] },
-  { title: "Prepare and sign", slugs: ["modifi", "docs"] },
+  { title: "Prepare", slugs: ["docs"] },
   { title: "AI audit checks", slugs: ["match", "verifi"] },
 ];
 
 /** Footer links of the Products menu (existing homepage anchors). */
 export const productMenuLinks: NavItem[] = [
   { label: "Praszo OS overview", href: "/", description: "One platform for the whole audit cycle." },
-  { label: "See the workflow", href: "/#workflow", description: "How the five products connect, step by step." },
-  { label: "All products", href: "/#products", description: "Five specialized engines, side by side." },
+  { label: "See the workflow", href: "/#workflow", description: "How the four products connect, step by step." },
+  { label: "All products", href: "/#products", description: "Four specialized engines, side by side." },
 ];
 
 export const solutionLinks: NavItem[] = [

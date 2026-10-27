@@ -31,7 +31,6 @@ export const metadata: Metadata = {
     "on-premise audit software",
     "AI financial statement validation",
     "AI purchase vouching",
-    "engagement letter automation",
     "document management for auditors",
     "Praszo OS",
   ],

@@ -26,14 +26,6 @@ export const productSections: Record<ProductSlug, ProductSection[]> = {
     { id: "match-workflow", label: "How it works" },
     { id: "match-faq", label: "FAQ" },
   ],
-  modifi: [
-    { id: "modifi-overview", label: "Overview" },
-    { id: "modifi-spotlights", label: "In detail" },
-    { id: "modifi-features", label: "Features" },
-    { id: "modifi-impact", label: "Impact" },
-    { id: "modifi-workflow", label: "Lifecycle" },
-    { id: "modifi-faq", label: "FAQ" },
-  ],
   docs: [
     { id: "docs-overview", label: "Overview" },
     { id: "docs-features", label: "Features" },

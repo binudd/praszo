@@ -50,7 +50,7 @@ export const solutions: Solution[] = [
       items: [
         {
           title: "A fully integrated audit ecosystem",
-          body: "Large firms rely on multiple systems to handle engagement letters, document control, reconciliation, and financial validation. Praszo replaces fragmentation with one connected operating cycle.",
+          body: "Large firms rely on multiple systems to handle document control, reconciliation, and financial validation. Praszo replaces fragmentation with one connected operating cycle.",
           icon: "Network",
         },
         {
@@ -82,7 +82,7 @@ export const solutions: Solution[] = [
     },
     products: {
       title: "One connected operating cycle",
-      slugs: ["practice", "verifi", "match", "modifi", "docs"],
+      slugs: ["practice", "verifi", "match", "docs"],
     },
     cta: {
       kicker: "Run your firm with clarity",

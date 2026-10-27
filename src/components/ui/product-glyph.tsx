@@ -2,7 +2,6 @@ import Image from "next/image";
 
 import glyphDocs from "@/assets/brand/docs.svg";
 import glyphMatch from "@/assets/brand/match.svg";
-import glyphModifi from "@/assets/brand/modifi.svg";
 import glyphPractice from "@/assets/brand/practice.svg";
 import glyphVerifi from "@/assets/brand/verifi.svg";
 import type { ProductSlug } from "@/data/products";
@@ -13,7 +12,6 @@ const glyphs = {
   practice: glyphPractice,
   verifi: glyphVerifi,
   match: glyphMatch,
-  modifi: glyphModifi,
   docs: glyphDocs,
 };
 

@@ -3,10 +3,6 @@ import type { StaticImageData } from "next/image";
 import matchEngine from "@/assets/products/match-engine.png";
 import matchGovernance from "@/assets/products/match-governance.png";
 import matchWorkflow from "@/assets/products/match-workflow.png";
-import modifiDynamic from "@/assets/products/modifi-dynamic.png";
-import modifiHub from "@/assets/products/modifi-hub.png";
-import modifiTemplate from "@/assets/products/modifi-template.png";
-import modifiTransparency from "@/assets/products/modifi-transparency.png";
 import practiceBoard from "@/assets/products/practice-board.png";
 import practiceEditProject from "@/assets/products/practice-edit-project.png";
 import practiceMyWork from "@/assets/products/practice-my-work.png";
@@ -17,7 +13,7 @@ import verifiIngestion from "@/assets/products/verifi-ingestion.png";
 import verifiReporting from "@/assets/products/verifi-reporting.png";
 import type { IconName } from "@/lib/icons";
 
-export type ProductSlug = "practice" | "verifi" | "match" | "modifi" | "docs";
+export type ProductSlug = "practice" | "verifi" | "match" | "docs";
 
 /** Hand-built mockups live in components/mockups/registry.tsx. */
 export type MockupId = "docs-repository" | "verifi-report" | "match-three-way";
@@ -96,7 +92,7 @@ export type Product = {
   cta: { title: string; body: string; bullets?: string[] };
 };
 
-export const productOrder: ProductSlug[] = ["practice", "verifi", "match", "modifi", "docs"];
+export const productOrder: ProductSlug[] = ["practice", "verifi", "match", "docs"];
 
 const sharedCtaBullets = ["Seamless integration", "Data-driven insights"];
 
@@ -293,7 +289,7 @@ const practice: Product = {
     items: [
       {
         title: "Larger audit firms",
-        body: "Large firms rely on multiple systems to handle engagement letters, document control, reconciliation, and financial validation. Praszo replaces fragmentation with one connected operating cycle, and on-premise deployment keeps sensitive audit data within your firm's own infrastructure.",
+        body: "Large firms rely on multiple systems to handle document control, reconciliation, and financial validation. Praszo replaces fragmentation with one connected operating cycle, and on-premise deployment keeps sensitive audit data within your firm's own infrastructure.",
         icon: "Building",
       },
       {
@@ -668,194 +664,6 @@ const match: Product = {
   },
 };
 
-const modifi: Product = {
-  slug: "modifi",
-  name: "Modifi",
-  fullName: "Praszo Modifi",
-  color: "#2874ff",
-  colorDeep: "#1f5fd6",
-  category: "Engagement letter automation",
-  tagline: "Create, approve, and sign engagement letters from approved templates.",
-  summary:
-    "Create, control, approve, and sign engagement letters and critical documents using firm-approved templates.",
-  workflowStep: {
-    order: 1,
-    label: "Setup & Sign",
-    body: "Create, control, approve, and sign engagement letters using firm-approved templates.",
-  },
-  meta: {
-    title: "Praszo Modifi | Engagement Letter Automation Software",
-    description:
-      "Praszo Modifi is engagement letter automation software that simplifies document creation, ensures consistency, and enables controlled approvals.",
-  },
-  hero: {
-    eyebrow: "Engagement letter automation",
-    headline: "Stop modifying documents manually",
-    description:
-      "Create, approve, and sign engagement letters from firm-approved templates.",
-    visual: {
-      kind: "image",
-      src: modifiHub,
-      alt: "Praszo Modifi document hub listing engagement documents with approvers, dates, and statuses such as in progress, completed, and pending review",
-      // Cropped to the app area (no browser chrome), so the site's WindowFrame supplies it.
-      frame: "browser",
-    },
-  },
-  spotlights: [
-    {
-      id: "templates",
-      eyebrow: "Master template creation",
-      title: "Design once. Deploy infinitely.",
-      body: "Build powerful document foundations with an intuitive drag-and-drop builder, with precise control over every data field.",
-      bullets: ["Drag-and-drop fields", "Smart placeholders with CRM sync", "Global style sync"],
-      visual: {
-        kind: "image",
-        src: modifiTemplate,
-        alt: "Modifi template builder with draggable text, date, and checkbox fields, CRM-synced client fields, and a properties panel",
-        frame: "none",
-      },
-    },
-    {
-      id: "dynamic",
-      eyebrow: "Dynamic content management",
-      title: "Documents that adapt to your logic",
-      body: "Toggle sections on or off based on custom rules, jurisdiction, or client tier automatically.",
-      bullets: ["Logic rules", "Conditional visibility"],
-      visual: {
-        kind: "image",
-        src: modifiDynamic,
-        alt: "Modifi dynamic content rules panel controlling which document sections are visible",
-        frame: "none",
-      },
-    },
-    {
-      id: "control",
-      eyebrow: "Transparency & absolute control",
-      title: "Never wonder which version is final again",
-      body: "Every change, every comment, and every approval is tracked in real time.",
-      bullets: ["Full audit trail"],
-      visual: {
-        kind: "image",
-        src: modifiTransparency,
-        alt: "Modifi audit trail showing tracked changes, comments, and approvals on a document",
-        frame: "none",
-      },
-    },
-  ],
-  featureSections: [
-    {
-      id: "features",
-      eyebrow: "Core features",
-      title: "Automate the entire engagement document lifecycle",
-      description: "Simplify document creation with engagement letter automation built for audit firms.",
-      groups: [
-        {
-          title: "Templates & fields",
-          icon: "FileStack",
-          items: [
-            { name: "Template centralization", description: "Create and store source-of-truth templates, securely accessible to designated team members across your organization.", icon: "FolderTree" },
-            { name: "Custom field engine", description: "Configure mandatory template fields including text, numeric, date, and boolean types to standardize document data capture.", icon: "FileInput" },
-            { name: "Placeholder logic", description: "Define precise locations where dynamic content automatically appears within structured Word document templates.", icon: "MousePointerClick" },
-            { name: "Manual field mapping", description: "Users highlight and link fields to placeholders, ensuring accurate content placement within finalized documents.", icon: "Link2" },
-          ],
-        },
-        {
-          title: "Access & authority",
-          icon: "KeyRound",
-          items: [
-            { name: "Granular access control", description: "Assign Admin or Member roles to manage permissions and maintain strict data security controls.", icon: "UserCog" },
-            { name: "Template assignment", description: "Admins determine which team members can access and generate documents using specific approved templates.", icon: "Users" },
-            { name: "Approval authority", description: "Only authorized Admins can finalize documents and release them securely for external signature processing.", icon: "Stamp" },
-          ],
-        },
-        {
-          title: "Drafting & approvals",
-          icon: "PenLine",
-          items: [
-            { name: "Template-based generation", description: "Generate documents instantly with one click using the latest approved master template version.", icon: "Sparkles" },
-            { name: "Modification logs", description: "Track every change made to drafts with detailed logs ensuring transparency and accountability.", icon: "FileDiff" },
-            { name: "Suggestion vs. edit", description: "Members suggest revisions while Admins review, approve, or reject changes before finalization.", icon: "MessageSquareText" },
-            { name: "Internal notification system", description: "Automated alerts notify stakeholders and route documents seamlessly through predefined approval workflows.", icon: "Bell" },
-          ],
-        },
-        {
-          title: "Signature & tracking",
-          icon: "Signature",
-          items: [
-            { name: "Automated signature routing", description: "Route documents for secure digital signatures through integrated third-party signature workflows.", icon: "Send" },
-            { name: "Coordinate-based positioning", description: "Place signature fields precisely using mapped coordinates to ensure accurate alignment within documents.", icon: "MapPin" },
-            { name: "Client view portal", description: "Provide clients a clean interface to securely review and digitally sign documents.", icon: "Eye" },
-            { name: "Engagement tracking", description: "Monitor document statuses including pending, approved, and signed for complete visibility.", icon: "ListChecks" },
-            { name: "History logs", description: "View the complete document lifecycle from initial draft creation to final signed PDF.", icon: "Clock" },
-          ],
-        },
-      ],
-    },
-  ],
-  comparison: {
-    title: "The impact of structure",
-    subtitle: "See how Modifi transforms your day-to-day operations.",
-    before: {
-      label: "Before Modifi",
-      items: [
-        "Dozens of “V2_FINAL_revised.docx” versions.",
-        "Manual copy-pasting leading to human error.",
-        "Approval bottlenecks waiting for email replies.",
-      ],
-    },
-    after: {
-      label: "With Modifi",
-      items: [
-        "Single source of truth for every document.",
-        "Automated data population from your CRM.",
-        "Instant, multi-level digital sign-offs.",
-      ],
-    },
-  },
-  workflow: {
-    title: "The engagement document lifecycle",
-    steps: [
-      { title: "Build the master template", body: "Admins design fields, placeholders, and protected clauses once." },
-      { title: "Assign templates", body: "Admins decide which team members can generate documents from each approved template." },
-      { title: "Generate", body: "One click produces a document from the latest approved master template version." },
-      { title: "Suggest, review, approve", body: "Members suggest revisions; Admins approve or reject with a full modification log." },
-      { title: "Route for signature", body: "Finalized documents go out through integrated digital signature workflows and the client portal." },
-      { title: "Track and archive", body: "Pending, approved, and signed statuses stay visible, with history from draft to signed PDF." },
-    ],
-  },
-  audience: {
-    title: "Roles built into the workflow",
-    items: [
-      { title: "Admins", body: "Control templates, assignments, and final approval, and release documents for external signature.", icon: "UserCog" },
-      { title: "Members", body: "Draft from approved templates and suggest revisions without touching protected clauses.", icon: "PenLine" },
-      { title: "Clients", body: "Review and digitally sign documents in a clean, secure client portal.", icon: "Eye" },
-    ],
-  },
-  faq: [
-    {
-      q: "What is Praszo Modifi and how does it work?",
-      a: "Praszo Modifi is engagement letter automation software that helps audit firms create, review, approve, and sign documents using pre-approved templates and automated workflows.",
-    },
-    {
-      q: "How is Modifi different from regular audit tools?",
-      a: "Unlike basic tools, Modifi standardizes templates, controls edits, and automates approvals of engagement letters, making it more reliable for audit workflows.",
-    },
-    {
-      q: "How does Modifi prevent errors in engagement letters?",
-      a: "It locks critical clauses and uses structured templates with placeholders, ensuring consistency and reducing manual mistakes.",
-    },
-    {
-      q: "Can Modifi integrate with other auditing practice management tools?",
-      a: "Yes. It can work along with other practice management tools in the suite to support end-to-end workflows.",
-    },
-  ],
-  cta: {
-    title: "Own your audit operations.",
-    body: "Copying and manually editing engagement letters creates errors and delays. Modifi replaces them with approved templates, controlled edits, and automated approvals.",
-    bullets: sharedCtaBullets,
-  },
-};
-
 const docs: Product = {
   slug: "docs",
   name: "Docs",
@@ -976,7 +784,7 @@ const docs: Product = {
   },
 };
 
-export const products: Record<ProductSlug, Product> = { practice, verifi, match, modifi, docs };
+export const products: Record<ProductSlug, Product> = { practice, verifi, match, docs };
 
 export const productList: Product[] = productOrder.map((slug) => products[slug]);
 

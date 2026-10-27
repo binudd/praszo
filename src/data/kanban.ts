@@ -42,7 +42,7 @@ export const kanban = {
       id: "review",
       title: "Review",
       cards: [
-        { id: "rep-letter", title: "Management rep letter", assignee: "MR", due: "Mar 20", hours: "2h", tag: "modifi" },
+        { id: "rep-letter", title: "Management rep letter", assignee: "MR", due: "Mar 20", hours: "2h" },
         { id: "disclosures", title: "Disclosure checklist", assignee: "JL", due: "Mar 22", hours: "5h", tag: "verifi" },
       ],
     },

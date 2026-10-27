@@ -5,7 +5,7 @@ import { prefersReducedMotion } from "@/lib/motion";
 /**
  * Shared "liveliness" kit for the hero mockups. Every mockup renders the same overlay through
  * MockupShell ([data-fx]: a labelled collaborator cursor, a click ripple and a toast), and drives it
- * with these helpers, so all five feel like one product being used by a person:
+ * with these helpers, so all four feel like one product being used by a person:
  *   cursorTo  the cursor glides to the element about to change;
  *   click     a press with a ripple;
  *   toast     a short status message (flat ink pill, no shadow);

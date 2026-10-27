@@ -19,7 +19,7 @@ type Props = {
 };
 
 /**
- * The five product glyphs as a menu: each links to its product overview, a
+ * The four product glyphs as a menu: each links to its product overview, a
  * GSAP-driven highlight slides behind the hovered or focused item, and a
  * tooltip names it. Works on touch (tap navigates) and keyboard (focus moves
  * the highlight and shows the tooltip).

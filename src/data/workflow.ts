@@ -10,7 +10,7 @@ export type WorkflowStep = {
   badge?: string;
 };
 
-/** The six-step audit workflow: client raw data, then one step per Praszo product in workflow order. */
+/** The five-step audit workflow: client raw data, then one step per Praszo product in workflow order. */
 export const workflowSteps: WorkflowStep[] = [
   {
     id: "raw-data",

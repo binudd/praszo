@@ -14,7 +14,7 @@ import { prefersReducedMotion } from "@/lib/motion";
 const DWELL = 7000;
 
 /**
- * Hero visual: the five product mockups stacked in one frame that fills the
+ * Hero visual: the four product mockups stacked in one frame that fills the
  * height it is given. They rotate on a timer; hovering or focusing a product
  * icon shows that product and holds, and so does pointing at the mockup itself (its demo pauses so it
  * can be played with). Only the visible mockup animates, and

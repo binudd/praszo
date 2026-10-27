@@ -14,7 +14,6 @@ The corporate site for **Praszo** (praszo.com), an on-premise practice-managemen
 | `/practice` | Praszo Practice (practice management, the core engine) | `#5539d9` |
 | `/verifi` | Praszo Verifi (AI financial statement validation) | `#17b978` |
 | `/match` | Praszo Match (AI purchase vouching, 3-way matching) | `#fb9528` |
-| `/modifi` | Praszo Modifi (engagement letter automation) | `#2874ff` |
 | `/docs` | Praszo Docs (on-premise document management) | `#d72d2d` |
 | `/contact` | Contact and "Book a demo" | Brand coral |
 | `/why-praszo` | Why Praszo (pillars, statement, differentiators, impact, segments, FAQ) | Brand coral |
@@ -82,7 +81,7 @@ src/
   app/
     layout.tsx            Root: fonts, JSON-LD, boot script, Splash, ambient layers, SmoothScroll, header/footer
     page.tsx              Homepage composition
-    <slug>/page.tsx       Product pages (practice, verifi, match, modifi, docs) + opengraph-image.tsx each
+    <slug>/page.tsx       Product pages (practice, verifi, match, docs) + opengraph-image.tsx each
     contact/page.tsx      Contact page
     globals.css           Theme mapping, type scale, all custom CSS classes (see §6)
     tokens.css            Design tokens (light + [data-theme="dark"])
@@ -95,7 +94,7 @@ src/
     product-sections.ts   Per-product in-page menu (ids must match rendered section ids)
     workflow.ts           The 6 audit workflow steps (home workflow tour)
     kanban.ts             Practice board mockup content and move script
-    showcases.ts          Verifi/Match/Modifi/Docs mockup content
+    showcases.ts          Verifi/Match/Docs mockup content
   lib/
     motion.ts             EASE, ANCHOR_OFFSET=0, prefersReducedMotion(), isFinePointer()
     splash.ts             Splash boot script, SPLASH_EVENT, splashActive(), onSplashDone()
@@ -157,14 +156,14 @@ The data layer drives the pages, and content edits should rarely need component 
 ### Typography
 - **Font.** Manrope through `next/font` (`lib/fonts.ts`) as `--font-manrope`. Body weight is 500.
 - **Display scale** (in `@layer components`): `.display-xl`, `.display-lg` (homepage hero and big section titles), `.display-hero` (product hero), `.display-md`, `.display-sm`, `.heading` (item titles in rails, lists and dense grids, 19→24px), plus `.lede` (intro and short bodies), `.copy` (running text and lists, 16→18px) and `.label` (uppercase tracking: index numbers, kicker lines, compact links). Avoid one-off `text-[Npx]` sizes in sections; pick a tier.
-- **Kickers.** `Eyebrow` (`ui/eyebrow.tsx`) has no dot. It carries a hand-drawn pen underline, the same loose stroke as the Modifi signature, as an inline SVG (`.eyebrow-scribble`). The stroke draws on hover of the kicker or its parent block (kicker + title + intro) via `stroke-dashoffset` with `pathLength=1`, CSS only, and retracts faster on leave. Touch screens (`hover: none`) show it drawn. Do not add `vector-effect: non-scaling-stroke`: Chrome then measures dashes in screen pixels and the stroke stops partway. The SVG needs an explicit width, because an absolutely positioned SVG ignores `left` + `right`.
+- **Kickers.** `Eyebrow` (`ui/eyebrow.tsx`) has no dot. It carries a hand-drawn pen underline as an inline SVG (`.eyebrow-scribble`). The stroke draws on hover of the kicker or its parent block (kicker + title + intro) via `stroke-dashoffset` with `pathLength=1`, CSS only, and retracts faster on leave. Touch screens (`hover: none`) show it drawn. Do not add `vector-effect: non-scaling-stroke`: Chrome then measures dashes in screen pixels and the stroke stops partway. The SVG needs an explicit width, because an absolutely positioned SVG ignores `left` + `right`.
 - **Layer rule.** Base typography sits in `@layer base`. Unlayered CSS beats Tailwind utilities, which broke `truncate` once, so keep custom rules layered or class-scoped.
 
 ### Surfaces
 - **No content cards.** Titled items never sit on a card surface. They use `EditorialItem` (`ui/editorial-item.tsx`): hairline top rule, `label` row (index and/or icon), `display-sm` + `lede` for sets of 2–3 (`size="display"`) or `heading` + `copy` for rails and lists (`size="heading"`). Used by pillars, highlights, audience, feature groups, both card rails and the contact details. Product link grids use `ProductLinks` (`ui/product-links.tsx`): rule, glyph, `heading`, one line of `copy`, hover to brand. The old `ui/card.tsx` was removed. Surfaces remain only for UI depictions (mockups, screenshots, the product posters), menus and buttons.
 - **Menus.** `.menu-surface` (header nav pill and menu button; flat, no shadow) and `.menu-panel` (dropdowns; keeps `--shadow-menu` because it floats over content) are glass. Blur is emitted via `@apply backdrop-blur-xl backdrop-saturate-150`, because Lightning CSS drops the unprefixed property from hand-written rules.
 - **Mockups** follow the contrast rule: flat `bg-elevated` desk, borderless `bg-bg` cards, state shown by a tint (`bg-product-soft`), no shadows at all (a lifted card only scales). **No inner borders.**
-- **Ecosystem posters** must reach AA (4.5:1) for every text layer: white on the product colour when it passes (Practice 7.06, Docs 4.88), else white on `colorDeep` when that passes (Modifi #1f5fd6, 5.73), else ink on the product colour (Verifi 7.29, Match 8.34). Text is full opacity; the badge uses `bg-black/15` (white text) or `bg-black/10` (ink).
+- **Ecosystem posters** must reach AA (4.5:1) for every text layer: white on the product colour when it passes (Practice 7.06, Docs 4.88), else white on `colorDeep` when that passes, else ink on the product colour (Verifi 7.29, Match 8.34). Text is full opacity; the badge uses `bg-black/15` (white text) or `bg-black/10` (ink).
 
 ### Layout utilities
 - **`Container`** has one width, `--container-wide` (86rem), with the same gutters as the header, so the logo, every section and the footer share one left and right edge. The old narrow `--container-site` and the `wide` prop were removed. For a narrow reading column, constrain the content inside the container (e.g. `max-w-3xl`), never the container itself.
@@ -295,21 +294,20 @@ Copy from praszo.com/why-praszo (page data in `data/pages/why-praszo.ts`; the sh
 ### 8.2 Product pages (`src/app/<slug>/page.tsx`)
 Every page is wrapped by `ProductPage`, which provides the product color scope, SoftwareApplication JSON-LD and `RelatedProducts` at the end. The header switches to the product lockup and that product's section menu (§9). Pages compose shared sections in this order (✓ = used):
 
-| Section | Component | Animation | Practice | Verifi | Match | Modifi | Docs |
-|---|---|---|---|---|---|---|---|
-| Hero (`<slug>-overview`) | `ProductHero` → `HeroShell` + `ProductShowcase` | Same shell as home: product mockup, word entrance, scroll depth, step pill linking to the home workflow | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Screenshot rail (`<slug>-preview`) | `ProductPreview` | `HorizontalScroll` of framed captures (`WindowFrame` chrome, one shared height). Falls back to one full-width `ClipReveal` image when only one capture exists (Docs). | ✓ (5 screens) | ✓ | ✓ | ✓ | single |
-| Highlights | `ProductHighlights` | `RevealGroup` | | | ✓ | | ✓ |
-| Problem statement | `ProductProblem` → `Statement` | Scrubbed word reveal with pain-point chips | ✓ | ✓ | | | |
-| Spotlights (`<slug>-spotlights`) | `ProductSpotlights` | `useScene` (`count*110+40` svh). Tabs, copy crossfade, visual cards slide and scale. Mobile: alternating rows with `ClipReveal`. | | ✓ | ✓ | ✓ | |
-| Feature section(s) (`<slug>-<sectionId>`) | `ProductFeatureGrid` | A single group renders as a **dark `HorizontalScroll` rail** of icon cards. Multiple groups (Practice 5, Modifi 4) render as **`ProductFeatureGroups`**, a sticky `useScene` scene (`count*90+40` svh, same primitives as the homepage products scene): left, eyebrow + title + the groups as numbered tabs with a product-coloured progress line (`[data-feature-progress]` scaleY); right, one panel per group crossfading (`applySceneItems`) with icon, title, description and features that stagger in via CSS (`.feature-scene.is-ready .is-current .feature-row`, `--i` × 70ms). Tabs jump with `scrollToSceneStep`. Below 1024px / reduced motion: the editorial grouped list (`RevealGroup`) is the stacked fallback; its heading has no id (the scene heading owns `<id>-title`). | ✓ ×2 | ✓ | ✓ | ✓ | ✓ |
-| Mobile app (`practice-mobile`) | `PracticeMobileSection` | `RevealBlock` and `ClipReveal` phone capture | ✓ | | | | |
-| Impact before and after (`modifi-impact`) | `ProductComparison` | `RevealGroup` | | | | ✓ | |
-| Workflow (`<slug>-workflow`) | `ProductWorkflow` | Numbered steps plus a connector line scrubbed `scaleX` (`scrub 0.5`) | | ✓ | ✓ | ✓ | ✓ |
-| Audience (`<slug>-audience`) | `ProductAudience` | `RevealGroup` | ✓ | ✓ | ✓ | ✓ | ✓ |
-| FAQ (`<slug>-faq`) | `FaqSection tone="product"` | `<details>` + JSON-LD | ✓ | ✓ | ✓ | ✓ | ✓ |
-| CTA | `ProductCta` → `FinalCta` | Dark closing scene | ✓ | ✓ | ✓ | ✓ | ✓ |
-| Related products | `RelatedProducts` (in `ProductPage`) | static | ✓ | ✓ | ✓ | ✓ | ✓ |
+| Section | Component | Animation | Practice | Verifi | Match | Docs |
+|---|---|---|---|---|---|---|
+| Hero (`<slug>-overview`) | `ProductHero` → `HeroShell` + `ProductShowcase` | Same shell as home: product mockup, word entrance, scroll depth, step pill linking to the home workflow | ✓ | ✓ | ✓ | ✓ |
+| Screenshot rail (`<slug>-preview`) | `ProductPreview` | `HorizontalScroll` of framed captures (`WindowFrame` chrome, one shared height). Falls back to one full-width `ClipReveal` image when only one capture exists (Docs). | ✓ (5 screens) | ✓ | ✓ | single |
+| Highlights | `ProductHighlights` | `RevealGroup` | | | ✓ | ✓ |
+| Problem statement | `ProductProblem` → `Statement` | Scrubbed word reveal with pain-point chips | ✓ | ✓ | | |
+| Spotlights (`<slug>-spotlights`) | `ProductSpotlights` | `useScene` (`count*110+40` svh). Tabs, copy crossfade, visual cards slide and scale. Mobile: alternating rows with `ClipReveal`. | | ✓ | ✓ | |
+| Feature section(s) (`<slug>-<sectionId>`) | `ProductFeatureGrid` | A single group renders as a **dark `HorizontalScroll` rail** of icon cards. Multiple groups (Practice 5) render as **`ProductFeatureGroups`**, a sticky `useScene` scene (`count*90+40` svh, same primitives as the homepage products scene): left, eyebrow + title + the groups as numbered tabs with a product-coloured progress line (`[data-feature-progress]` scaleY); right, one panel per group crossfading (`applySceneItems`) with icon, title, description and features that stagger in via CSS (`.feature-scene.is-ready .is-current .feature-row`, `--i` × 70ms). Tabs jump with `scrollToSceneStep`. Below 1024px / reduced motion: the editorial grouped list (`RevealGroup`) is the stacked fallback; its heading has no id (the scene heading owns `<id>-title`). | ✓ ×2 | ✓ | ✓ | ✓ |
+| Mobile app (`practice-mobile`) | `PracticeMobileSection` | `RevealBlock` and `ClipReveal` phone capture | ✓ | | | |
+| Workflow (`<slug>-workflow`) | `ProductWorkflow` | Numbered steps plus a connector line scrubbed `scaleX` (`scrub 0.5`) | | ✓ | ✓ | ✓ |
+| Audience (`<slug>-audience`) | `ProductAudience` | `RevealGroup` | ✓ | ✓ | ✓ | ✓ |
+| FAQ (`<slug>-faq`) | `FaqSection tone="product"` | `<details>` + JSON-LD | ✓ | ✓ | ✓ | ✓ |
+| CTA | `ProductCta` → `FinalCta` | Dark closing scene | ✓ | ✓ | ✓ | ✓ |
+| Related products | `RelatedProducts` (in `ProductPage`) | static | ✓ | ✓ | ✓ | ✓ |
 
 `data/product-sections.ts` lists the in-page menu per product. Its ids must equal the rendered ids above. All currently match.
 
@@ -341,7 +339,7 @@ Data-driven and built from one kit in `components/page/`, so new pages need no n
 **Liveliness layer (2026-10-15).** Every mockup gets the same playful, interactive layer through two shared pieces, so the five stay consistent:
 - **`MockupShell`** renders coloured window dots (`WindowFrame dots="color"`: accent / warning / success tokens), a product-colour wash on the desk, a pulsing **Live** chip, and the effects overlay `[data-fx]` (labelled collaborator cursor, click ripple, toast). `toastAt="left" | "right"` puts the toast in the corner that layout leaves empty (checked: it covers no card, row, step or badge).
 - **`mockup-fx.ts`**: `createMockupFx(root)` → `cursorTo(el)`, `cursorAt(x, y)`, `click()`, `toast(text, tone)`, `burst(el)` (confetti in the five product colours); `bindHoverHold(root, fx, onHold)` pauses a demo while the pointer is over it. All no-ops under reduced motion. No shadows anywhere (toast is a flat ink pill; cursor has a `--bg` stroke).
-- **Per mockup**: the cursor visits what is about to change and clicks it; milestones toast; completions burst. Each has one hands-on interaction: Practice, click a card to advance it (moves are serialised with the loop); Verifi, the score card re-runs the checks; Match, rows are buttons that match that row; Modifi, "Click to sign" jumps to signing and the cursor traces the signature path; Docs, click a file to re-run OCR. Clicking releases the hover hold.
+- **Per mockup**: the cursor visits what is about to change and clicks it; milestones toast; completions burst. Each has one hands-on interaction: Practice, click a card to advance it (moves are serialised with the loop); Verifi, the score card re-runs the checks; Match, rows are buttons that match that row; Docs, click a file to re-run OCR. Clicking releases the hover hold.
 - The homepage showcase also holds its 7s product rotation while the pointer is over the mockup.
 All five share `MockupShell`: a `WindowFrame` (dots, title pill, optional `action` slot) plus a meta-chip toolbar on an `bg-elevated` desk. They take `{ paused?, className? }`, and pausing holds the loop. All are static under reduced motion.
 
@@ -350,7 +348,6 @@ All five share `MockupShell`: a `WindowFrame` (dots, title pill, optional `actio
 | `KanbanBoard` | Practice | **GSAP Flip**, transform-only (`absolute`, `scale: true`, `prune`) | 3 columns (2 on phones). Cards lift (`scale 1.02`, no shadow), fly to the top of the target column, counts update, then the moves replay in reverse. In-flight animation is finished on cleanup. |
 | `VerifiValidator` | Verifi | GSAP timeline `repeat -1` | Checks go pending, then running, then pass or flag. A score ring and counter tween. |
 | `MatchEngine` | Match | GSAP timeline | For each register row, SVG links draw to Invoice, PO and GRN, and results stamp. |
-| `ModifiFlow` | Modifi | GSAP timeline | Placeholders fill, approval stepper advances, signature path draws, "Signed" pops |
 | `DocsPipeline` | Docs | **GSAP Flip** plus a scan sweep | Files move from intake to processing (OCR sweep, tags), then route to Finance or Legal, then reset |
 
 `product-showcases.tsx` maps each slug to its component and caption label. `HeroShowcase` (home) stacks all five, and `ProductShowcase` (product hero) renders one.
@@ -361,7 +358,7 @@ All five share `MockupShell`: a `WindowFrame` (dots, title pill, optional `actio
 
 ### 9.4 Navigation (Workspace-style, 2026-10-15)
 - **One global header, every route** (`layout/site-header.tsx`): Praszo logo · Products ▾ · Solutions ▾ · Why Praszo · Resources ▾ · Contact · coral "Book a demo". It never changes per route: no product lockup, no product colour, no product sections. The GSAP nav pill (`useNavFollower`) highlights the item with `aria-current` (a menu trigger is current when the route is one of its links).
-- **Data** (`data/navigation.ts`): `productGroups` (Manage: Practice · Prepare and sign: Modifi, Docs · AI audit checks: Match, Verifi), `productMenuLinks` (Praszo OS overview `/`, See the workflow `/#workflow`, All products `/#products`), `solutionLinks`, `resourceLinks`, `globalLinks`. Desktop menus and the mobile menu read only this (plus `data/products.ts` for names, glyphs, taglines). `primaryNav` was removed.
+- **Data** (`data/navigation.ts`): `productGroups` (Manage: Practice · Prepare: Docs · AI audit checks: Match, Verifi), `productMenuLinks` (Praszo OS overview `/`, See the workflow `/#workflow`, All products `/#products`), `solutionLinks`, `resourceLinks`, `globalLinks`. Desktop menus and the mobile menu read only this (plus `data/products.ts` for names, glyphs, taglines). `primaryNav` was removed.
 - **Menus** (`layout/nav-dropdown.tsx`): `NavDropdown` (hover intent on fine pointers, click/keyboard, Escape returns focus, outside click and route change close, always mounted with a CSS transition, `inert` while closed, centred under the pill with `min(width, 100vw - 2.5rem)` so it fits from 1024px). `ProductsMenu` (grouped mega menu) and `LinkMenu` (Solutions, Resources) are thin wrappers.
 - **Product hero + section pill** (Workspace product-page pattern, 2026-10-15). `ProductPage` renders both for every product, so route files no longer include the hero. `ProductHero` (`product/product-hero.tsx`) is minimal: the product identity (glyph + "Praszo X") appears once, above the headline, then the description (both **at most two lines**: short `hero.headline` and `hero.description` in `data/products.ts`, and a fluid headline size `clamp(1.85rem, 1.1rem + 3.3vw, 3.5rem)` / `min(3.6vw, 3.5rem, 7.5svh)` on desktop, verified at 1440/1280/1024/768/390), "See the features" and the workflow-step link; the live mockup sits on the right. Columns are near-equal (`1fr / 1.05fr`) on desktop. The mockup is **frameless** in product heroes: `ProductShowcase` wraps it in `MockupFrameProvider value="bare"`, so `MockupShell` drops the `WindowFrame` (no window bar, border or box) and draws a soft product-tinted wash whose edges fade out (mask on the background layer only); the title becomes the first chip and the theme toggle ends the chip row. **Dark mode (bare):** no dark fill (it read as a smudge on the light page); the dark cards sit on a faint product glow, and the toast switches to a dark pill (`dark:group-data-[frame=bare]/shell:bg-elevated`). Card-level backgrounds in hero mockups must be opaque (e.g. Verifi's flagged row is `color-mix(in srgb, var(--accent) 14%, var(--bg))`), because there is no desk behind them in this mode. The homepage showcase keeps the window frame (default `"window"`). `useHeroScroll(rootRef, { visualMedia: "(min-width: 1024px)" })` stops the mockup rising into the copy when the hero stacks. `ProductSubNav` (`product/product-sub-nav.tsx`) is a floating pill of the page's sections (data: `data/product-sections.ts`) directly under the hero, **in the page flow, not sticky**; the current tab gets the header's GSAP pill highlight (`useNavFollower`). **Header section menu** (`layout/product-section-menu.tsx`, rendered by the global header next to the logo on product routes only): no background, product glyph + "Praszo X" + current section + chevron (glyph only below `sm`), opening a **mega menu** via `NavDropdown align="start"` (36rem, two columns from `sm`): "On this page" sections on the left, and every Praszo product on the right via `ProductGroupLinks variant="compact"` (shared with the Products menu, current product marked). Two GSAP layers on the Lenis loop: the **inner layer is scrubbed to the in-page pill** (ScrollTrigger on `[data-product-subnav]`, `top top+=170` → `top top+=8`, scrub 0.6): as the pill rises toward the header it shrinks, lifts and fades while the menu grows in from the left, reversing on the way back, and the menu is inert below 60% progress. The **outer layer follows the header**: on `HEADER_EVENT` it eases its x into the logo's place (0.7s `power3.inOut`) while cancelling the header's vertical slide every frame (reads the header's `yPercent`/`y`), so it stays on screen when the header hides (measured 0px vertical drift) and glides back beside the logo when the header returns. `useHeaderReveal` dispatches `HEADER_EVENT` after creating its tween, so listeners see the new transform immediately under reduced motion. Both use `useSectionSpy` (the header one against the visible `<main>`, `keepLast`) and `scrollToSection` (offset 88px).
 - **Scroll choreography.** `useHeaderReveal` hides and shows the header (and fires `HEADER_EVENT`); nothing else on product pages is sticky. An open section menu keeps the header shown (it reports `aria-expanded`). Verified at 1440/1280/1024/768/390.
@@ -390,7 +387,7 @@ All five share `MockupShell`: a `WindowFrame` (dots, title pill, optional `actio
 - **Per-route metadata.** `buildMetadata({ title, description, path })` on every page gives a unique title and description, canonical, Open Graph and Twitter.
 - **Structured data.** Organization JSON-LD in `layout.tsx`, SoftwareApplication per product (`ProductPage`) and FAQPage (`FaqSection`).
 - **OG images.** Route-level `opengraph-image.tsx` files call `renderOg()`.
-- **Crawl files.** `sitemap.ts` covers the 7 routes with a fixed `lastModified`. `robots.ts` is the default.
+- **Crawl files.** `sitemap.ts` covers every route with a fixed `lastModified`. `robots.ts` is the default.
 - **Icons.** `icon.png` and `apple-icon.png` come from the Praszo mark.
 
 ---

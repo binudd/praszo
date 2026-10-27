@@ -68,7 +68,7 @@ export const home = {
   },
   ecosystem: {
     eyebrow: "Our products",
-    title: "Five specialized engines",
+    title: "Four specialized engines",
     description:
       "Each Praszo product can be used on its own. Together, they form a complete operating cycle for audit firms.",
   },
@@ -89,7 +89,7 @@ export const home = {
       {
         title: "Larger audit firms",
         subtitle: "Enterprise control. Absolute data security. Scalable governance.",
-        body: "Large firms rely on multiple systems to handle engagement letters, document control, reconciliation, and financial validation. Praszo replaces fragmentation with one connected operating cycle.",
+        body: "Large firms rely on multiple systems to handle document control, reconciliation, and financial validation. Praszo replaces fragmentation with one connected operating cycle.",
         points: [
           "Operational discipline through structured workflows and real-time oversight",
           "Revenue assurance by linking time tracking directly to tasks and budgets",
@@ -166,8 +166,8 @@ export const home = {
         a: "Praszo is a set of auditing practice management tools designed exclusively for audit firms that require strong compliance, data security, and operational control.",
       },
       {
-        q: "What are the five products in Praszo OS?",
-        a: "Praszo OS includes Praszo Practice, Praszo Verifi, Praszo Match, Praszo Modifi, and Praszo Docs, each designed to support a critical stage of the audit lifecycle.",
+        q: "What are the four products in Praszo OS?",
+        a: "Praszo OS includes Praszo Practice, Praszo Verifi, Praszo Match, and Praszo Docs, each designed to support a critical stage of the audit lifecycle.",
       },
       {
         q: "Can Praszo be deployed on-premise?",

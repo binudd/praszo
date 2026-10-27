@@ -12,8 +12,7 @@ const tones: Record<Tone, string> = {
 };
 
 /**
- * Section kicker. Instead of a dot it carries a hand-drawn pen underline (the same loose stroke as
- * the Modifi signature) that draws itself while the kicker's block is hovered; see .eyebrow in
+ * Section kicker. Instead of a dot it carries a hand-drawn pen underline that draws itself while the kicker's block is hovered; see .eyebrow in
  * globals.css. Shown drawn on touch screens, where there is no hover.
  */
 export function Eyebrow({

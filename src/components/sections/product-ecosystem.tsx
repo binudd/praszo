@@ -36,7 +36,7 @@ function ProductPoster({ product, className }: { product: Product; className?: s
   const Mockup = visual.kind === "mockup" ? mockups[visual.id] : null;
   // Every text layer must reach WCAG AA (4.5:1) on the poster surface:
   // - white on the product colour when it passes (Practice 7.06, Docs 4.88);
-  // - otherwise white on the product's deep shade when that passes (Modifi: #2874ff 4.17 -> #1f5fd6 5.73);
+  // - otherwise white on the product's deep shade when that passes;
   // - otherwise dark ink on the product colour (Verifi 7.29, Match 8.34).
   const whiteOnColor = whiteContrast(product.color) >= 4.5;
   const useDeep = !whiteOnColor && whiteContrast(product.colorDeep) >= 4.5;

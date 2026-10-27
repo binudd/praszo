@@ -152,8 +152,8 @@
   }
 
   /* Section kicker with a hand-drawn underline (Eyebrow). The pen stroke draws itself while the
-     kicker's block (its parent: kicker + heading + intro) is hovered, using the same stroke-reveal
-     as the Modifi signature, and retracts on leave. CSS only. */
+     kicker's block (its parent: kicker + heading + intro) is hovered, using a stroke-reveal,
+     and retracts on leave. CSS only. */
   .eyebrow {
     position: relative;
   }
