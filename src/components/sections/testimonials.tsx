@@ -27,7 +27,9 @@ export function Testimonials() {
             </span>
             <span>
               <span className="copy block font-semibold text-ink">{item.name}</span>
-              <span className="label mt-1 block text-ink-3">{item.role}</span>
+              <span className="label mt-1 block text-ink-3">
+                {item.role}, <span className="text-brand-strong">{item.company}</span>
+              </span>
             </span>
           </figcaption>
         </HorizontalCard>

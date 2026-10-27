@@ -134,24 +134,28 @@ export const home = {
           "Our workflows are now structured, consistent, and fully traceable across teams, reducing review delays and improving audit readiness.",
         name: "John Varghese",
         role: "Managing Partner",
+        company: "HLB HAMT",
       },
       {
         quote:
           "Praszo centralizes tasks, documents, and billing, giving us better control over deadlines, productivity, and profitability.",
         name: "Sojen Manjila",
         role: "Managing Partner",
+        company: "Carvy Consultants",
       },
       {
         quote:
           "With controlled approvals and complete audit trails, we approach regulatory reviews with confidence and clarity.",
         name: "Venugopal P.T",
         role: "CEO",
+        company: "Buchprufer",
       },
       {
         quote:
           "As we grew, the platform standardized our processes without adding complexity, keeping our teams aligned and efficient.",
         name: "Jay Krishnan",
         role: "Managing Partner",
+        company: "HLB HAMT",
       },
     ],
   },
