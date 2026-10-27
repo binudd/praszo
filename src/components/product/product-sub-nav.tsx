@@ -65,7 +65,7 @@ export function ProductSubNav({ product }: { product: Product }) {
   };
 
   return (
-    <div ref={barRef} data-product-subnav className="relative z-10 flex justify-center px-5 md:px-8">
+    <div ref={barRef} data-product-subnav className="relative z-10 flex justify-center px-5 pb-16 md:px-8 md:pb-24">
       <nav aria-label={`${product.fullName} sections`} className="menu-panel max-w-full rounded-full p-1.5">
         <ul
           ref={listRef}
