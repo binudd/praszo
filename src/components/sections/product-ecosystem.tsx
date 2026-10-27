@@ -16,55 +16,33 @@ import { home } from "@/data/home";
 import { productList, type Product } from "@/data/products";
 import { cn } from "@/lib/cn";
 
-/** WCAG contrast of white text on a hex color. */
-function whiteContrast(hex: string) {
-  const channel = (i: number) => {
-    const v = parseInt(hex.slice(i, i + 2), 16) / 255;
-    return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4;
-  };
-  const luminance = 0.2126 * channel(1) + 0.7152 * channel(3) + 0.0722 * channel(5);
-  return 1.05 / (luminance + 0.05);
-}
-
 function productStyle(product: Product) {
   return { "--product": product.color, "--product-deep": product.colorDeep } as CSSProperties;
 }
 
-/** Poster card filled with the product color: glyph, name and a cropped interface preview. */
+/**
+ * Poster card on the same soft surface for every product: glyph, name and a cropped interface preview.
+ * The product color lives in the glyph (and in the preview), not in the card fill.
+ */
 function ProductPoster({ product, className }: { product: Product; className?: string }) {
   const visual = product.hero.visual;
   const Mockup = visual.kind === "mockup" ? mockups[visual.id] : null;
-  // Every text layer must reach WCAG AA (4.5:1) on the poster surface:
-  // - white on the product colour when it passes (Practice 7.06, Docs 4.88);
-  // - otherwise white on the product's deep shade when that passes;
-  // - otherwise dark ink on the product colour (Verifi 7.29, Match 8.34).
-  const whiteOnColor = whiteContrast(product.color) >= 4.5;
-  const useDeep = !whiteOnColor && whiteContrast(product.colorDeep) >= 4.5;
-  const light = !whiteOnColor && !useDeep;
   return (
-    <div
-      style={productStyle(product)}
-      className={cn(
-        "flex flex-col overflow-hidden rounded-media",
-        useDeep ? "bg-product-deep" : "bg-product",
-        light ? "text-ink" : "text-white",
-        className,
-      )}
-    >
+    <div style={productStyle(product)} className={cn("flex flex-col overflow-hidden rounded-media bg-surface text-ink", className)}>
       <div className="flex items-center justify-between gap-4 px-6 pt-6">
         <span className="inline-flex items-center gap-3">
           <ProductGlyph slug={product.slug} size={44} />
           <span className="flex flex-col leading-none">
-            <span className="text-[11px] font-semibold">Praszo</span>
+            <span className="text-[11px] font-semibold text-ink-3">Praszo</span>
             <span className="mt-1 text-xl font-bold tracking-[-0.02em]">{product.name}</span>
           </span>
         </span>
-        <Badge className={cn("hidden border-transparent sm:inline-flex", light ? "bg-black/10 text-ink" : "bg-black/15 text-white")}>
+        <Badge className="hidden border-transparent bg-elevated text-ink-2 sm:inline-flex">
           {product.category}
         </Badge>
       </div>
-      <p className="px-6 pt-4 pb-5 text-[15px] leading-relaxed">{product.tagline}</p>
-      <div className="relative min-h-[14rem] flex-1 overflow-hidden bg-black/10 px-6 pt-5">
+      <p className="px-6 pt-4 pb-5 text-[15px] leading-relaxed text-ink-2">{product.tagline}</p>
+      <div className="relative min-h-[14rem] flex-1 overflow-hidden bg-elevated px-6 pt-5">
         <div data-poster-preview className={cn("absolute inset-x-6 top-5 bottom-0 overflow-hidden rounded-t-xl text-ink", visual.kind === "image" && "bg-white")}>
           {visual.kind === "image" ? (
             <Image src={visual.src} alt="" aria-hidden sizes="560px" className="h-full w-full object-cover object-left-top" />
