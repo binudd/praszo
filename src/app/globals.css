@@ -177,11 +177,12 @@
     stroke-linejoin: round;
     /* Gap longer than the path: with an equal gap the round cap of the next dash shows as a dot at rest. */
     stroke-dasharray: 1 2;
-    stroke-dashoffset: 1;
+    /* Drawn by default (was 1: hidden until hover). */
+    stroke-dashoffset: 0;
     transition: stroke-dashoffset 0.35s var(--ease-out);
   }
 
-  :where(*:has(> .eyebrow)):hover > .eyebrow .eyebrow-scribble path,
+  :where(*:has(> .eyebrow)) > .eyebrow .eyebrow-scribble path,
   .eyebrow:hover .eyebrow-scribble path {
     stroke-dashoffset: 0;
     transition: stroke-dashoffset 0.8s cubic-bezier(0.65, 0, 0.35, 1);

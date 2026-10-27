@@ -3,6 +3,7 @@ import { ArrowRight, CircleCheck, Phone } from "lucide-react";
 import { RevealBlock, RevealHeading } from "@/components/motion/reveal";
 import { Button } from "@/components/ui/button";
 import { Container } from "@/components/ui/container";
+import { Eyebrow } from "@/components/ui/eyebrow";
 import { company, demoCta } from "@/data/company";
 
 type Props = {
@@ -21,7 +22,7 @@ export function FinalCta({ title, subtitle, body, bullets, tone = "brand", id = 
     <section data-theme="dark" aria-labelledby={`${id}-title`} className="relative overflow-hidden py-28 md:py-40">
       <div className="dot-field" aria-hidden />
       <Container className="relative text-center">
-        {subtitle ? <p className="label text-brand-strong">{subtitle}</p> : null}
+        {subtitle ? <Eyebrow>{subtitle}</Eyebrow> : null}
         <h2 id={`${id}-title`} className="display-lg mx-auto mt-5 max-w-[14ch] text-ink">
           <RevealHeading>{title}</RevealHeading>
         </h2>
