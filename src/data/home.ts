@@ -74,7 +74,7 @@ export const home = {
   },
   workflow: {
     eyebrow: "The complete audit firm workflow",
-    title: "From client raw data to a validated audit file",
+    title: "From Raw Data to Audit File",
     description: "Unified compliance and operational intelligence for high-performance firms.",
     start: {
       label: "Client raw data",
