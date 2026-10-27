@@ -13,12 +13,14 @@
    * Brand: the coral of the Praszo logo mark is the primary color.
    * --brand is the exact logo color, for fills, rules, icons and large display text
    * (3.0:1 on white, enough for graphics and large text).
-   * --brand-strong is the same coral deepened for small text: 5.3:1 on white, 4.7:1 on --brand-soft.
+   * --brand-strong is the coral used for small text (kickers, badges, links). On 2026-10-27 the user chose
+   * the exact logo color for it so every coral matches the logo, accepting 3.0:1 on white (below AA
+   * 4.5:1 for normal-size text); it was #b04c35 (5.3:1) before.
    * --brand-ink is the label color on --brand fills: white, matching the product page buttons
    * (chosen by the user on 2026-10-15; 3.0:1, below AA 4.5:1 for normal-size text).
    */
   --brand: #f46a4a;
-  --brand-strong: #b04c35;
+  --brand-strong: #f46a4a;
   --brand-hover: #e2583a;
   --brand-soft: #fef0ed;
   --brand-ink: #ffffff;
@@ -76,7 +78,7 @@
   --line-strong: rgba(255, 255, 255, 0.2);
   /* Logo coral reads at 6.2:1 on the dark background, so text can use it too. */
   --brand: #f46a4a;
-  --brand-strong: #ff8a70;
+  --brand-strong: #f46a4a;
   --brand-hover: #e2583a;
   --brand-soft: rgba(244, 106, 74, 0.14);
   --accent: #ff7d68;
@@ -107,7 +109,7 @@
   --line: #e3e8ee;
   --line-strong: #cbd5e1;
   --brand: #f46a4a;
-  --brand-strong: #b04c35;
+  --brand-strong: #f46a4a;
   --brand-hover: #e2583a;
   --brand-soft: #fef0ed;
   --accent: #f55d48;
