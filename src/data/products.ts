@@ -25,8 +25,12 @@ export type Visual =
       alt: string;
       /** "browser" wraps the image in window chrome; "none" when the capture already has it. */
       frame?: "browser" | "none";
+      /** Visible caption in the screenshot rail: what the screen does for the firm. Falls back to alt. */
+      caption?: string;
+      /** Card title in the screenshot rail when this is the hero capture (defaults to "Overview"). */
+      screenTitle?: string;
     }
-  | { kind: "mockup"; id: MockupId; alt: string };
+  | { kind: "mockup"; id: MockupId; alt: string; caption?: string; screenTitle?: string };
 
 export type FeatureItem = { name: string; description?: string; icon: IconName };
 
@@ -126,6 +130,8 @@ const practice: Product = {
       src: practiceBoard,
       alt: "Praszo Practice project kanban board with Not Started, Completed, and In Progress columns, task estimates, logged hours, due dates, and dependencies",
       frame: "none",
+      screenTitle: "Engagement board",
+      caption: "Each engagement as a board: estimated vs logged hours, due dates, owners, and blockers on every card.",
     },
   },
   problem: {
@@ -137,19 +143,19 @@ const practice: Product = {
   screens: [
     {
       title: "Project details",
-      visual: { kind: "image", src: practiceProject, alt: "Praszo Practice project details with people and organization, category, schedule, and budget versus actual hours flagged over budget", frame: "none" },
+      visual: { kind: "image", src: practiceProject, alt: "Praszo Practice project details with people and organization, category, schedule, and budget versus actual hours flagged over budget", frame: "none", caption: "Client, team, schedule, and budget vs actual on one page, flagged the moment it runs over budget." },
     },
     {
       title: "My work",
-      visual: { kind: "image", src: practiceMyWork, alt: "Praszo Practice My Work view listing a team member's overdue tasks with status, due dates, and logged versus estimated hours", frame: "none" },
+      visual: { kind: "image", src: practiceMyWork, alt: "Praszo Practice My Work view listing a team member's overdue tasks with status, due dates, and logged versus estimated hours", frame: "none", caption: "Each person's tasks split into today, upcoming, and overdue, with hours logged vs estimated." },
     },
     {
       title: "Weekly timesheet",
-      visual: { kind: "image", src: practiceTimesheetWeek, alt: "Praszo Practice weekly timesheet grouped by member and project, with daily hours and a grand total", frame: "none" },
+      visual: { kind: "image", src: practiceTimesheetWeek, alt: "Praszo Practice weekly timesheet grouped by member and project, with daily hours and a grand total", frame: "none", caption: "The week's hours by member, project, and task, with daily totals and timesheet approvals." },
     },
     {
       title: "Project setup",
-      visual: { kind: "image", src: practiceEditProject, alt: "Praszo Practice edit project form with template, leader, owner, members, kanban task statuses, and priority", frame: "none" },
+      visual: { kind: "image", src: practiceEditProject, alt: "Praszo Practice edit project form with template, leader, owner, members, kanban task statuses, and priority", frame: "none", caption: "Start from a firm template, assign the team, and choose the board columns and priority." },
     },
   ],
   featureSections: [
@@ -165,10 +171,10 @@ const practice: Product = {
           description: "Plan, structure, and execute audit engagements effortlessly.",
           icon: "Kanban",
           items: [
-            { name: "Kanban boards", icon: "Kanban" },
-            { name: "Recurring tasks", icon: "Repeat" },
-            { name: "Multi-level approvals", icon: "CheckCheck" },
-            { name: "Workflow automation", icon: "Workflow" },
+            { name: "Kanban boards", description: "Columns you choose per project, from Not Started to Review by Client.", icon: "Kanban" },
+            { name: "Recurring tasks", description: "Monthly, quarterly, and annual work is created automatically.", icon: "Repeat" },
+            { name: "Multi-level approvals", description: "Timesheets and requests are approved before they reach budgets and billing.", icon: "CheckCheck" },
+            { name: "Workflow automation", description: "Rules take care of repeat steps, so work moves without manual follow-up.", icon: "Workflow" },
           ],
         },
         {
@@ -176,9 +182,9 @@ const practice: Product = {
           description: "Maintain financial visibility and precise control across every active engagement.",
           icon: "Wallet",
           items: [
-            { name: "Budget time tracking", description: "Log mandatory hours", icon: "Clock" },
-            { name: "WIP & budget vs actual", description: "Real-time profitability", icon: "Gauge" },
-            { name: "Expense & rate cards", description: "Automated billing flows", icon: "Receipt" },
+            { name: "Budget time tracking", description: "Hours are logged against each task and counted against the project budget.", icon: "Clock" },
+            { name: "WIP & budget vs actual", description: "Real-time profitability: budget and actual side by side, with an over-budget flag.", icon: "Gauge" },
+            { name: "Expense & rate cards", description: "Expenses and rates flow into estimates and invoices automatically.", icon: "Receipt" },
           ],
         },
         {
@@ -186,9 +192,9 @@ const practice: Product = {
           description: "Keep teams and clients aligned in real time.",
           icon: "Users",
           items: [
-            { name: "Custom branding", icon: "PenTool" },
-            { name: "Project chat", icon: "MessageSquare" },
-            { name: "Secure docs", icon: "Lock" },
+            { name: "Custom branding", description: "Clients see a portal in your firm's brand.", icon: "PenTool" },
+            { name: "Project chat", description: "Discussion, chat, and mail live with the project, not in inboxes.", icon: "MessageSquare" },
+            { name: "Secure docs", description: "Files and notes are stored with the engagement, behind access control.", icon: "Lock" },
           ],
         },
         {
@@ -196,9 +202,9 @@ const practice: Product = {
           description: "Accountability and strict access control.",
           icon: "ShieldCheck",
           items: [
-            { name: "Immutable audit trails", icon: "FileCheck" },
-            { name: "RBAC access matrix", icon: "KeyRound" },
-            { name: "Secure API integrations", icon: "Link2" },
+            { name: "Immutable audit trails", description: "Every change is logged with who made it and when.", icon: "FileCheck" },
+            { name: "RBAC access matrix", description: "Granular role-based permissions decide who sees and changes what.", icon: "KeyRound" },
+            { name: "Secure API integrations", description: "Connect Practice to your firm's other systems over secured APIs.", icon: "Link2" },
           ],
         },
         {
@@ -207,10 +213,10 @@ const practice: Product = {
             "Ensure balanced workloads and optimal staff utilisation across engagements. Monitor health, prevent burnout, and maximize efficiency.",
           icon: "UsersRound",
           items: [
-            { name: "Role dashboards", icon: "ChartBar" },
-            { name: "Allocation matrix", icon: "Table" },
-            { name: "Utilization reports", icon: "TrendingUp" },
-            { name: "Live roster health", icon: "Activity" },
+            { name: "Role dashboards", description: "Utilization, overdue work, and approvals for each role at a glance.", icon: "ChartBar" },
+            { name: "Allocation matrix", description: "Who is on which engagement, so over-allocation shows before it happens.", icon: "Table" },
+            { name: "Utilization reports", description: "Utilization by person and team, to balance workloads.", icon: "TrendingUp" },
+            { name: "Live roster health", description: "Overloaded staff are flagged live, before burnout sets in.", icon: "Activity" },
           ],
         },
       ],
@@ -220,7 +226,7 @@ const practice: Product = {
       eyebrow: "Built to scale",
       title: "Features growing audit firms will love",
       description:
-        "One platform, zero compromises. As engagements, staff, deadlines, and compliance pressure grow, Practice gives your firm a structured operating layer for engagements, people, budgets, billing, and approvals.",
+        "One platform, zero compromises. The firm-wide controls that keep standards, margins, and billing intact as you grow from a handful of engagements to hundreds.",
       groups: [
         {
           title: "Scale features",
@@ -233,25 +239,15 @@ const practice: Product = {
               icon: "Gauge",
             },
             {
+              name: "Every project in one list",
+              description: "Search the whole portfolio and see each engagement's progress at a glance, however many you run.",
+              icon: "FolderKanban",
+            },
+            {
               name: "Standardized project templates",
               description:
                 "Reusable engagement templates ensure every audit follows a consistent, controlled workflow as your team expands.",
               icon: "FileStack",
-            },
-            {
-              name: "Recurring engagement automation",
-              description: "Automatically generate monthly, quarterly, and annual projects without manual setup or follow-ups.",
-              icon: "CalendarClock",
-            },
-            {
-              name: "Budget vs actual monitoring",
-              description: "Track project hours against budget in real time and receive proactive alerts before margins are impacted.",
-              icon: "ChartBar",
-            },
-            {
-              name: "Workload & capacity planning",
-              description: "Visualize team availability, prevent over-allocation, and plan hiring based on actual workload forecasts.",
-              icon: "UsersRound",
             },
             {
               name: "Structured timesheet enforcement",
@@ -267,16 +263,6 @@ const practice: Product = {
               name: "Realization & revenue tracking",
               description: "Measure billed vs. collected revenue and reduce write-offs with controlled billing workflows.",
               icon: "Receipt",
-            },
-            {
-              name: "Role-based access & audit trails",
-              description: "Granular permissions and automatic activity logs keep your firm inspection-ready at all times.",
-              icon: "ShieldCheck",
-            },
-            {
-              name: "Mobile audit management",
-              description: "Capture time, update tasks, and approve work instantly, even outside the office.",
-              icon: "Smartphone",
             },
           ],
         },

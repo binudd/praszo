@@ -17,7 +17,7 @@ import type { Product, Screen } from "@/data/products";
 /** Hero capture first, then each spotlight capture, then extra screens; duplicates dropped. */
 function screensFor(product: Product): Screen[] {
   const all: Screen[] = [
-    { title: "Overview", visual: product.hero.visual },
+    { title: product.hero.visual.screenTitle ?? "Overview", visual: product.hero.visual },
     ...product.spotlights.map((spotlight) => ({ title: spotlight.title, visual: spotlight.visual })),
     ...(product.screens ?? []),
   ];
@@ -60,7 +60,7 @@ function ScreenCard({ screen, index }: { screen: Screen; index: number }) {
         <span className="label mt-0.5 shrink-0 text-ink-3">{String(index + 1).padStart(2, "0")}</span>
         <span className="min-w-0">
           <span className="heading block text-ink">{screen.title}</span>
-          <span className="copy mt-1 line-clamp-2 text-ink-3">{visual.alt}</span>
+          <span className="copy mt-1 line-clamp-3 text-ink-3">{visual.caption ?? visual.alt}</span>
         </span>
       </div>
     </HorizontalCard>
