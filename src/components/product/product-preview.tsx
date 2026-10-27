@@ -14,7 +14,10 @@ import { Eyebrow } from "@/components/ui/eyebrow";
 import { demoCta } from "@/data/company";
 import type { Product, Screen } from "@/data/products";
 
-/** Hero capture first, then each spotlight capture, then extra screens; duplicates dropped. */
+/**
+ * Hero capture first, then each spotlight capture, then extra screens; duplicates dropped. Hand-built
+ * mockups are illustrations, not captures, so they are left out whenever the product has a real one.
+ */
 function screensFor(product: Product): Screen[] {
   const all: Screen[] = [
     { title: product.hero.visual.screenTitle ?? "Overview", visual: product.hero.visual },
@@ -22,12 +25,14 @@ function screensFor(product: Product): Screen[] {
     ...(product.screens ?? []),
   ];
   const seen = new Set<string>();
-  return all.filter(({ visual }) => {
+  const unique = all.filter(({ visual }) => {
     const key = visual.kind === "image" ? visual.src.src : visual.id;
     if (seen.has(key)) return false;
     seen.add(key);
     return true;
   });
+  const captures = unique.filter(({ visual }) => visual.kind === "image");
+  return captures.length ? captures : unique;
 }
 
 function ScreenCard({ screen, index }: { screen: Screen; index: number }) {
@@ -92,6 +97,7 @@ export function ProductPreview({ product }: { product: Product }) {
   const screens = screensFor(product);
 
   if (screens.length < 2) {
+    const visual = screens[0]?.visual ?? product.hero.visual;
     return (
       <section id={id} aria-labelledby={`${id}-title`} className="pb-24 md:pb-32">
         <Container>
@@ -104,9 +110,9 @@ export function ProductPreview({ product }: { product: Product }) {
             </h2>
           </RevealBlock>
           <ClipReveal className="mt-10">
-            <ProductVisual visual={product.hero.visual} sizes="(min-width: 1024px) 86rem, 100vw" />
+            <ProductVisual visual={visual} sizes="(min-width: 1024px) 86rem, 100vw" />
           </ClipReveal>
-          <p className="copy mt-4 text-center text-ink-3">{product.hero.visual.alt}</p>
+          <p className="copy mt-4 text-center text-ink-3">{visual.caption ?? visual.alt}</p>
         </Container>
       </section>
     );

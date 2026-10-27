@@ -12,7 +12,7 @@ The corporate site for **Praszo** (praszo.com), an on-premise practice-managemen
 |---|---|---|
 | `/` | Corporate homepage | Brand coral `#f46a4a` (logo) |
 | `/practice` | Praszo Practice (practice management, the core engine) | `#5539d9` |
-| `/verifi` | Praszo Verifi (AI financial statement validation) | `#17b978` |
+| `/verifi` | Praszo Verifi (automated financial statement verification) | `#17b978` |
 | `/match` | Praszo Match (AI purchase vouching, 3-way matching) | `#fb9528` |
 | `/docs` | Praszo Docs (on-premise document management) | `#d72d2d` |
 | `/contact` | Contact and "Book a demo" | Brand coral |
@@ -122,7 +122,7 @@ The data layer drives the pages, and content edits should rarely need component 
   - **Workflow and SEO:** `workflowStep` (order and label in the 6-step workflow) and `meta` (SEO).
   - **Hero:** `hero` (eyebrow, headline, description, `visual`).
   - **Section content:** `highlights?`, `problem?`, `spotlights[]`, `screens?`, `featureSections[]`, `comparison?`, `workflow?`, `audience?`, `faq[]`, `cta`.
-- **`Visual`** is either `{ kind: "image", src, alt, frame? }` or `{ kind: "mockup", id }`. Mockup ids resolve through `components/mockups/registry.tsx` (static mockups: `docs-repository`, `verifi-report`, `match-three-way`).
+- **`Visual`** is either `{ kind: "image", src, alt, frame?, caption?, screenTitle? }` or `{ kind: "mockup", id, alt, caption?, screenTitle? }`. `caption` is the visible text under a card in the screenshot rail (falls back to `alt`, which stays the screen-reader description); `screenTitle` names the hero capture's card (default "Overview"). Mockup ids resolve through `components/mockups/registry.tsx` (static mockups: `docs-repository`, `verifi-report`, `match-three-way`).
 - **`screens?`** holds extra captures for the screenshot rail after the hero. The rail always starts with `hero.visual` and then every spotlight visual, with duplicates dropped. Practice uses five real app captures.
 - **Product color scoping.**
   - `ProductPage` sets `--product` and `--product-deep` inline on `<main data-product>`.
@@ -296,12 +296,12 @@ Every page is wrapped by `ProductPage`, which provides the product color scope, 
 
 | Section | Component | Animation | Practice | Verifi | Match | Docs |
 |---|---|---|---|---|---|---|
-| Hero (`<slug>-overview`) | `ProductHero` → `HeroShell` + `ProductShowcase` | Same shell as home: product mockup, word entrance, scroll depth, step pill linking to the home workflow | ✓ | ✓ | ✓ | ✓ |
-| Screenshot rail (`<slug>-preview`) | `ProductPreview` | `HorizontalScroll` of framed captures (`WindowFrame` chrome, one shared height). Falls back to one full-width `ClipReveal` image when only one capture exists (Docs). | ✓ (5 screens) | ✓ | ✓ | single |
-| Highlights | `ProductHighlights` | `RevealGroup` | | | ✓ | ✓ |
-| Problem statement | `ProductProblem` → `Statement` | Scrubbed word reveal with pain-point chips | ✓ | ✓ | | |
+| Hero (`<slug>-overview`) | `ProductHero` → `HeroShell` + `ProductShowcase` | Same shell as home: product mockup, word entrance, scroll depth | ✓ | ✓ | ✓ | ✓ |
+| Screenshot rail (`<slug>-preview`) | `ProductPreview` | `HorizontalScroll` of framed captures (`WindowFrame` chrome, one shared height). Real captures only: hand-built mockups are dropped whenever the product has at least one image. Falls back to one full-width `ClipReveal` visual when only one remains (Verifi, Match, Docs). | ✓ (5 screens) | single | single | single |
+| Highlights (`<slug>-highlights`) | `ProductHighlights` | `RevealGroup`; 3 columns, or 2 when there are 4 items | | ✓ | ✓ | ✓ |
+| Problem statement (`<slug>-problem`), first section after the hero on every product page | `ProductProblem` → `Statement` | Scrubbed word reveal with pain-point chips | ✓ | ✓ | ✓ | ✓ |
 | Spotlights (`<slug>-spotlights`) | `ProductSpotlights` | `useScene` (`count*110+40` svh). Tabs, copy crossfade, visual cards slide and scale. Mobile: alternating rows with `ClipReveal`. | | ✓ | ✓ | |
-| Feature section(s) (`<slug>-<sectionId>`) | `ProductFeatureGrid` | A single group renders as a **dark `HorizontalScroll` rail** of icon cards. Multiple groups (Practice 5) render as **`ProductFeatureGroups`**, a sticky `useScene` scene (`count*90+40` svh, same primitives as the homepage products scene): left, eyebrow + title + the groups as numbered tabs with a product-coloured progress line (`[data-feature-progress]` scaleY); right, one panel per group crossfading (`applySceneItems`) with icon, title, description and features that stagger in via CSS (`.feature-scene.is-ready .is-current .feature-row`, `--i` × 70ms). Tabs jump with `scrollToSceneStep`. Below 1024px / reduced motion: the editorial grouped list (`RevealGroup`) is the stacked fallback; its heading has no id (the scene heading owns `<id>-title`). | ✓ ×2 | ✓ | ✓ | ✓ |
+| Feature section(s) (`<slug>-<sectionId>`) | `ProductFeatureGrid` | A single group renders as a **dark `HorizontalScroll` rail** of icon cards. Multiple groups (Practice 5, Verifi 4 engines, Match 3 modules) render as **`ProductFeatureGroups`**, a sticky `useScene` scene (`count*90+40` svh, same primitives as the homepage products scene): left, eyebrow + title + the groups as numbered tabs with a product-coloured progress line (`[data-feature-progress]` scaleY); right, one panel per group crossfading (`applySceneItems`) with icon, title, description and features that stagger in via CSS (`.feature-scene.is-ready .is-current .feature-row`, `--i` × 70ms). Tabs jump with `scrollToSceneStep`. Below 1024px / reduced motion: the editorial grouped list (`RevealGroup`) is the stacked fallback; its heading has no id (the scene heading owns `<id>-title`). | ✓ ×2 | ✓ ×2 | ✓ ×2 | ✓ |
 | Mobile app (`practice-mobile`) | `PracticeMobileSection` | `RevealBlock` and `ClipReveal` phone capture | ✓ | | | |
 | Workflow (`<slug>-workflow`) | `ProductWorkflow` | Numbered steps plus a connector line scrubbed `scaleX` (`scrub 0.5`) | | ✓ | ✓ | ✓ |
 | Audience (`<slug>-audience`) | `ProductAudience` | `RevealGroup` | ✓ | ✓ | ✓ | ✓ |

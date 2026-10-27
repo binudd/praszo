@@ -1,22 +1,21 @@
 /** Illustrative content for the animated product mockups (hero showcases). */
 
 export const verifiShowcase = {
-  title: "FY23 Consolidated Statements",
-  meta: ["Balance Sheet", "P&L", "Cash Flow", "Notes"],
+  title: "FY25 Financial Statements · Draft v3",
+  meta: ["Annual", "Listed entity"],
   scoreLabel: "Overall verification score",
   checks: [
-    { id: "bs-notes", label: "Balance Sheet ↔ Notes", detail: "42 line items cross-checked", result: "pass", score: 34 },
-    { id: "pl", label: "P&L recalculation", detail: "Totals and sub-totals", result: "pass", score: 58 },
-    { id: "cf", label: "Cash flow ties to balance sheet", detail: "Opening and closing cash", result: "pass", score: 76 },
-    { id: "py", label: "Prior-year comparatives", detail: "Opening balances", result: "pass", score: 90 },
-    { id: "disc", label: "Disclosure checklist", detail: "1 disclosure missing", result: "flag", score: 98 },
+    { id: "math", label: "Math checks", detail: "Casting and cross-casting", result: "pass", score: 41 },
+    { id: "notes", label: "Note reconciliation", detail: "Statements agreed to notes", result: "pass", score: 68 },
+    { id: "py", label: "Prior year tie-in", detail: "Comparatives match last year's report", result: "pass", score: 88 },
+    { id: "draft", label: "Draft revision compare", detail: "1 numerical edit since v2", result: "flag", score: 97 },
   ],
 } as const;
 
 export const matchShowcase = {
-  title: "Purchase register · Q1 FY25",
+  title: "Purchase sample · FY25 audit",
   meta: ["3-way match", "Line level"],
-  documents: ["Invoice", "Purchase order", "Goods receipt"],
+  documents: ["Sample", "PO", "GRN"],
   rows: [
     { id: "r1", vendor: "TechPro Solutions", ref: "INV-2024-0002", amount: "4,250.00", results: ["match", "partial", "match"] },
     { id: "r2", vendor: "Northwind Supplies", ref: "INV-2024-0017", amount: "1,180.00", results: ["match", "match", "match"] },

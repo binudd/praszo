@@ -16,8 +16,8 @@ export const metadata = buildMetadata({ ...product.meta, path: "/practice" });
 export default function PracticePage() {
   return (
     <ProductPage product={product}>
-      <ProductPreview product={product} />
       <ProductProblem product={product} />
+      <ProductPreview product={product} />
       <ProductFeatureGrid product={product} section={product.featureSections[0]} />
       <PracticeMobileSection />
       <ProductFeatureGrid product={product} section={product.featureSections[1]} />

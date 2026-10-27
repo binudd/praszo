@@ -101,7 +101,7 @@ export function VerifiValidator({ paused, className }: MockupProps) {
     // A click is an explicit request to watch: release the hover pause and play from the start.
     heldRef.current = false;
     tl.restart();
-    fxRef.current?.toast("Re-running 5 checks", "product");
+    fxRef.current?.toast(`Re-running ${data.checks.length} checks`, "product");
   };
 
   return (
@@ -149,7 +149,7 @@ export function VerifiValidator({ paused, className }: MockupProps) {
                 key={check.id}
                 data-check={check.id}
                 data-state="pending"
-                className="group flex items-center justify-between gap-2 rounded-sm bg-bg px-3 py-2 transition-colors duration-300 data-[state=flag]:bg-[color-mix(in_srgb,var(--accent)_14%,var(--bg))] data-[state=running]:bg-product-soft"
+                className="group flex max-h-[5.25rem] flex-1 items-center justify-between gap-2 rounded-sm bg-bg px-3 py-2 transition-colors duration-300 data-[state=flag]:bg-[color-mix(in_srgb,var(--accent)_14%,var(--bg))] data-[state=running]:bg-product-soft"
               >
                 <span className="min-w-0">
                   <span className="block truncate text-[11px] font-semibold text-ink">{check.label}</span>

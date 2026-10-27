@@ -1,7 +1,6 @@
 "use client";
 
-import { ArrowRight, Play } from "lucide-react";
-import Link from "next/link";
+import { Play } from "lucide-react";
 import { useRef } from "react";
 
 import { useHeroEntrance } from "@/components/motion/hero-entrance";
@@ -68,13 +67,6 @@ export function ProductHero({ product }: { product: Product }) {
               <Play size={14} className="fill-current" aria-hidden />
               See the features
             </Button>
-            <Link
-              href="/#workflow"
-              className="group inline-flex items-center gap-2 px-2 text-[15px] font-semibold text-ink-2 transition-colors hover:text-ink"
-            >
-              Step {product.workflowStep.order} · {product.workflowStep.label}
-              <ArrowRight size={15} className="transition-transform group-hover:translate-x-0.5" aria-hidden />
-            </Link>
           </div>
         </div>
         <div data-hero="visual" className="relative h-[19rem] min-w-0 sm:h-[25rem] lg:h-[min(31rem,58svh)]">

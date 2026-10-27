@@ -1,16 +1,12 @@
 import type { StaticImageData } from "next/image";
 
 import matchEngine from "@/assets/products/match-engine.png";
-import matchGovernance from "@/assets/products/match-governance.png";
-import matchWorkflow from "@/assets/products/match-workflow.png";
 import practiceBoard from "@/assets/products/practice-board.png";
 import practiceEditProject from "@/assets/products/practice-edit-project.png";
 import practiceMyWork from "@/assets/products/practice-my-work.png";
 import practiceProject from "@/assets/products/practice-project.png";
 import practiceTimesheetWeek from "@/assets/products/practice-timesheet-week.png";
 import verifiDashboard from "@/assets/products/verifi-dashboard.png";
-import verifiIngestion from "@/assets/products/verifi-ingestion.png";
-import verifiReporting from "@/assets/products/verifi-reporting.png";
 import type { IconName } from "@/lib/icons";
 
 export type ProductSlug = "practice" | "verifi" | "match" | "docs";
@@ -111,7 +107,7 @@ const practice: Product = {
   summary:
     "The core engine of the Praszo ecosystem, managing projects, people, time, budgets, and billing across your audit firm.",
   workflowStep: {
-    order: 2,
+    order: 1,
     label: "Plan & Manage",
     body: "The core engine that manages projects, people, time, budgets, and billing seamlessly.",
   },
@@ -316,118 +312,214 @@ const verifi: Product = {
   fullName: "Praszo Verifi",
   color: "#17b978",
   colorDeep: "#0f8f5c",
-  category: "AI financial statement validation",
-  tagline: "AI validation across the Balance Sheet, P&L, Cash Flow, and Notes.",
+  category: "Financial statement verification",
+  tagline: "Automated checks on final drafts: math, notes, prior year, and revisions.",
   summary:
-    "An intelligent financial statement analyzer that automates cross-statement checks, disclosures, ratios, and analytical reviews.",
+    "Pre-issuance verification that re-foots every total and ties the statements to their notes, the prior year, and earlier drafts.",
   workflowStep: {
-    order: 6,
+    order: 4,
     label: "Validate (AI)",
-    body: "An intelligent financial statement analyzer that automates cross-statement checks and reviews.",
+    body: "Automated checks on final statement drafts catch errors before sign-off.",
   },
   meta: {
-    title: "Praszo Verifi | AI Financial Statement Validation for Audit Firms",
+    title: "Praszo Verifi | Automated Financial Statement Verification for Audit Firms",
     description:
-      "Verifi is an AI financial statement validation tool that extracts, validates, and cross-checks data across reports, helping auditors detect errors accurately.",
+      "Praszo Verifi checks final financial statement drafts before sign-off: casting and cross-casting, note reconciliation, prior-year tie-in, and draft revision compare, behind your firewall.",
   },
   hero: {
-    eyebrow: "AI-powered validation",
-    headline: "AI financial statement validation",
-    description:
-      "AI cross-checks your Balance Sheet, P&L, Cash Flow, and Notes for inconsistencies.",
+    eyebrow: "Pre-issuance diagnostic intelligence",
+    headline: "Automated financial statement verification",
+    description: "Catch last-minute financial statement errors in seconds. Keep complete audit control.",
     visual: {
       kind: "image",
       src: verifiDashboard,
       alt: "Praszo Verifi dashboard with statement health score, open exceptions, weekly activity chart, and team workload",
       frame: "browser",
+      screenTitle: "Dashboard",
+      caption: "Every engagement at a glance: statement health, open exceptions, review activity, and team workload.",
     },
   },
   problem: {
-    title: "Manual line-item hunting does not scale",
+    title: "The last-mile risk in exported drafts",
+    body: "Once statements leave the spreadsheet for PDF or Word, live links break and last-minute edits slip in unseen",
     points: [
-      "Data arrives fragmented across Excel sheets, nested PDFs, and legacy paper",
-      "Manual cross-checks between statements and notes are slow and easy to miss",
-      "Partners and inspectors expect a documented trail for every check",
+      "Broken subtotals and rounding",
+      "Statements that don't match the notes",
+      "Unintended edits between drafts",
+      "Senior hours lost to manual footing",
     ],
   },
-  spotlights: [
+  highlights: [
     {
-      id: "ingestion",
-      eyebrow: "Ingestion",
-      title: "Multi-format ingestion",
-      body: "Stop wrestling with fragmented data. Verifi standardizes complex Excel sheets and nested PDFs into a unified format for seamless processing.",
-      bullets: [
-        "OCR extraction for legacy paper invoices",
-        "Excel mapping and column reconciliation",
-        "Direct ERP integration support",
-      ],
-      visual: {
-        kind: "image",
-        src: verifiIngestion,
-        alt: "Verifi data ingestion pipeline turning Excel sheets, PDF invoices, and paper scans into standardized data, with OCR extraction and an Excel mapping table",
-        frame: "none",
-      },
+      title: "Runs behind your firewall",
+      body: "A standalone desktop application on one PC, or a central firm database shared across your network server. Confidential client files stay protected.",
+      icon: "Server",
     },
     {
-      id: "logic",
-      eyebrow: "AI-powered logic",
-      title: "Only look at what matters",
-      body: "Automated discrepancy flagging and confidence scoring ensure you only look at what matters. No more manual line-item hunting.",
+      title: "Reads any draft",
+      body: "Text-based or scanned PDF and Word documents, with sideways tables rotated automatically and Western (1,234,567) or South Asian (12,34,567) number formats.",
+      icon: "ScanText",
+    },
+    {
+      title: "Fits every engagement",
+      body: "Annual, half-yearly, and quarterly interim engagements for private, listed, or group entities, with deviation tolerances you set.",
+      icon: "CalendarClock",
+    },
+    {
+      title: "Your team decides",
+      body: "Verifi flags potential errors. Your reviewers apply tick-marks, leave comments, and log formal approval overrides.",
+      icon: "UserCog",
+    },
+  ],
+  spotlights: [
+    {
+      id: "deliverables",
+      eyebrow: "Deliverables",
+      title: "Working papers, ready for the file",
+      body: "When the review is complete, Verifi turns your team's work into clean, compliant audit deliverables.",
+      bullets: [
+        "Tick-marked PDF with a summary legend and comments as native Acrobat sticky notes",
+        "Excel working papers with every check, reconciliation, and reviewer decision",
+        "Custom PDF reports: executive summary, scope and disclaimers, findings ledger, activity timeline",
+      ],
       visual: {
         kind: "mockup",
         id: "verifi-report",
-        alt: "Sample AI validation report: Balance Sheet cross-checked against Notes with 42 line items matched and P&L totals recalculated with no discrepancies",
+        alt: "Sample verification report: Balance Sheet cross-checked against Notes with 42 line items matched and P&L totals recalculated with no discrepancies",
+        caption: "A verification summary: statements agreed to the notes and every total recalculated.",
       },
     },
     {
-      id: "reporting",
-      eyebrow: "Reporting",
-      title: "Audit-ready reporting",
-      body: "Generate a comprehensive verification matrix in seconds. Designed for compliance, every match is recorded with a clear digital audit trail.",
+      id: "oversight",
+      eyebrow: "Oversight",
+      title: "Where every review stands",
+      body: "Statement health, open exceptions, material mismatches, and team workload on one dashboard, so partners see where each review stands.",
+      bullets: [
+        "Prepared By, Reviewed By, and Approved By roles",
+        "A full team activity timeline and administrator security controls",
+        "Accepted, Declined, or False Positive decisions, with partner override notes",
+      ],
       visual: {
         kind: "image",
-        src: verifiReporting,
-        alt: "Verifi approvals and activity log listing pending approvals, total activities, and average approval time",
-        frame: "none",
+        src: verifiDashboard,
+        alt: "Praszo Verifi dashboard with statement health score, open exceptions, weekly activity chart, and team workload",
+        frame: "browser",
       },
     },
   ],
   featureSections: [
     {
       id: "features",
-      eyebrow: "Core features",
-      title: "Automated verification. Financial accuracy.",
+      eyebrow: "The 4 core diagnostic engines",
+      title: "Precision checking across every line",
       description:
-        "Automatically extract, cross-check, and validate financial statements to detect discrepancies and ensure reporting accuracy with confidence.",
+        "Verifi runs four verification checks across your whole draft to catch errors before they reach boards, clients, or regulators.",
       groups: [
         {
-          title: "Verification engines",
-          icon: "BadgeCheck",
+          title: "Math checks",
+          description: "Casting and cross-casting. Every total is re-calculated, so broken subtotals and rounding never reach sign-off.",
+          icon: "Calculator",
           items: [
             {
-              name: "Page Compare",
-              description: "Detects table of contents, page number, and heading mismatches instantly.",
-              icon: "BookOpen",
+              name: "Total arithmetic verification",
+              description: "Every column, cross-cast movement schedule, subtotal deduction, and multi-page block re-calculated.",
+              icon: "Calculator",
             },
             {
-              name: "Notes Compare",
-              description: "Flags discrepancies between financial statements and disclosure notes.",
+              name: "Smart visual highlighting",
+              description: "Hover any number to see its components in yellow and the total it feeds in green.",
+              icon: "Highlighter",
+            },
+            {
+              name: "Sum breakdown",
+              description: "Click any Σ marker for additions, deductions, the exact deviation, and an AI-written explanation.",
+              icon: "Sigma",
+            },
+          ],
+        },
+        {
+          title: "Note reconciliation",
+          description: "Internal consistency. The primary statements are tied to their disclosure notes.",
+          icon: "FileSearch",
+          items: [
+            {
+              name: "Face-to-note agreement",
+              description: "Each line item is checked against its note table, such as PPE or retained earnings.",
+              icon: "FileCheck",
+            },
+            {
+              name: "Near-match and missing note alerts",
+              description: "Single-digit transcription errors flagged as near-matches, and references to notes that don't exist caught.",
+              icon: "ShieldAlert",
+            },
+          ],
+        },
+        {
+          title: "Prior year tie-in",
+          description: "Comparatives. This year's comparative columns are checked against last year's signed report.",
+          icon: "History",
+          items: [
+            {
+              name: "Historical continuity",
+              description: "Comparative figures cross-checked against the finalized prior-year financial report.",
+              icon: "History",
+            },
+            {
+              name: "Side-by-side synchronized scroll",
+              description: "Pages aligned side by side to spot unauthorized restatements or re-keying mistakes.",
+              icon: "Columns3",
+            },
+          ],
+        },
+        {
+          title: "Draft revision compare",
+          description: "Delta tracking. See exactly what changed between two drafts.",
+          icon: "GitCompare",
+          items: [
+            {
+              name: "Draft-to-draft change tracking",
+              description: "Every line item addition, removal, or numerical edit highlighted in green and red.",
               icon: "FileDiff",
             },
             {
-              name: "Accuracy Verifier",
-              description: "Detects incorrect totals, sub-totals, and calculation mismatches instantly.",
-              icon: "CircleCheck",
+              name: "Precision change ledger",
+              description: "Variance amounts and percentages, with changes acknowledged or ticked in bulk in one step.",
+              icon: "ListChecks",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      id: "review",
+      eyebrow: "Reviewer workspace",
+      title: "Built for faster sign-offs",
+      description:
+        "Interactive tools to inspect findings, mark up the draft, and document review work across the whole engagement.",
+      groups: [
+        {
+          title: "Review tools",
+          icon: "ClipboardCheck",
+          items: [
+            {
+              name: "Figure Trace",
+              description: "Click any number to find every occurrence across statements, notes, and narrative, then jump straight to it in context.",
+              icon: "ScanSearch",
             },
             {
-              name: "Annual Compare",
-              description: "Flags prior-year comparative and opening balance mismatches automatically.",
-              icon: "CalendarClock",
+              name: "Anchored comments",
+              description: "Comments pinned to any word, figure, or area, with author and timestamp. AI drafts each mismatch explanation for you to edit or approve.",
+              icon: "MessageSquareText",
             },
             {
-              name: "Version Compare",
-              description: "Tracks all numerical and textual changes across document versions.",
-              icon: "GitCompare",
+              name: "Custom tick marks",
+              description: "Standard ✓ and ✗ or your firm's own stamps. Accept, decline, or mark false positives one at a time or across the whole document.",
+              icon: "Stamp",
+            },
+            {
+              name: "Snipping tool",
+              description: "Draw a box around faint scans, rotated pages, or unusual tables to total them in the math engine.",
+              icon: "Scissors",
             },
           ],
         },
@@ -435,27 +527,27 @@ const verifi: Product = {
     },
   ],
   workflow: {
-    title: "From ingestion to audit trail",
-    description: "Verifi extracts, recalculates, compares, and cross-checks, then records every result.",
+    title: "From draft to sign-off",
+    description: "Four engines, one review, and deliverables your engagement file can keep.",
     steps: [
-      { title: "Ingest", body: "Excel sheets, nested PDFs, and scanned paper are standardized into one unified format." },
-      { title: "Extract and recalculate", body: "Figures are extracted and totals, sub-totals, and ratios are recalculated." },
-      { title: "Cross-check", body: "Balance Sheet, P&L, Cash Flow, Notes, prior-year comparatives, and versions are compared." },
-      { title: "Flag with confidence", body: "Discrepancies are flagged and scored so reviewers see only what matters." },
-      { title: "Report", body: "A verification matrix is generated and every check is recorded in a digital audit trail." },
+      { title: "Set up the engagement", body: "Annual, half-yearly, or quarterly; private, listed, or group; with your deviation tolerances." },
+      { title: "Load the draft", body: "Typed or scanned PDF and Word, read page by page, with sideways tables rotated." },
+      { title: "Run the checks", body: "Math, note reconciliation, prior-year tie-in, and draft revision compare across the whole document." },
+      { title: "Review and decide", body: "Trace figures, comment, tick, and accept, decline, or override each finding." },
+      { title: "Export", body: "Tick-marked PDF, Excel working papers, and a customizable audit report." },
     ],
   },
   audience: {
-    title: "Built for auditors and the partners who sign off",
+    title: "Built for audit and review teams",
     items: [
       {
         title: "Audit teams",
-        body: "Automated extraction, cross-checking, and discrepancy flagging reduce manual effort and improve overall audit accuracy.",
+        body: "No more calculator footings, page-flipping, or manual comparative tie-ins during busy season.",
         icon: "Users",
       },
       {
         title: "Partners and reviewers",
-        body: "Every check and exception is digitally logged, creating a clear audit trail for partner reviews and inspections.",
+        body: "Catch calculation errors, mismatched note references, and restatement mistakes before final reports leave the firm.",
         icon: "ClipboardCheck",
       },
     ],
@@ -463,24 +555,28 @@ const verifi: Product = {
   faq: [
     {
       q: "What does Praszo Verifi do?",
-      a: "Praszo Verifi is an AI financial statement validation tool that cross-checks figures across the Balance Sheet, P&L, Cash Flow, and Notes, instantly flagging inconsistencies.",
+      a: "Verifi checks final financial statement drafts before sign-off. It reads every page, typed or scanned, and runs four automated checks: math, note reconciliation, prior-year tie-in, and draft revision compare.",
     },
     {
-      q: "How does Praszo Verifi help auditors?",
-      a: "It automates data extraction, cross-checks statements, and flags discrepancies, reducing manual effort and improving overall audit accuracy.",
+      q: "Which documents can Verifi read?",
+      a: "Text-based or scanned PDF and Word documents. It rotates sideways tables automatically and supports both Western (1,234,567) and South Asian (12,34,567) number formats.",
     },
     {
-      q: "Is Praszo Verifi an AI-powered auditing software solution?",
-      a: "Yes. It is an AI auditing software solution that uses AI to validate and analyze financial data while helping auditors focus on review and judgment.",
+      q: "Where does Verifi run, and is client data secure?",
+      a: "Verifi runs as a standalone desktop application on a single PC, or on a central firm database shared across your network server, so confidential client files stay behind your firewall.",
     },
     {
-      q: "Does Verifi maintain documentation for partner review and inspections?",
-      a: "Yes. Every check and exception is digitally logged, creating a clear audit trail for reviews and inspections.",
+      q: "Does the AI make the final call?",
+      a: "No. Verifi flags potential errors and drafts explanations. Your team applies tick-marks, leaves comments, and logs formal approval overrides.",
+    },
+    {
+      q: "What can we export for the engagement file?",
+      a: "A tick-marked PDF with review comments as Acrobat sticky notes, Excel working papers with every check and reviewer decision, and a customizable PDF audit report.",
     },
   ],
   cta: {
-    title: "Run your firm with clarity",
-    body: "Ready to streamline workflows, approvals, and document control? Praszo brings structure, visibility, and precision to every engagement without disrupting how your team works.",
+    title: "Catch errors before reports leave the firm",
+    body: "Bring mathematical precision and automated confidence to your audit workflow. See Praszo Verifi in a live demo.",
     bullets: sharedCtaBullets,
   },
 };
@@ -492,160 +588,212 @@ const match: Product = {
   color: "#fb9528",
   colorDeep: "#c4640a",
   category: "AI purchase vouching",
-  tagline: "Three-way matching of registers, invoices, POs, and GRNs.",
+  tagline: "AI 3-way matching of invoices against your purchase sample, POs, and GRNs.",
   summary:
-    "AI-powered reconciliation that matches registers with invoices and evidence end-to-end, so auditors can focus on judgment.",
+    "AI purchase testing that matches every invoice to your purchase sample, POs, and GRNs, with auditor judgment kept at the center.",
   workflowStep: {
-    order: 5,
+    order: 3,
     label: "Reconcile (AI)",
-    body: "AI-powered reconciliation that matches registers with invoices and evidence flawlessly.",
+    body: "AI matches invoices to the purchase sample, POs, and GRNs in seconds.",
   },
   meta: {
     title: "Praszo Match | AI Purchase Vouching Solution for Auditors",
     description:
-      "AI purchase vouching solution that compares transactions with supporting documents, helping auditors detect gaps, reduce risk, and improve verification speed.",
+      "Praszo Match automates purchase testing for audit teams: AI 3-way matching of invoices against your purchase sample, POs, and GRNs, with a full decision audit trail.",
   },
   hero: {
     eyebrow: "AI purchase vouching",
-    headline: "AI purchase vouching for auditors",
-    description:
-      "Match registers, invoices, POs, and GRNs faster, with greater accuracy and control.",
+    headline: "Smarter, faster purchase auditing",
+    description: "Turn hours of manual purchase checking into minutes of AI insights.",
     visual: {
       kind: "image",
       src: matchEngine,
       alt: "Praszo Match verification engine comparing an invoice and a purchase order side by side with an overall match score",
       frame: "browser",
+      screenTitle: "Verification engine",
+      caption: "Invoice and purchase order side by side, with the overall match, status, and the auditor's note, flag, or approval.",
     },
+  },
+  problem: {
+    title: "Purchase auditing is tedious, manual work",
+    body: "Spreadsheet comparisons, missing paperwork, and human error, with days spent matching invoice line items by hand",
+    points: ["Spreadsheet comparisons", "Missing paperwork", "Human error", "Days of line-item matching"],
   },
   highlights: [
     {
-      title: "Automated three-way matching",
-      body: "Automatically matches purchase register data with invoices, POs, and GRNs to verify transactions instantly, without manual comparison.",
+      title: "Automated 3-way reconciliation",
+      body: "Purchase invoices are matched against your audit sample, purchase orders (POs), and goods receipt notes (GRNs) in seconds.",
       icon: "GitCompare",
     },
     {
-      title: "Faster audits",
-      body: "Reduces manual verification effort, enabling auditors to complete transaction checks faster and meet deadlines with ease.",
-      icon: "Gauge",
+      title: "100% decision audit trail",
+      body: "Every review decision, auditor note, and override is logged with timestamped user details for senior sign-off.",
+      icon: "FileCheck",
     },
     {
-      title: "Zero oversight",
-      body: "AI verifies 100% of transactions, instantly flagging discrepancies to eliminate missed errors and manual oversight.",
-      icon: "ShieldCheck",
+      title: "Flexible firm deployment",
+      body: "Runs on a single auditor's laptop, or as a shared SQL database across the whole audit team.",
+      icon: "Server",
+    },
+    {
+      title: "Fast setup",
+      body: "A simple 4-step setup wizard gets your audit firm up and running in minutes.",
+      icon: "MousePointerClick",
     },
   ],
   spotlights: [
     {
-      id: "documents",
-      eyebrow: "Smart document handling",
-      title: "Upload one scanned PDF. Match splits the rest.",
-      body: "The system auto-detects and splits a single scanned PDF into Invoice, PO, and GRN, so there is no need to sort files manually. High-speed OCR extraction and instant field highlighting put every value where reviewers expect it.",
-      bullets: ["Auto-detects and splits Invoice, PO, and GRN", "High-speed OCR extraction", "Instant field highlighting"],
-      visual: {
-        kind: "mockup",
-        id: "match-three-way",
-        alt: "Three-way match of a purchase register row against its invoice, purchase order, and goods receipt note with line-level statuses",
-      },
-    },
-    {
       id: "review",
-      eyebrow: "Review and validation",
-      title: "Line-by-line verification, side by side",
-      body: "Every transaction is checked at line level, clearly showing matched, partial, and mismatched items. A side-by-side PDF viewer makes discrepancy checks instant, and reviewers add comments and remarks or handle small differences with defined thresholds.",
+      eyebrow: "Review",
+      title: "Every match inspected side by side",
+      body: "A split-screen view puts the source documents next to the match results. Click any sample entry to highlight the exact matched values on the invoice, PO, or GRN.",
+      bullets: [
+        "Confirm suggested matches, add notes, or flag for review",
+        "Accepting a discrepancy or re-linking a document requires a reason before saving",
+        "Every decision logged with timestamped user details",
+      ],
       visual: {
         kind: "image",
-        src: matchWorkflow,
-        alt: "Approval activity log showing pending requests, logged activities, and approval statuses",
-        frame: "none",
+        src: matchEngine,
+        alt: "Praszo Match verification engine comparing an invoice and a purchase order side by side with an overall match score",
+        frame: "browser",
       },
     },
     {
       id: "reports",
       eyebrow: "Reporting",
-      title: "Audit-ready evidence, tracked in one dashboard",
-      body: "Generate shareable discrepancy reports, open linked PDFs directly in the browser, and attach evidence to the audit file. The dashboard shows overall verification status and tracks matched, partial, and mismatched items as the audit progresses.",
+      title: "Partner-ready audit folders",
+      body: "When testing is complete, export professional audit reports in two formats.",
+      bullets: [
+        "Interactive HTML audit folder: match summaries, original PDFs, and Excel workpapers, with every transaction one click from its supporting PDF",
+        "Simple audit summary: a single-file HTML executive report for email and the audit file",
+      ],
       visual: {
-        kind: "image",
-        src: matchGovernance,
-        alt: "Dashboard cards for revenue, budget versus actual, billing realization, work in progress by client, and timesheet approvals",
-        frame: "none",
+        kind: "mockup",
+        id: "match-three-way",
+        alt: "Illustration of one transaction's match summary across its invoice, purchase order, and goods receipt note, with line-level statuses",
       },
     },
   ],
   featureSections: [
     {
       id: "features",
-      eyebrow: "Core features",
-      title: "Match your transactions with speed and precision",
+      eyebrow: "Key verification modules",
+      title: "Catch what manual sampling misses",
       description:
-        "Praszo Match eliminates risk by automatically standardizing and reconciling registers with invoices, flagging mismatches at the row and column level. The result is faster audits, higher accuracy, and audit-ready evidence, ensuring no transaction is overlooked.",
+        "Deep line-by-line verification across three documentation levels: your purchase sample, the purchase order, and the goods receipt note.",
       groups: [
         {
-          title: "Verification features",
-          icon: "GitCompare",
+          title: "Invoice vs purchase sample",
+          description: "Each invoice is paired with its row in your purchase sample.",
+          icon: "Table",
           items: [
-            { name: "AI 3-way matching", description: "Automatically verifies Invoice vs Register, Invoice vs PO, and Invoice vs GRN.", icon: "GitCompare" },
-            { name: "Smart document handling", description: "Upload a single scanned PDF; the system auto-detects and splits it into Invoice, PO, and GRN with high-speed OCR extraction and instant field highlighting.", icon: "Split" },
-            { name: "Line-by-line verification", description: "Checks every transaction at line level and clearly shows matched, partial, and mismatched items.", icon: "Rows3" },
-            { name: "Side-by-side PDF viewer", description: "Instant side-by-side discrepancy checks.", icon: "Columns3" },
-            { name: "Comments & remarks", description: "Add notes during verification and handle small differences with defined thresholds.", icon: "MessageSquareText" },
-            { name: "Dynamic column mapping", description: "Align your purchase register headers with the tool's data fields.", icon: "Table" },
-            { name: "Multi-currency support", description: "Verify transactions across different currencies.", icon: "Globe" },
-            { name: "Audit-ready reports", description: "Generate shareable discrepancy reports, open linked PDFs directly in the browser, and attach them to the audit file.", icon: "FileOutput" },
-            { name: "Partial match management", description: "Identify partial matches where certain fields align while minor discrepancies appear in tax amounts or dates.", icon: "ListChecks" },
-            { name: "Dashboard & tracking", description: "See overall verification status, track matched, partial, and mismatched items, and monitor audit progress easily.", icon: "ChartBar" },
-            { name: "Secure by design", description: "Data stays within your environment. Built for audit-level data security.", icon: "Lock" },
+            { name: "Automatic pairing", description: "Each invoice is matched to its corresponding row in the purchase sample.", icon: "Link2" },
+            { name: "Missing, duplicate, and variance checks", description: "Detects missing invoices, unrecorded sample entries, duplicate bookings, and amount variances.", icon: "ShieldAlert" },
+            { name: "Multi-currency flags", description: "Flags multi-currency transactions and highlights exchange discrepancies.", icon: "Globe" },
+          ],
+        },
+        {
+          title: "Invoice vs purchase order",
+          description: "Line items are verified against approved purchase orders.",
+          icon: "Receipt",
+          items: [
+            { name: "Over-billing and price variances", description: "Line items checked against the approved PO to catch over-billing and price differences.", icon: "Scale" },
+            { name: "Timing risks", description: "Flags risks such as purchase orders created after the invoice date.", icon: "CalendarClock" },
+            { name: "Open and partial PO lines", description: "Identifies un-invoiced open PO lines and partial billing.", icon: "ListChecks" },
+          ],
+        },
+        {
+          title: "Invoice vs goods receipt note",
+          description: "Physical receipt of goods is confirmed before payment is verified.",
+          icon: "Boxes",
+          items: [
+            { name: "Proof of receipt", description: "Confirms that goods were physically received before payment verification.", icon: "Boxes" },
+            { name: "Billed before delivery", description: "Flags items billed before delivery, or invoiced but never received.", icon: "Clock" },
+            { name: "Services vs goods", description: "Distinguishes service charges from physical item deliveries automatically.", icon: "Split" },
+          ],
+        },
+      ],
+    },
+    {
+      id: "insights",
+      eyebrow: "Review interface",
+      title: "Clear insights, full control",
+      description:
+        "Match keeps auditor judgment at the center, and the dashboard shows where the risk is across every engagement.",
+      groups: [
+        {
+          title: "Insights",
+          icon: "ChartBar",
+          items: [
+            { name: "Smart supplier name memory", description: "Remembers alternative supplier spellings across engagements, such as \"Acme Corp\" and \"Acme Corporation\", so future audits get smarter.", icon: "BrainCircuit" },
+            { name: "Company-level match rates", description: "Match rates for each client company, to highlight client risk.", icon: "Gauge" },
+            { name: "Top mismatch fields", description: "The fields that mismatch most across all engagements, such as unit price, tax, and date.", icon: "ChartBar" },
+            { name: "Team progress", description: "Monthly team progress and auditor review speeds, tracked in one place.", icon: "TrendingUp" },
           ],
         },
       ],
     },
   ],
   workflow: {
-    title: "From ingestion to audit-ready reporting",
+    title: "The core audit engine",
+    description: "Upload the sample once and let AI do the matching, while auditors keep the final say.",
     steps: [
-      { title: "Data ingestion", body: "Import the purchase register and upload scanned invoices, POs, and GRNs in one go." },
-      { title: "Intelligent matching", body: "AI standardizes headers and reconciles registers with documents at row and column level." },
-      { title: "Review", body: "Matched, partial, and mismatched items are shown line by line with a side-by-side viewer." },
-      { title: "Validation", body: "Reviewers add remarks, apply thresholds for minor differences, and approve." },
-      { title: "Reporting", body: "Shareable discrepancy reports and linked PDFs become audit-ready evidence." },
+      { title: "Sample and invoice upload", body: "Drag and drop the purchase sample (Excel or CSV) with all supporting PDF vouchers. Multi-page bulk PDFs are read at once." },
+      { title: "AI matching", body: "AI extracts key fields and pairs invoices with sample rows, POs, and GRNs, flagging line-item errors and missing records." },
+      { title: "Review and verify", body: "Auditors inspect discrepancies, confirm suggested matches, and record audit reasons." },
+      { title: "Report and export", body: "Interactive workpaper folders and clean Excel audit schedules, ready for partner review." },
     ],
   },
   audience: {
-    title: "Designed for high-volume purchase verification",
+    title: "Built for firms with many client engagements",
     items: [
       {
-        title: "Audit firms",
-        body: "Praszo Match is designed specifically for audit firms handling high volumes of purchase verification, helping them improve accuracy, reduce manual effort, and complete audits more efficiently.",
+        title: "Multi-client workspace",
+        body: "Manage every audit client with trade license details, Tax Registration Numbers (TRN), and industry classifications.",
         icon: "Building",
       },
       {
-        title: "Audit teams in the field",
-        body: "Verification runs on 100% of transactions with mismatches flagged in detail, reducing the risk of human error or missed entries.",
-        icon: "Users",
+        title: "Engagement tracking",
+        body: "Organize sample work by audit year, reporting currency, and engagement type: Audit, Review, Tax, or Advisory.",
+        icon: "CalendarClock",
+      },
+      {
+        title: "Role-based security",
+        body: "Admin, Auditor, Reviewer, and Viewer roles protect sensitive client data and restrict setting changes.",
+        icon: "KeyRound",
       },
     ],
   },
   faq: [
     {
       q: "What is Praszo Match?",
-      a: "Praszo Match is an AI purchase vouching solution that automates purchase verification by matching invoices with registers, POs, and GRNs to identify discrepancies instantly.",
+      a: "Praszo Match is an intelligent audit tool for accounting and audit teams. It automates purchase testing by matching invoices against your purchase sample, purchase orders, and goods receipt notes.",
     },
     {
-      q: "Who is Praszo Match designed for?",
-      a: "Praszo Match is designed specifically for audit firms handling high volumes of purchase verification, helping them improve accuracy, reduce manual effort, and complete audits more efficiently.",
+      q: "What do we need to upload?",
+      a: "Your purchase sample file (Excel or CSV) and the supporting PDF vouchers. No spreadsheet reformatting is needed, and multi-page bulk PDFs are read at once.",
     },
     {
-      q: "How does AI purchase vouching improve audit accuracy?",
-      a: "AI purchase vouching verifies 100% of transactions, flags mismatches at a detailed level, and reduces the risk of human error or missed entries.",
+      q: "Where does Praszo Match run?",
+      a: "As a standalone desktop installation for a single auditor, or on a shared SQL database for larger audit teams.",
     },
     {
-      q: "Can Praszo Match generate audit-ready reports?",
-      a: "Yes. It provides detailed reports of matched, mismatched, and partially matched transactions for easy audit documentation.",
+      q: "Which AI does Praszo Match use?",
+      a: "It works with leading enterprise AI providers (Claude, Gemini, and GPT) and switches to a backup automatically to prevent downtime.",
+    },
+    {
+      q: "Do auditors keep the final say?",
+      a: "Yes. Auditors confirm or reject every suggested match, and accepting a discrepancy or re-linking a document requires a recorded reason.",
+    },
+    {
+      q: "What happens to our work if the license expires?",
+      a: "Existing audit verifications stay fully accessible in read-only mode for review and workpaper inspection.",
     },
   ],
   cta: {
     title: "Verify every transaction with confidence",
-    body: "Eliminate manual errors, accelerate audit cycles, and generate audit-ready evidence with AI-powered purchase reconciliation.",
+    body: "Turn hours of manual checking into minutes of AI insights. See Praszo Match in a live demo.",
     bullets: sharedCtaBullets,
   },
 };
@@ -661,7 +809,7 @@ const docs: Product = {
   summary:
     "A powerful, on-premise document management system that turns scattered files into searchable, governed, audit-ready data.",
   workflowStep: {
-    order: 3,
+    order: 2,
     label: "Collect & Govern",
     body: "A powerful system that turns scattered files into searchable, governed, audit-ready data.",
   },
@@ -680,6 +828,11 @@ const docs: Product = {
       id: "docs-repository",
       alt: "Illustration of the Praszo Docs repository: documents arriving by upload and email, OCR-indexed, classified by type and correspondent, and routed to Finance or Legal",
     },
+  },
+  problem: {
+    title: "Scattered files are not audit-ready",
+    body: "Scans can't be searched, filing is manual, and sensitive files sit on someone else's computer",
+    points: ["Unstructured files", "Scans you can't search", "Manual filing and routing", "Data outside your control"],
   },
   highlights: [
     {
