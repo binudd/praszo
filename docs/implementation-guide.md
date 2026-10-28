@@ -367,6 +367,7 @@ All five share `MockupShell`: a `WindowFrame` (dots, title pill, optional `actio
 - **Logos.** Kept in the Products menu, the product bar, the hero showcase selector, the workflow and related products; removed from the footer product list (plain links).
 
 ### 9.5 Screenshot rail (`product/product-preview.tsx`)
+- **Verifi** (2026-10-28): seven real desktop-app captures supplied by Praszo (`src/assets/products/verifi-app-dashboard.png`, `-engagements`, `-summary`, `-math-accuracy`, `-sum-check`, `-internal-consistency`, `-prior-year`, resized to 1900px wide) via `hero.visual` plus `screens` in `data/products.ts`. The old `verifi-dashboard.png` is no longer referenced.
 `screensFor(product)` collects the hero visual, then the spotlight visuals, then `product.screens`, dropping duplicates.
 - Each card is a `WindowFrame` titled "Praszo ⟨screen⟩".
 - Its body is `h-[var(--screen-h)]` with `object-cover object-top`, and the card width comes from the aspect ratio.

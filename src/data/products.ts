@@ -6,7 +6,14 @@ import practiceEditProject from "@/assets/products/practice-edit-project.png";
 import practiceMyWork from "@/assets/products/practice-my-work.png";
 import practiceProject from "@/assets/products/practice-project.png";
 import practiceTimesheetWeek from "@/assets/products/practice-timesheet-week.png";
-import verifiDashboard from "@/assets/products/verifi-dashboard.png";
+// Verifi desktop application captures (supplied by Praszo, 2026-10-28).
+import verifiDashboard from "@/assets/products/verifi-app-dashboard.png";
+import verifiEngagements from "@/assets/products/verifi-engagements.png";
+import verifiInternalConsistency from "@/assets/products/verifi-internal-consistency.png";
+import verifiMathAccuracy from "@/assets/products/verifi-math-accuracy.png";
+import verifiPriorYear from "@/assets/products/verifi-prior-year.png";
+import verifiSumCheck from "@/assets/products/verifi-sum-check.png";
+import verifiSummary from "@/assets/products/verifi-summary.png";
 import type { IconName } from "@/lib/icons";
 
 export type ProductSlug = "practice" | "verifi" | "match" | "docs";
@@ -333,10 +340,10 @@ const verifi: Product = {
     visual: {
       kind: "image",
       src: verifiDashboard,
-      alt: "Praszo Verifi dashboard with statement health score, open exceptions, weekly activity chart, and team workload",
+      alt: "Praszo Verifi dashboard with total engagements, client companies, files needing attention, average quality score, verification coverage, and risk profile",
       frame: "browser",
       screenTitle: "Dashboard",
-      caption: "Every engagement at a glance: statement health, open exceptions, review activity, and team workload.",
+      caption: "Every engagement at a glance: files verified, those needing attention, quality scores, and risk profile.",
     },
   },
   problem: {
@@ -402,8 +409,70 @@ const verifi: Product = {
       visual: {
         kind: "image",
         src: verifiDashboard,
-        alt: "Praszo Verifi dashboard with statement health score, open exceptions, weekly activity chart, and team workload",
+        alt: "Praszo Verifi dashboard with total engagements, client companies, files needing attention, average quality score, verification coverage, and risk profile",
         frame: "browser",
+      },
+    },
+  ],
+  screens: [
+    {
+      title: "Engagements",
+      visual: {
+        kind: "image",
+        src: verifiEngagements,
+        alt: "Praszo Verifi company view listing an FY2026 audit engagement with its document versions, each with a verification score, and the selected version's details",
+        frame: "none",
+        caption: "Every engagement and draft version under its client and financial year, each with its latest score.",
+      },
+    },
+    {
+      title: "Verification summary",
+      visual: {
+        kind: "image",
+        src: verifiSummary,
+        alt: "Praszo Verifi summary of a 24-page statement: mathematical accuracy, internal consistency, and prior year consistency, each with pass, mismatch, and missing counts",
+        frame: "none",
+        caption: "One summary per draft: figures verified, checks matched, and what still needs a look.",
+      },
+    },
+    {
+      title: "Mathematical accuracy",
+      visual: {
+        kind: "image",
+        src: verifiMathAccuracy,
+        alt: "Praszo Verifi mathematical accuracy view: a statement of financial position with tick-marked totals, a sum breakdown showing a 20,000,000 deviation, and an AI review naming the likely incorrect line",
+        frame: "none",
+        caption: "Every total re-footed and tick-marked, with an AI review pointing to the line that breaks it.",
+      },
+    },
+    {
+      title: "Snip checks",
+      visual: {
+        kind: "image",
+        src: verifiSumCheck,
+        alt: "Praszo Verifi snip check adding three selected figures and comparing them with the stated total, showing the difference",
+        frame: "none",
+        caption: "Select any figures on the page to add them up and compare them with the stated total.",
+      },
+    },
+    {
+      title: "Internal consistency",
+      visual: {
+        kind: "image",
+        src: verifiInternalConsistency,
+        alt: "Praszo Verifi internal consistency view: the face statement beside its notes, with a receivable figure traced to the note that disagrees and a results list of matches, mismatches, and missing items",
+        frame: "none",
+        caption: "Face statement and notes side by side, with every figure traced to its note and mismatches flagged.",
+      },
+    },
+    {
+      title: "Prior year",
+      visual: {
+        kind: "image",
+        src: verifiPriorYear,
+        alt: "Praszo Verifi prior year view: current and prior year statements side by side, with comparative figures paired and an inconsistent prior-year figure flagged",
+        frame: "none",
+        caption: "This year's comparatives paired with last year's statements, so changed prior-year figures surface.",
       },
     },
   ],
