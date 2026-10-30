@@ -27,7 +27,8 @@ const variants: Record<Variant, string> = {
 };
 
 const sizes: Record<Size, string> = {
-  sm: "h-10 px-4 text-sm",
+  // 40px tall; the hit area still reaches 44px.
+  sm: "tap-target h-10 px-4 text-sm",
   md: "h-11 px-5 text-[15px]",
   lg: "h-12 px-6 text-base",
 };

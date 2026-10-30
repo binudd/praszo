@@ -25,6 +25,8 @@
   --color-product-deep: var(--product-deep);
   /* Mixed per element (not on :root), so the tint follows wherever --product is overridden. */
   --color-product-soft: color-mix(in srgb, var(--product) 10%, var(--bg));
+  /* Product-colored text on dark scenes (--product-deep is too dark there); 7:1 or better on --bg for every product. */
+  --color-product-bright: color-mix(in srgb, var(--product) 55%, white);
   --color-product-ink: var(--product-ink);
   --font-sans: var(--font-manrope), "Manrope", ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
@@ -101,6 +103,22 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+/* Touch targets: grows a small control's hit area to at least 44px without changing its layout.
+   For isolated controls; stacked lists get real 44px rows instead, so neighbouring hit areas never overlap. */
+@utility tap-target {
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100%, 2.75rem);
+    height: max(100%, 2.75rem);
+    transform: translate(-50%, -50%);
   }
 }
 

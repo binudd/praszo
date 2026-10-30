@@ -6,17 +6,19 @@ import { ProductLinks } from "@/components/ui/product-links";
 import { otherProducts, type Product } from "@/data/products";
 
 export function RelatedProducts({ product }: { product: Product }) {
+  // Slug-prefixed: visited product pages stay mounted, so a shared id would repeat.
+  const titleId = `${product.slug}-related-title`;
   return (
-    <section aria-labelledby="related-title" className="border-t border-line py-16 md:py-20">
+    <section aria-labelledby={titleId} className="border-t border-line py-16 md:py-20">
       <Container>
         <div className="flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="label text-ink-3">Part of Praszo OS</p>
-            <h2 id="related-title" className="display-sm mt-3 max-w-2xl text-ink">
+            <h2 id={titleId} className="display-sm mt-3 max-w-2xl text-ink">
               {product.name} works on its own, or as one step in the complete audit workflow.
             </h2>
           </div>
-          <Link href="/#workflow" className="label inline-flex items-center gap-1.5 text-brand-strong hover:underline">
+          <Link href="/#workflow" className="label tap-target inline-flex items-center gap-1.5 text-brand-strong hover:underline">
             See the full workflow <ArrowRight size={14} aria-hidden />
           </Link>
         </div>

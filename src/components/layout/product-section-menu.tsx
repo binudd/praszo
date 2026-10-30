@@ -118,7 +118,7 @@ export function ProductSectionMenu() {
           ariaLabel={`${product.fullName} sections, current: ${current.label}`}
           width="36rem"
           align="start"
-          buttonClassName="inline-flex h-10 items-center gap-2.5 rounded-full px-1 text-[15px] font-semibold text-ink transition-colors hover:text-ink-2"
+          buttonClassName="inline-flex h-11 items-center gap-2.5 rounded-full px-1 text-[15px] font-semibold text-ink transition-colors hover:text-ink-2"
           label={
             <>
               <ProductGlyph slug={product.slug} size={28} />

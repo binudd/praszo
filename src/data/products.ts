@@ -318,7 +318,7 @@ const verifi: Product = {
   name: "Verifi",
   fullName: "Praszo Verifi",
   color: "#17b978",
-  colorDeep: "#0f8f5c",
+  colorDeep: "#0c7d50",
   category: "Financial statement verification",
   tagline: "Automated checks on final drafts: math, notes, prior year, and revisions.",
   summary:
@@ -655,7 +655,7 @@ const match: Product = {
   name: "Match",
   fullName: "Praszo Match",
   color: "#fb9528",
-  colorDeep: "#c4640a",
+  colorDeep: "#ad5708",
   category: "AI purchase vouching",
   tagline: "AI 3-way matching of invoices against your purchase sample, POs, and GRNs.",
   summary:

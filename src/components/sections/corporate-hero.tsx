@@ -14,7 +14,7 @@ import { company } from "@/data/company";
 import { home } from "@/data/home";
 
 /** Hero CTAs: compact on phones (both fit one row), regular on tablets, large on desktop. */
-const heroButton = "max-sm:h-10 max-sm:px-4 max-sm:text-sm lg:h-12 lg:px-6 lg:text-base";
+const heroButton = "max-sm:h-11 max-sm:px-4 max-sm:text-sm lg:h-12 lg:px-6 lg:text-base";
 
 const opener = "Simplify your practice management.";
 

@@ -47,9 +47,10 @@ export function SiteHeader() {
       ref={headerRef}
       className="site-header pointer-events-none fixed inset-x-0 top-1 z-50 will-change-transform"
     >
-      <div className="mx-auto flex h-[4.5rem] w-full max-w-wide items-center justify-between gap-4 px-5 md:px-8 lg:px-10 [&>*]:pointer-events-auto">
+      {/* Large screens: three columns, so the nav pill sits at the page centre whatever the side groups hold. */}
+      <div className="mx-auto flex h-[4.5rem] w-full max-w-wide items-center justify-between gap-4 px-5 md:px-8 lg:grid lg:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] lg:px-10 [&>*]:pointer-events-auto">
         <div className="flex min-w-0 items-center gap-3 sm:gap-5">
-          <Link href="/" aria-label="Praszo home" className="inline-flex shrink-0 items-center">
+          <Link href="/" aria-label="Praszo home" className="inline-flex min-h-11 shrink-0 items-center">
             <Logo />
           </Link>
           {/* Product pages: the page's section menu, once the in-page section pill has scrolled away. */}
@@ -73,7 +74,7 @@ export function SiteHeader() {
           {linkItem(contact)}
         </nav>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 lg:justify-self-end">
           {/* The site's one persistent "Book a demo", always the coral brand button. */}
           <Button href={demoCta.href} size="sm" className="max-sm:h-9 max-sm:px-3.5 max-sm:text-[13px]">
             {demoCta.label}

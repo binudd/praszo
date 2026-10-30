@@ -10,6 +10,8 @@ export type PageHeroContent = {
   eyebrow: string;
   title: string;
   description: string;
+  /** Title tier: "md" for long titles (see PageHero). */
+  size?: "lg" | "md";
 };
 
 export type FeatureItem = { title: string; body: string; icon: IconName };

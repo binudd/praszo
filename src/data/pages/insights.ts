@@ -28,6 +28,7 @@ export const insights = {
     eyebrow: "Insights and resources",
     title: "Insights on workflow automation and practice management.",
     description: "Praszo insights on project management, compliance workflows, and productivity tools.",
+    size: "md",
   } satisfies PageHeroContent,
   articles: [] as Article[],
 } as const;

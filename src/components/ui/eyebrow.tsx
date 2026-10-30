@@ -6,7 +6,7 @@ type Tone = "brand" | "product" | "muted" | "inverse";
 
 const tones: Record<Tone, string> = {
   brand: "text-brand-strong",
-  product: "text-product-deep",
+  product: "text-product-deep dark:text-product-bright",
   muted: "text-ink-3",
   inverse: "text-white/80",
 };

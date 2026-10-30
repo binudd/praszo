@@ -56,7 +56,7 @@ function SegmentPanel({ segment, scene = false }: { segment: Segment; scene?: bo
         <Link
           data-seg-part
           href={segment.href}
-          className="label group mt-6 inline-flex w-fit items-center gap-1.5 text-ink transition-colors hover:text-brand-strong"
+          className="label group tap-target mt-6 inline-flex w-fit items-center gap-1.5 text-ink transition-colors hover:text-brand-strong"
         >
           Explore {segment.title.toLowerCase()}
           <ArrowRight size={14} className="transition-transform group-hover:translate-x-0.5" aria-hidden />

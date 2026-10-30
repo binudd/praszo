@@ -108,7 +108,7 @@ function ProductRail() {
         <p className="label text-ink-3 tabular-nums" aria-live="polite">
           {String(active + 1).padStart(2, "0")} / {String(productList.length).padStart(2, "0")}
         </p>
-        <div className="flex items-center gap-1">
+        <div className="-mr-3 flex items-center">
           {productList.map((product, index) => (
             <button
               key={product.slug}
@@ -116,7 +116,7 @@ function ProductRail() {
               onClick={() => goTo(index)}
               aria-label={`Go to the Praszo ${product.name} card`}
               aria-current={index === active || undefined}
-              className="inline-flex h-8 w-8 items-center justify-center"
+              className="inline-flex h-11 w-11 items-center justify-center"
             >
               <span
                 aria-hidden
@@ -249,7 +249,7 @@ export function ProductEcosystem() {
                     <p className="lede mt-5">{product.summary}</p>
                     <Link
                       href={`/${product.slug}`}
-                      className="mt-6 inline-flex items-center gap-2 text-[15px] font-bold text-product-deep hover:underline"
+                      className="tap-target mt-6 inline-flex items-center gap-2 text-[15px] font-bold text-product-deep hover:underline"
                     >
                       Explore Praszo {product.name}
                       <ArrowRight size={16} aria-hidden />

@@ -42,7 +42,7 @@ export function FinalCta({ title, subtitle, body, bullets, tone = "brand", id = 
               {demoCta.label}
               <ArrowRight size={18} aria-hidden />
             </Button>
-            <a href={company.phone.href} className="label inline-flex items-center gap-2 text-ink-2 hover:text-ink">
+            <a href={company.phone.href} className="label tap-target inline-flex items-center gap-2 text-ink-2 hover:text-ink">
               <Phone size={16} aria-hidden /> {company.phone.display}
             </a>
           </div>

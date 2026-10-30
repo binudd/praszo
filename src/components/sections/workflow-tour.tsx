@@ -277,7 +277,7 @@ export function WorkflowTour() {
                   {step.product ? (
                     <a
                       href={`/${step.product.slug}`}
-                      className="label mt-3 inline-flex min-h-6 items-center text-brand-strong hover:underline"
+                      className="label tap-target mt-3 inline-flex min-h-6 items-center text-brand-strong hover:underline"
                     >
                       Explore Praszo {step.product.name} →
                     </a>

@@ -12,7 +12,7 @@ export function SiteFooter() {
       <Container className="py-14 md:py-20">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1.1fr]">
           <div className="max-w-sm">
-            <Link href="/" aria-label="Praszo home" className="inline-flex">
+            <Link href="/" aria-label="Praszo home" className="inline-flex min-h-11 items-center">
               <Logo />
             </Link>
             <p className="copy mt-4 font-semibold text-ink">{company.footerTagline}</p>
@@ -25,7 +25,7 @@ export function SiteFooter() {
                     target="_blank"
                     rel="noreferrer"
                     aria-label={`Praszo on ${item.label}`}
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line bg-bg text-ink-2 transition-colors hover:border-brand hover:text-brand"
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line bg-bg text-ink-2 transition-colors hover:border-brand hover:text-brand"
                   >
                     <SocialIcon name={item.icon as SocialIconName} />
                   </a>
@@ -36,10 +36,10 @@ export function SiteFooter() {
 
           <div>
             <p className="label text-ink-3">Products</p>
-            <ul className="mt-4 flex flex-col gap-2.5">
+            <ul className="mt-2 flex flex-col md:mt-4 md:gap-2.5">
               {productList.map((product) => (
                 <li key={product.slug}>
-                  <Link href={`/${product.slug}`} className="copy font-semibold transition-colors hover:text-ink">
+                  <Link href={`/${product.slug}`} className="copy inline-flex min-h-11 items-center font-semibold transition-colors hover:text-ink md:min-h-0">
                     Praszo {product.name}
                   </Link>
                 </li>
@@ -49,10 +49,10 @@ export function SiteFooter() {
 
           <div>
             <p className="label text-ink-3">Company</p>
-            <ul className="mt-4 flex flex-col gap-2.5">
+            <ul className="mt-2 flex flex-col md:mt-4 md:gap-2.5">
               {companyLinks.map((item) => (
                 <li key={item.href}>
-                  <Link href={item.href} className="copy font-semibold transition-colors hover:text-ink">
+                  <Link href={item.href} className="copy inline-flex min-h-11 items-center font-semibold transition-colors hover:text-ink md:min-h-0">
                     {item.label}
                   </Link>
                 </li>
@@ -62,17 +62,17 @@ export function SiteFooter() {
 
           <div>
             <p className="label text-ink-3">Contact</p>
-            <address className="copy mt-4 flex flex-col gap-2.5 not-italic">
-              <a href={company.phone.href} className="font-semibold transition-colors hover:text-ink">
+            <address className="copy mt-2 flex flex-col not-italic md:mt-4 md:gap-2.5">
+              <a href={company.phone.href} className="inline-flex min-h-11 items-center font-semibold transition-colors hover:text-ink md:min-h-0">
                 {company.phone.display}
               </a>
-              <a href={`mailto:${company.emails.demo}`} className="font-semibold transition-colors hover:text-ink">
+              <a href={`mailto:${company.emails.demo}`} className="inline-flex min-h-11 items-center font-semibold transition-colors hover:text-ink md:min-h-0">
                 {company.emails.demo}
               </a>
-              <a href={`mailto:${company.emails.support}`} className="font-semibold transition-colors hover:text-ink">
+              <a href={`mailto:${company.emails.support}`} className="inline-flex min-h-11 items-center font-semibold transition-colors hover:text-ink md:min-h-0">
                 {company.emails.support}
               </a>
-              <span className="mt-1">
+              <span className="mt-2 md:mt-1">
                 {company.address.name}
                 <br />
                 {company.address.lines[0]}
@@ -88,7 +88,7 @@ export function SiteFooter() {
           <ul className="flex items-center gap-4">
             {legalLinks.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} className="transition-colors hover:text-ink">
+                <Link href={item.href} className="tap-target transition-colors hover:text-ink">
                   {item.label}
                 </Link>
               </li>

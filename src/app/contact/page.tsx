@@ -42,21 +42,21 @@ export default function ContactPage() {
         aside={
           <RevealGroup className="grid content-start gap-x-10 gap-y-8 sm:grid-cols-2 lg:grid-cols-1">
             <EditorialItem reveal icon="Phone" titleAs="h2" title="Call">
-              <a href={company.phone.href} className="copy mt-2 block font-semibold text-ink hover:text-brand-strong">
+              <a href={company.phone.href} className="copy tap-target mt-2 block w-fit font-semibold text-ink hover:text-brand-strong">
                 {company.phone.display}
               </a>
             </EditorialItem>
             <EditorialItem reveal icon="Mail" titleAs="h2" title="Email">
               <a
                 href={`mailto:${company.emails.demo}`}
-                className="copy mt-2 block font-semibold text-ink hover:text-brand-strong"
+                className="copy tap-target mt-2 block w-fit font-semibold text-ink hover:text-brand-strong"
               >
                 {company.emails.demo}
               </a>
               <p className="label mt-1 text-ink-3">Demos and sales</p>
               <a
                 href={`mailto:${company.emails.support}`}
-                className="copy mt-3 block font-semibold text-ink hover:text-brand-strong"
+                className="copy tap-target mt-3 block w-fit font-semibold text-ink hover:text-brand-strong"
               >
                 {company.emails.support}
               </a>
@@ -96,7 +96,7 @@ export default function ContactPage() {
                     target="_blank"
                     rel="noreferrer"
                     aria-label={`Praszo on ${item.label}`}
-                    className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line bg-bg text-ink-2 transition-colors hover:border-brand hover:text-brand"
+                    className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-line bg-bg text-ink-2 transition-colors hover:border-brand hover:text-brand"
                   >
                     <SocialIcon name={item.icon as SocialIconName} />
                   </a>

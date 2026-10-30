@@ -13,7 +13,7 @@ type Props = {
   actions?: ReactNode;
   /** Second column on large screens (an image, contact details). */
   aside?: ReactNode;
-  /** "lg" for short titles, "md" for long ones or when an aside shares the row. */
+  /** "lg" for short titles, "md" for long ones or when an aside shares the row (the default with an aside). */
   size?: "lg" | "md";
   titleId: string;
   className?: string;
@@ -25,7 +25,7 @@ type Props = {
  * Opening section for company pages (About, solutions, Insights, legal, contact). Light, no surface:
  * eyebrow, h1 from the display scale, a lede and optional actions, with an optional aside column.
  */
-export function PageHero({ eyebrow, title, description, actions, aside, size = "lg", titleId, className, children }: Props) {
+export function PageHero({ eyebrow, title, description, actions, aside, size = aside ? "md" : "lg", titleId, className, children }: Props) {
   return (
     <section aria-labelledby={titleId} className={cn("relative pt-32 pb-16 md:pt-40 md:pb-24", className)}>
       <Container>

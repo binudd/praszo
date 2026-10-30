@@ -43,7 +43,7 @@ export function FaqSection({ id, eyebrow = "FAQs", title, description, items, to
           <div className="divide-y divide-line-strong border-y border-line-strong">
             {items.map((item) => (
               <details key={item.q} className="group py-6">
-                <summary className="heading flex cursor-pointer list-none items-start justify-between gap-6 text-left text-ink">
+                <summary className="heading tap-target flex cursor-pointer list-none items-start justify-between gap-6 text-left text-ink">
                   <span>{item.q}</span>
                   <span
                     className={cn(

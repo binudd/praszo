@@ -12,16 +12,16 @@ export function LegalDocument({ document }: { document: LegalDocumentData }) {
         <div className="grid gap-12 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-20">
           <nav aria-label="On this page" className="lg:sticky lg:top-28 lg:self-start">
             <p className="label text-ink-3">On this page</p>
-            <ol className="mt-4 flex flex-col gap-2.5 border-l border-line pl-4">
+            <ol className="mt-2 flex flex-col border-l border-line pl-4 lg:mt-4 lg:gap-2.5">
               {document.sections.map((section) => (
                 <li key={section.id}>
-                  <a href={`#${section.id}`} className="text-sm font-semibold text-ink-2 transition-colors hover:text-ink">
+                  <a href={`#${section.id}`} className="flex min-h-11 items-center text-sm font-semibold text-ink-2 transition-colors hover:text-ink lg:block lg:min-h-0">
                     {section.title}
                   </a>
                 </li>
               ))}
               <li>
-                <a href="#legal-contact" className="text-sm font-semibold text-ink-2 transition-colors hover:text-ink">
+                <a href="#legal-contact" className="flex min-h-11 items-center text-sm font-semibold text-ink-2 transition-colors hover:text-ink lg:block lg:min-h-0">
                   Contact us
                 </a>
               </li>
@@ -55,10 +55,10 @@ export function LegalDocument({ document }: { document: LegalDocumentData }) {
               <p className="copy mt-4">If you have any questions or concerns about this Privacy Policy, please contact us:</p>
               <address className="copy mt-4 not-italic">
                 <span className="block font-semibold text-ink">{document.contact.name}</span>
-                <a href={`mailto:${document.contact.email}`} className="block font-semibold text-ink hover:text-brand-strong">
+                <a href={`mailto:${document.contact.email}`} className="tap-target block w-fit font-semibold text-ink hover:text-brand-strong">
                   {document.contact.email}
                 </a>
-                <a href={document.contact.phone.href} className="block font-semibold text-ink hover:text-brand-strong">
+                <a href={document.contact.phone.href} className="tap-target block w-fit font-semibold text-ink hover:text-brand-strong">
                   {document.contact.phone.display}
                 </a>
               </address>

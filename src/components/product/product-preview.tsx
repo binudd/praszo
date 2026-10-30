@@ -77,7 +77,7 @@ function MoreCard({ product }: { product: Product }) {
   return (
     <HorizontalCard className="flex w-[calc(var(--screen-h)*1.15)] min-w-[15rem] flex-col">
       <div className="flex h-[calc(var(--screen-h)+2.6rem)] flex-col justify-between rounded-card bg-product-soft p-6">
-        <span className="label text-product-deep dark:text-product">And more inside</span>
+        <span className="label text-product-deep dark:text-product-bright">And more inside</span>
         <div>
           <p className="heading text-ink">There is more to Praszo {product.name} than these screens</p>
           <p className="copy mt-2 text-ink-2">See the full application in a live demo.</p>
