@@ -1,0 +1,497 @@
+# Praszo website: implementation guide
+
+Audience: an AI agent or developer about to change this codebase. Read this before touching sections or animation. It describes the site as built on 2026-10-14 (commit `2244071`), how every animated part works, which package owns which job, and the rules that keep it stable.
+
+---
+
+## 1. What this is
+
+The corporate site for **Praszo** (praszo.com), an on-premise practice-management suite for audit firms. Five products, each with its own landing page:
+
+| Route | Page | Product color |
+|---|---|---|
+| `/` | Corporate homepage | Brand coral `#f46a4a` (logo) |
+| `/practice` | Praszo Practice (practice management, the core engine) | `#5539d9` |
+| `/verifi` | Praszo Verifi (automated financial statement verification) | `#17b978` |
+| `/match` | Praszo Match (AI purchase vouching, 3-way matching) | `#fb9528` |
+| `/docs` | Praszo Docs (on-premise document management) | `#d72d2d` |
+| `/contact` | Contact and "Book a demo" | Brand coral |
+| `/why-praszo` | Why Praszo (pillars, statement, differentiators, impact, segments, FAQ) | Brand coral |
+| `/about` | About Praszo (mission, team, values) | Brand coral |
+| `/large-firms` | Solution: larger audit firms | Brand coral |
+| `/mid-sized-firms` | Solution: mid-sized audit firms | Brand coral |
+| `/insights` | Insights hub (articles list, empty for now) | Brand coral |
+| `/privacy-policy` | Privacy policy | Brand coral |
+
+Every footer link is an internal page; only the social profiles open externally. Every "Book a demo" goes to `/contact` (the header button is the site's persistent one, visible at every width; hero sections show only their secondary action), which offers `tel:` and a pre-filled `mailto:pms@praszo.com`. There is no form backend.
+
+**Content rules (do not break):**
+- All copy comes from praszo.com, typos fixed, meaning unchanged. Everything lives in `src/data/`.
+- No invented claims or numeric marketing stats (no "100%", "90%+", "10,000+").
+- Pricing on praszo.com is chatbot-template residue. Never copy it.
+- No fake forms.
+
+The design language is modeled on sports.withgoogle.com/teamusa. It uses giant display type, alternating light and dark scenes, sticky scroll scenes, scrubbed reveals and pinned horizontal rails, all in Praszo's own palette and the Manrope font.
+
+---
+
+## 2. Stack and packages
+
+| Package | Version | Job in this site | Where it is used | Rules |
+|---|---|---|---|---|
+| `next` | 16.4.0 | App Router, static prerender of all 7 routes, `next/image`, `next/og` | everywhere | **Not the Next you know.** Read `node_modules/next/dist/docs/` before writing Next code (see AGENTS.md). `cacheComponents: true`, `reactCompiler: true`, `partialPrefetching: true` in `next.config.ts`. |
+| `react` / `react-dom` | 19.3.0 | UI, `<Activity>` route preservation | everywhere | The React Compiler lint is on. See §11. |
+| `gsap` | ^3.15 | **All scroll and timeline animation.** Plugins: ScrollTrigger, Flip (MotionPathPlugin was dropped on 2026-10-15; nothing needs it) | `src/components/motion/*`, sections, mockups, splash | Import only from `@/components/motion/gsap`, never from `gsap` directly. That file registers plugins once. |
+| `@gsap/react` | ^2.1 | `useGSAP({ scope })` hook for automatic cleanup | every GSAP component | Every GSAP effect must live inside `useGSAP` or an effect with cleanup. |
+| `lenis` | ^1.3.26 | Smooth scrolling. It drives ScrollTrigger. | `src/components/motion/smooth-scroll.tsx` only | One instance, ticked by `gsap.ticker`. Use `getLenis()` and `scrollToTarget()`. Never create a second instance or call `window.scrollTo` for in-page jumps. |
+| ~~`motion` (motion/react)~~ | removed 2026-10-15 | Uninstalled for performance (≈48 KiB of unused JS at load). Its four uses are now: nav pill → GSAP (`useNavFollower`), products menu and back-to-top → CSS transitions on always-mounted, `inert`-when-closed elements, `useReducedMotion` → `prefersReducedMotion()`. Do not reintroduce it for micro-interactions. | | |
+| `@radix-ui/react-dialog` | ^1.2 | Mobile menu sheet (focus trap, Escape, aria) | `layout/mobile-menu.tsx` | |
+| `@radix-ui/react-visually-hidden` | ^1.2 | Dialog title for screen readers | `layout/mobile-menu.tsx` | |
+| `@radix-ui/react-slot` | ^1.4 | `asChild` on `Button` | `ui/button.tsx` | |
+| `lucide-react` | ^1.53 | Icons | many | Render dynamic icons with `<Icon name="…" />` (`ui/icon.tsx`) only. Brand icons are missing in lucide, so `ui/social-icons.tsx` uses inline SVG. |
+| `tailwindcss` v4 + `@tailwindcss/turbopack` | ^4 | Styling, CSS-first config | `src/app/globals.css`, `tokens.css` | No `tailwind.config`. Theme mapping lives in `@theme inline`. |
+| `clsx` + `tailwind-merge` | | `cn()` in `src/lib/cn.ts` | everywhere | |
+| `babel-plugin-react-compiler` | 1.0 | Auto-memoization | build | |
+
+Scripts: `npm run dev`, `npm run build`, `npm run start`, `npm run lint`. Type-check with `npx tsc --noEmit`. If `LayoutProps` goes missing, run `npx next typegen`.
+
+---
+
+## 3. Next 16 behaviors that shape the code
+
+1. **Routes stay mounted.** With `cacheComponents`, client-navigated routes are kept in React `<Activity>` (hidden with `display:none`, up to 3). Consequences:
+   - **Duplicate ids.** Ids repeat across hidden routes. Product section ids are prefixed with the slug (`verifi-features`). Anchors resolve through `findVisible(selector)` in `smooth-scroll.tsx`.
+   - **Re-runs.** Effects re-run on hide and show, so every animation must clean up (`useGSAP` scope, `gsap.matchMedia().revert()`, kill tweens and restore DOM).
+   - **Played state.** The hero entrance remembers played routes in a module `Set`, so a re-shown route does not replay.
+   - **Refresh timing.** `ScrollTrigger.refresh()` runs on every pathname change, and again 700 ms later once the route settles.
+2. **Metadata merges shallowly.** Use `buildMetadata()` (`src/lib/metadata.ts`), which builds canonical, Open Graph and Twitter per route.
+3. **Images.**
+   - `next/image` `priority` is deprecated. Use `loading="eager"` plus `fetchPriority="high"`.
+   - Always pass `sizes`.
+   - Static imports give width, height and blur.
+4. **OG images.** Use `ImageResponse` from `next/og`. `src/lib/og.tsx` renders all route OG images with the Manrope WOFF files from `src/assets/fonts`.
+5. **No `new Date()` in render or sitemap.** `contentLastModified` in `data/company.ts` is a fixed string.
+
+---
+
+## 4. Repository map
+
+```
+src/
+  app/
+    layout.tsx            Root: fonts, JSON-LD, boot script, Splash, ambient layers, SmoothScroll, header/footer
+    page.tsx              Homepage composition
+    <slug>/page.tsx       Product pages (practice, verifi, match, docs) + opengraph-image.tsx each
+    contact/page.tsx      Contact page
+    globals.css           Theme mapping, type scale, all custom CSS classes (see §6)
+    tokens.css            Design tokens (light + [data-theme="dark"])
+    robots.ts, sitemap.ts, not-found.tsx, icon.png, apple-icon.png
+  assets/  brand/ (mark PNG + 5 product SVG glyphs), clients/ (6 logos), products/ (screenshots), fonts/ (OG)
+  data/
+    company.ts            Contact, socials, nav, external links, demoCta, demoMailto, routes
+    home.ts               All homepage copy (hero, ecosystem, why, segments + `art`, testimonials, faq, cta)
+    products.ts           Typed Product model and the five products (copy, visuals, screens, spotlights, features, faq)
+    product-sections.ts   Per-product in-page menu (ids must match rendered section ids)
+    workflow.ts           The 6 audit workflow steps (home workflow tour)
+    kanban.ts             Practice board mockup content and move script
+    showcases.ts          Verifi/Match/Docs mockup content
+  lib/
+    motion.ts             EASE, ANCHOR_OFFSET=0, prefersReducedMotion(), isFinePointer()
+    splash.ts             Splash boot script, SPLASH_EVENT, splashActive(), onSplashDone()
+    metadata.ts, og.tsx, json-ld.ts, fonts.ts, icons.ts, cn.ts
+  components/
+    motion/       gsap.ts, smooth-scroll.tsx, use-scene.ts, horizontal-scroll.tsx, reveal.tsx, word-reveal.tsx,
+                  hero-entrance.ts, hero-scroll.ts, hero-title.tsx, 
+    layout/       site-header, products-menu, mobile-menu, site-footer, splash, theme-observer, background-grid,
+                  pointer-field, back-to-top, skip-link, nav-styles
+    sections/     Homepage sections + shared hero-shell, hero-showcase, statement, faq-section, final-cta
+    product/      Product page sections and helpers
+    mockups/      Animated product mockups + window chrome + static mockups + registry
+    ui/           button, badge, card, container, eyebrow, icon, logo, product-glyph, product-lockup,
+                  product-icon-nav, section-header, social-icons
+```
+
+---
+
+## 5. Data layer
+
+The data layer drives the pages, and content edits should rarely need component changes.
+
+- **`Product`** (in `data/products.ts`) has these fields:
+  - **Identity and color:** `slug`, `name`, `fullName`, `color`, `colorDeep`, `category`, `tagline`, `summary`.
+  - **Workflow and SEO:** `workflowStep` (order and label in the 6-step workflow) and `meta` (SEO).
+  - **Hero:** `hero` (eyebrow, headline, description, `visual`).
+  - **Section content:** `highlights?`, `problem?`, `spotlights[]`, `screens?`, `featureSections[]`, `comparison?`, `workflow?`, `audience?`, `faq[]`, `cta`.
+- **`Visual`** is either `{ kind: "image", src, alt, frame?, caption?, screenTitle? }` or `{ kind: "mockup", id, alt, caption?, screenTitle? }`. `caption` is the visible text under a card in the screenshot rail (falls back to `alt`, which stays the screen-reader description); `screenTitle` names the hero capture's card (default "Overview"). Mockup ids resolve through `components/mockups/registry.tsx` (static mockups: `docs-repository`, `verifi-report`, `match-three-way`).
+- **`screens?`** holds extra captures for the screenshot rail after the hero. The rail always starts with `hero.visual` and then every spotlight visual, with duplicates dropped. Practice uses five real app captures.
+- **Product color scoping.**
+  - `ProductPage` sets `--product` and `--product-deep` inline on `<main data-product>`.
+  - Anything inside uses `bg-product`, `text-product-deep` and `bg-product-soft`.
+  - `bg-product-soft` is mixed **per element** in `@theme inline` (`color-mix(in srgb, var(--product) 10%, var(--bg))`), so it follows the nearest override. Never define product tints on `:root`. A root-resolved variable ignores overrides.
+- **`home.segments.items[].image`** (`{ src, alt }`) is the photo for each firm size. Both are free under the Unsplash License; sources are noted beside their imports in `data/home.ts` (assets in `src/assets/segments/`, cropped 3:2, 1200×800).
+
+---
+
+## 6. Design system
+
+### Tokens (`src/app/tokens.css`)
+- **Neutrals:** `--bg`, `--surface`, `--elevated`, `--ink`, `--ink-2`, `--ink-3`, `--line`, `--line-strong`.
+- **Brand:** the logo coral is the primary color. `--brand #f46a4a` (exact logo color: fills, rules, icons, large display text; 3.0:1 on white), `--brand-strong` (#b04c35 light / #ff8a70 dark: **all small brand text**, 5.3:1 on white), `--brand-hover`, `--brand-soft`, `--brand-ink` (white on coral fills, matching the product buttons; the user's choice, 3.0:1, below AA for normal text), hover darkens to `--brand-hover`. `--accent #f55d48` stays for warning flags in mockups. Use `text-brand` only for icons or text ≥24px; use `text-brand-strong` for anything smaller.
+- **Product:** `--product`, `--product-deep`, `--product-soft` (defaults to brand).
+- **Radii:** `--radius-sm .75rem`, `--radius-card 1.5rem`, `--radius-panel 2rem`, `--radius-media 3rem`.
+- **Shadows:** `--shadow-card`, `--shadow-float`, `--shadow-stage`, `--shadow-menu`. **Interface screenshots and mockups never carry a shadow** (window frames, preview rails, spotlights, ecosystem posters, the workflow panel, the phone screenshot, mockup panels). Shadows remain only on floating chrome: dropdown menus, the mobile sheet, back-to-top and the product icon nav marker.
+- **Menu glass:** `--menu-bg` plus `--shadow-menu`. Menus have no borders by design.
+- **Easing:** `--ease-out`, `--ease-expo`, `--ease-nav`. GSAP default `EASE = "power3.out"` (`lib/motion.ts`).
+- **Header height:** `--header-h: 4.5rem` (used for hero and scene top padding).
+- **Dark scene:** `[data-theme="dark"]` redefines the whole token set, so any subtree with that attribute restyles itself. Tailwind `dark:` is a custom variant that matches `[data-theme="dark"]` ancestors.
+
+### Theme and scene switching
+- **Two theme lines** (`layout/theme-observer.tsx`, 2026-10-15). `<html data-theme>` follows the scene crossing the viewport middle. `<header data-theme>` follows what is visibly behind the transparent header: dark when the scene under the header line (40px) is dark **or** the page is dark, because light scenes paint no background of their own. A `[data-theme="light"]` token block (tokens.css) lets the nearest attribute win, so a light header works inside a dark page; header components must use tokens, not the `dark:` variant (which matches any dark ancestor). The nav pill highlight uses `--nav-pill`.
+- **Pinned scenes** are measured from their pin trigger (start to end + own height) with function-based start/end, not their own box, which ended too early. Verified: 0 header and 0 page mismatches over 336 sampled positions (/, /why-praszo, /practice, /verifi at 1440 and 390); logo contrast ≥ 4.45:1 everywhere sampled (large text minimum is 3:1).
+- Light sections must not hard-code a background colour (Practice's mobile section had `bg-white`, which stayed white on a dark page and hid the white logo).
+- **Dark sections.** A section opts into the dark scene with `data-theme="dark"`. Current dark sections are the home Statement, the WorkflowTour, the product feature rails (HorizontalScroll `theme="dark"`) and FinalCta.
+- **`ThemeObserver`** mirrors whichever `[data-theme]` crosses the viewport middle onto `<html data-theme>`. The fixed background, brand bar and nav glass crossfade with it.
+- **Local dark areas.** These must carry `data-theme-local`, or they will flip the page header. The hero mockup frame does this (see §9.6).
+
+### Typography
+- **Font.** Manrope through `next/font` (`lib/fonts.ts`) as `--font-manrope`. Body weight is 500.
+- **Display scale** (in `@layer components`): `.display-xl`, `.display-lg` (homepage hero and big section titles), `.display-hero` (product hero), `.display-md`, `.display-sm`, `.heading` (item titles in rails, lists and dense grids, 19→24px), plus `.lede` (intro and short bodies), `.copy` (running text and lists, 16→18px) and `.label` (uppercase tracking: index numbers, kicker lines, compact links). Avoid one-off `text-[Npx]` sizes in sections; pick a tier.
+- **Kickers.** `Eyebrow` (`ui/eyebrow.tsx`) has no dot. It carries a hand-drawn pen underline as an inline SVG (`.eyebrow-scribble`). The stroke draws on hover of the kicker or its parent block (kicker + title + intro) via `stroke-dashoffset` with `pathLength=1`, CSS only, and retracts faster on leave. Touch screens (`hover: none`) show it drawn. Do not add `vector-effect: non-scaling-stroke`: Chrome then measures dashes in screen pixels and the stroke stops partway. The SVG needs an explicit width, because an absolutely positioned SVG ignores `left` + `right`.
+- **Layer rule.** Base typography sits in `@layer base`. Unlayered CSS beats Tailwind utilities, which broke `truncate` once, so keep custom rules layered or class-scoped.
+
+### Surfaces
+- **No content cards.** Titled items never sit on a card surface. They use `EditorialItem` (`ui/editorial-item.tsx`): hairline top rule, `label` row (index and/or icon), `display-sm` + `lede` for sets of 2–3 (`size="display"`) or `heading` + `copy` for rails and lists (`size="heading"`). Used by pillars, highlights, audience, feature groups, both card rails and the contact details. Product link grids use `ProductLinks` (`ui/product-links.tsx`): rule, glyph, `heading`, one line of `copy`, hover to brand. The old `ui/card.tsx` was removed. Surfaces remain only for UI depictions (mockups, screenshots, the product posters), menus and buttons.
+- **Menus.** `.menu-surface` (header nav pill and menu button; flat, no shadow) and `.menu-panel` (dropdowns; keeps `--shadow-menu` because it floats over content) are glass. Blur is emitted via `@apply backdrop-blur-xl backdrop-saturate-150`, because Lightning CSS drops the unprefixed property from hand-written rules.
+- **Mockups** follow the contrast rule: flat `bg-elevated` desk, borderless `bg-bg` cards, state shown by a tint (`bg-product-soft`), no shadows at all (a lifted card only scales). **No inner borders.**
+- **Ecosystem posters** (2026-10-27, at the user's request) all use the same soft card: `bg-surface` with ink text, an `bg-elevated` category badge and preview well. The product color appears only in the glyph and the preview, never as the card fill, so no per-product text contrast logic is needed.
+
+### Layout utilities
+- **`Container`** has one width, `--container-wide` (86rem), with the same gutters as the header, so the logo, every section and the footer share one left and right edge. The old narrow `--container-site` and the `wide` prop were removed. For a narrow reading column, constrain the content inside the container (e.g. `max-w-3xl`), never the container itself.
+- **`.fit-box` / `.fit-frame`.** The hero visual box fills its area. Below 640px the frame is free-form. From 640px it is capped to a 720:520 window and centered (`.fit-box-end` bottom-aligns it for the home caption row).
+- **`.screen-rail`.** Screenshot rail cards share a height `--screen-h`, capped so a pinned rail fits the viewport, and take their width from their aspect ratio.
+
+### Ambient fixed layers (`layout.tsx` order, bottom to top)
+1. `.background-grid` (z 0). A 100×150px grid texture, light and dark layers crossfading with the theme.
+2. `.pointer-field` (z 1). A soft radial glow following `--mx` and `--my`, set by `PointerField` on fine pointers only.
+3. `main` (z 10), then the header (fixed, transparent, pointer-events only on its children).
+4. `.splash` (z 200). The first-load splash.
+
+---
+
+## 7. Motion architecture
+
+### 7.1 One loop: Lenis drives GSAP
+`SmoothScroll` (in `layout.tsx`) creates the single Lenis instance:
+
+```ts
+new Lenis({ anchors: { offset: 0 }, respectReducedMotion: true,
+  prevent: (node) => node.closest("[data-lenis-prevent], [role='dialog']") })
+lenis.on("scroll", ScrollTrigger.update)          // every ScrollTrigger reads Lenis' smoothed scroll
+gsap.ticker.add((t) => lenis.raf(t * 1000))       // Lenis runs on GSAP's ticker: one RAF loop
+gsap.ticker.lagSmoothing(0)
+```
+
+- **Anchors.** Lenis subtracts `scroll-margin-top` and `scroll-padding-top` itself, so `ANCHOR_OFFSET = 0` and `html { scroll-padding-top: 6rem }`.
+- **Pause and resume.** Use `holdScroll(reason)` and `releaseScroll(reason)` from `smooth-scroll.tsx`. Lenis stays stopped while any reason holds it, so one owner can never restart scrolling another still needs stopped. SmoothScroll itself holds `"splash"` until `SPLASH_EVENT`; the mobile menu holds `"mobile-menu"` while open. (The old `lenis:stop`/`lenis:start` window events were removed: the menu fired `lenis:start` on mount, which restarted Lenis under the splash.)
+- **QA hook.** A build with `NEXT_PUBLIC_QA_HOOKS=1` exposes `window.__praszoQA` (`gsap`, `ScrollTrigger`, `getLenis`, Lenis created/destroyed counts) for headless checks. The condition is inlined at build time, so normal builds contain none of it.
+- **In-page jumps.** `scrollToTarget(target)` accepts a selector, element or number, resolves visible elements and uses Lenis.
+- **Theme flips.** `html` transitions only `background-color`. Never transition `color` (or any inherited property) on `html` or `body`: every descendant then re-resolves its colour each frame, which cost about 820 ms of style work per scene flip (now about 75 ms).
+- **No native scroll listeners for scroll-driven UI.** ThemeObserver, the header scroll spy and BackToTop each use ScrollTriggers (`onToggle`), so they run only when a threshold is crossed, never measure every section per frame, and never set React state per scroll event. Declare the trigger array before calling `ScrollTrigger.create`: `onToggle` can fire synchronously during creation (an earlier version read it in its temporal dead zone and crashed `/verifi` on direct load). Use `refreshPriority: -1` for observers so they measure after pinned sections.
+- **Scrollable regions.** Inner scroll areas that must not be hijacked carry `data-lenis-prevent`, for example the native horizontal rail on mobile.
+
+**Consequence:** any ScrollTrigger animation with `scrub: true` is automatically smooth, because Lenis already eases the scroll. Use `scrub: true` (no lag) for pinned or 1:1 motion. Use small numbers (0.4 to 0.6) for "soft" step scenes.
+
+### 7.2 GSAP registration
+`src/components/motion/gsap.ts` registers `useGSAP`, `ScrollTrigger` and `Flip` once, and sets `ScrollTrigger.config({ ignoreMobileResize: true })`. Always import `{ gsap, ScrollTrigger, Flip, useGSAP }` from there.
+
+### 7.3 Reduced motion and no-JS
+- **Checking.** Use `prefersReducedMotion()` in effects. Add `gsap.matchMedia("… and (prefers-reduced-motion: no-preference)")` for desktop-only effects.
+- **Fallback layout.** Every scene and rail renders a static fallback that is the default DOM. The animated version is opted into with a class added by JS (`.is-ready`, `.is-pinned`).
+- **No JS.** A `<noscript>` style in `layout.tsx` reveals hero targets and scene stacks and hides the splash.
+
+### 7.4 First-load sequence (timeline)
+1. **Boot script** (inline, first in `<body>`, from `lib/splash.ts`) sets `<html data-splash="on">` before first paint, on every full load. Client navigation never replays it.
+2. **Splash** (`layout/splash.tsx`). Timings: minimum 0.35 s, contraction 0.8 s, settle 0.5 s. It waits for **fonts only** (max 1.2 s), never for the full window load: waiting for every image held the hero back ~3 s on throttled mobile. A 7 s watchdog always hands the site over. React Strict Mode safe: the effect cleanup only finalises if no remount follows within 50 ms (before, development showed the splash for about 0.4 s). Under reduced motion it waits only for fonts and fades in 0.25 s (about 0.45 s total). The screen is the Praszo mark as a vector, traced from `praszo-mark.png` as two polygons in coral `#f46a4a`.
+   - **Cover.** The mark is scaled up around a point inside its solid wedge, so it covers the viewport. A CSS fallback paints solid coral until JS places it.
+   - **Wait.** It waits for `window.load` plus `document.fonts.ready`, with a minimum of 0.9 s and a maximum of 4 s.
+   - **Contract.** GSAP contracts the shape into a 96px "Z" (1.25 s `expo.inOut`). It is driven by one proxy object `{x, y, fx, fy, s}` and an SVG `transform` written in `onUpdate`.
+   - **Start site.** Near the end of the contraction it calls `startSite()`: `data-splash="landing"`, `lenis.start()` and dispatches `SPLASH_EVENT`.
+   - **Land.** The mark glides onto the visible `header [data-logo-mark]` (0.85 s `power3.inOut`). Then `data-splash="landed"` reveals the real logo, the copy fades and the state becomes `"done"`.
+   - **Edge cases.** With no header mark visible (product pages on phones), it shrinks and fades in the center. Under reduced motion the coral simply fades.
+   - **CSS states.** `on` locks scroll and hides header marks. `landing` keeps marks hidden while the page is interactive. `landed` and `done` show them.
+3. **Hero entrance** (`motion/hero-entrance.ts`). Its timeline is created `paused: splashActive()` and plays on `onSplashDone()`. Order:
+   - Eyebrow fades.
+   - **Title words** (`[data-hero="word"]` from `HeroTitle`) rise from per-word masks: `yPercent 115→0`, `rotate 7→0`, `blur 12px→0`, `opacity 0→1`, 1.15 s `expo.out`, stagger 0.075. Note the explicit `y: 0` in both states, because GSAP otherwise reads the CSS gating `translateY(110%)` as pixels and leaves words offset.
+   - Copy, then the hero's secondary action ("See the workflow" / "See the features").
+   - Visual (`y 28→0`, `scale .985→1`, `clearProps: transform`).
+   - When it finishes, the root gets `.is-ready`. **There is no CSS gating any more** (removed for LCP): the hero is painted from the first frame, and the timeline applies its own from-state when created (under the splash, or before paint on client navigation). The hero copy (`[data-hero="copy"]`, the LCP element) only slides and never fades, because text at opacity 0 does not count as painted.
+4. **Hero scroll depth** (`motion/hero-scroll.ts`). A scrubbed timeline (`top top` to `bottom top`, `scrub: true`) on wrapper elements `[data-hero-depth]`:
+   - **Title** `yPercent 55, scale .9, opacity 0`.
+   - **Lede** `y 90, opacity 0`.
+   - **Visual** `y -70, scale .94`.
+   - Separate wrappers keep the entrance (`[data-hero]`) and scroll (`[data-hero-depth]`) transforms from colliding.
+
+### 7.5 Motion primitives catalogue
+
+- **`scrollToSceneStep(root, index, count)`** (`motion/use-scene.ts`) is the one way scene tabs jump to a step (products, workflow, spotlights, feature groups). Do not re-implement it per component.
+
+| Primitive | File | Trigger and engine | What it does | Fallback |
+|---|---|---|---|---|
+| `useScene(rootRef, { count, onUpdate, media, scrub })` | `motion/use-scene.ts` | ScrollTrigger on `[data-scene-track]` (`top top` to `bottom bottom`), `scrub 0.6`, desktop `(min-width:1024px)` | Sticky step scene. Calls `onUpdate(progress, t, index, set)`, where `set` is a change-only setter (`createSceneSetter()`) scoped to this activation: it writes only properties whose value changed, and parked items are not rewritten every frame, where `t` is a fractional step. Adds `.scene.is-ready`, which shows track and stage and hides `.scene-stack`. Helpers: `stepOpacity(t, i, fade)` and `applySceneItems(stage, t, index)` (crossfade `[data-scene-item]`, toggles `[data-scene-tab]` `.is-current`). | `.scene-stack` static layout |
+| `HorizontalScroll` / `HorizontalCard` | `motion/horizontal-scroll.tsx` | `pinMedia` `(min-width:1024px) and (hover:hover) and (pointer:fine)` and no reduced motion (touch tablets and phones get the native rail): pins the section with `pinType: "transform"` (the fixed/static swap scored about 2.0 CLS per rail; transform pinning measures 0.015 and stays within 0.3 px while pinned), tweens the track `x` by its overflow, `scrub: true`, `invalidateOnRefresh`. A ResizeObserver refreshes only when `track.scrollWidth` changes. Keyboard focus scrolls the card into view via Lenis. | Pinned horizontal carousel driven by vertical scroll | Native horizontal scroll (`data-lenis-prevent`); pinned stage padding and gap tighten below 820px viewport height so header and rail fit; proximity snapping only below 640px (on tablets it pulled short drags back to the start); `scroll-padding-inline` keeps cards on the page gutter |
+| `RevealHeading` | `motion/reveal.tsx` | `once`, `top 90%` | Masked line rise (`y 110%→0`) | none needed |
+| `RevealBlock` | same | `once`, `top 90%` | Fade-up 18px | |
+| `RevealGroup` (+ `data-reveal` children) | same | `once`, `top 85%`, stagger 0.08 | Staggered fade-up of children | |
+| `WordReveal` | `motion/word-reveal.tsx` | ScrollTrigger `scrub 0.4` on the nearest `[data-reveal-track]` ancestor (else the text). Found from the DOM, not a ref: a parent ref is still null when the child layout effect runs, which once made the Statement reveal snap on in one step. | Words gain `.is-on` progressively; highlight phrases get the brand color | `.is-static` shows all |
+| `ClipReveal` | `product/clip-reveal.tsx` | `once`, `top 82%` | `clip-path inset(10% 6%) → inset(0)` plus scale | |
+| `HeroTitle` | `motion/hero-title.tsx` | (entrance) | Splits a title into per-word masks, keeps hyphenated words whole, colors one `highlight` word, keeps an `sr-only` full title | |
+| `useHeroEntrance` / `useHeroScroll` | `motion/hero-entrance.ts`, `hero-scroll.ts` | see §7.4 | | `.is-static` |
+| `useOnScreen(ref)` | `motion/use-on-screen.ts` | IntersectionObserver | Pauses the hero mockup loops and the 7 s rotation while the hero is off screen | |
+| `useHeaderReveal(ref, { delta, topOffset, duration, resetKey })` | `motion/use-header-reveal.ts` | One ScrollTrigger (`start 0`, `end "max"`) fed by Lenis; GSAP `yPercent` tween with `overwrite` | Hides the site header on scroll down (`yPercent -100`, `power2.in`), reveals it on scroll up (`power3.out`, 0.38 s). Defaults: 8 px run before reacting, always shown within 96 px of the top, overscroll clamped, 350 ms settle window after mount or route change. Never hides while any header trigger has `aria-expanded="true"` (Products menu, mobile drawer) or keyboard focus is inside; focus entering a hidden header reveals it. Sets `data-header-hidden`. | Reduced motion: instant hide and show |
+| `ProductIconNav` | `ui/product-icon-nav.tsx` | `gsap.to` indicator | Sliding highlight behind hovered or focused product glyph, tooltips, links | |
+| `PointerField` | `layout/pointer-field.tsx` | rAF-throttled pointermove | Updates `--mx` and `--my` for the ambient glow | off for coarse pointers and reduced motion |
+| Logo marquee | CSS `.marquee` | CSS keyframes 42 s, pauses on hover | Client logos scroll | duplicates hidden, static under reduced motion |
+| Nav follower | `site-header.tsx` (`useNavFollower`) | One absolutely positioned pill; GSAP tweens its x/y/width/height to the `[aria-current]` item (0.45s `power3.out`), re-measured by a ResizeObserver; fades out when nothing is current; instant under reduced motion | Pill highlight slides between nav items | |
+| Products menu, back-to-top | CSS transitions (opacity, translate, scale, visibility) on always-mounted elements, `inert` while hidden | | Fade and slide in and out | |
+| Mobile menu | Radix Dialog + CSS `sheet-in` keyframes | | Slide-in sheet, focus trap; stops Lenis while open | |
+
+---
+
+## 8. Pages and sections
+
+### 8.1 Homepage (`src/app/page.tsx`), top to bottom
+
+Kept short on purpose (decided 2026-10-15: visitors don't scroll that far). Only the essentials stay; the long-form case moved to `/why-praszo` (8.1b). Header nav "Why Praszo" and the footer link go to that page.
+
+**Mobile-first below desktop (decided 2026-10-15).** The desktop scroll scenes (≥1024px, motion allowed) are untouched; everything below uses purpose-built layouts in the scenes' stacked fallbacks. Homepage height at 390×844 went from 10,250px to 6,173px.
+- **Products** (`ProductRail` in `product-ecosystem.tsx`): below md a horizontal scroll-snap rail (cards 80vw, max 21rem, 26rem tall, next card peeking, bleeding to the screen edge) with a "01 / 05" counter and tappable dots (32px targets, `aria-current`, labels "Go to the Praszo X card"). From md it is the two-column grid, no dots.
+- **Workflow** (stack in `workflow-tour.tsx`): a vertical timeline, product glyph on the line, "Step 0N · Praszo X" label, `heading` title, `copy` body, link. No canvas illustrations. Below 1024px with motion a coral line draws down (`[data-tl-progress]`, scaleY scrubbed `top 65%`→`bottom 65%`) and steps brighten as it reaches them (`.tl-live` + `.is-on`); reduced motion / no JS show it fully lit. Centered at max-w-2xl on tablets.
+
+| # | Section | Component | Animation |
+|---|---|---|---|
+| 1 | **Hero**: "Run it on Praszo." | `CorporateHero` → `HeroShell` + `HeroShowcase` | **Layout.** 100svh grid: title row at the top (below a header gap), then lede and CTAs on the left with the visual on the right (5/7 columns at lg). **Entrance.** Splash hand-off, word entrance (§7.4), scroll depth. **Visual.** Rotates the five product mockups every 7 s, and hovering or focusing a product icon holds one. Only the visible mockup animates (`paused` prop, `inert` on the others). The caption row shows the product lockup, label and `ProductIconNav`. **Theme.** Dark by default with a local light toggle (§9.6). |
+| 2 | Trusted by | `TrustedBy` | CSS marquee of 6 grayscale client logos |
+| 3 | Five specialized engines (`#products`) | `ProductEcosystem` | `useScene`, 5 steps, 420svh track. Left: product name list (current one expanded). Center: stacked **poster cards filled with the product color** fan in and out (`x d*70`, `rotate d*7`, `scale`). Right: step badge, summary and link crossfade. Clicking a name jumps to its step. **Entrance** (scrubbed from track `top 92%` to `top top`, ending exactly where the scene starts): the deck rises 160px, untilts from -9° and scales up from 0.84; the first poster's preview slides up inside it; the names stagger in from the left; the copy column rises. It only animates `[data-eco-deck]`, `[data-poster-preview]`, tab rows and `[data-eco-copy]`, which the scene never writes. Mobile: grid of posters. |
+| 4 | The complete audit firm workflow (`#workflow`, dark) | `WorkflowTour` + `mockups/workflow-canvas.tsx` | Custom ScrollTrigger scene, 440svh, `scrub 0.6`, 6 steps, same layout (tabs, copy left, canvas right, progress rule). **The canvas tells one engagement's story** (redesigned 2026-10-15): a fixed "Acme Holdings · FY2025 audit" header; one `[data-layer]` per step showing that step's output (raw data with 3 issues → letter filled with values and signed → board with the hours budget filling → evidence OCR-indexed and filed → register row matched to invoice/PO/GRN → statements cross-checked, score ring drawing to 98, file validated); and a **pipeline track** of six stage nodes (`TOUR_STAGES`) where a coral line fills (`[data-tour-fill]` scaleX), each stage dot pops in its product colour as it is reached (`[data-tour-node]`), and the dark audit-file token slides along (`[data-tour-token]` x) with its status crossfading Raw → Signed → Planned → Filed → Matched → Validated (`[data-tour-status]`). `data-stroke` paths draw per step. Lightweight: no MotionPath, no SVG pattern or filters, change-only writes of opacity/scale/x/dashoffset; scrubbing holds 16.7 ms frames at 1440×900. Below 1024px: the vertical timeline (see 8.1 mobile notes). |
+| 5 | Testimonials | `Testimonials` | `HorizontalScroll` rail of 4 quotes |
+| 6 | Final CTA (dark) | `FinalCta` | `RevealHeading` plus `RevealBlock` |
+
+### 8.1b Why Praszo (`/why-praszo`), top to bottom
+
+Copy from praszo.com/why-praszo (page data in `data/pages/why-praszo.ts`; the shared blocks still read `data/home.ts`). `WhyPraszo` takes its content as props.
+
+| # | Section | Component | Animation |
+|---|---|---|---|
+| 1 | Hero: "Because audit firms deserve better practice management" | `PageHero` | `RevealBlock` |
+| 2 | Platform pillars: "Praszo OS. One platform." | `PlatformPillars` | `RevealHeading` lines, then three editorial columns (no card surface) under the giant title: hairline top rule, `label` index with icon, `display-sm` title, `lede` body, staggered by `RevealGroup` |
+| 3 | Statement (dark) | `Statement` | Sticky 100svh stage over a 190svh track, with `WordReveal` scrubbed `top top` to `bottom bottom`. "cannot risk data exposure" is highlighted. Glass chips and a dot-field backdrop. |
+| 4 | What makes Praszo different (`#why-praszo`, dark) | `WhyPraszo` | `HorizontalScroll` rail with a `WordReveal` intro and `RevealHeading` |
+| 5 | From chaos to clarity: the Praszo impact (`#why-impact`) | `PageSection` + `FeatureGrid` | `RevealGroup` stagger |
+| 6 | Who it is for: "Built for firms that cannot risk data exposure" | `Segments` (photos from `src/assets/segments/`) | `useScene`, 2 steps, `count*130+40` svh. One persistent frame with no surface (hairline top rule, progress rule at the bottom, content on the page grid; it still clips content moving in and out). Each step holds for most of its slice. Inside a `SWITCH = 0.32` window the outgoing content leaves in reading order (photo tilts and shrinks, copy rises 42px, points slide left 64px, stagger 0.07). Then the incoming content builds in from below and the right, with no overlap. A progress rule fills along the frame bottom, and tabs jump to settled points. Type matches the pillars: `display-sm` title, `label` subtitle in brand coral (`brand-strong`), `copy` body, numbered points (`label` index, `copy` text) between hairline rules, and a `label` link. Each firm size shows a **photo** (glass towers for larger firms, a mid-rise office for mid-sized firms) in a 3:2 rounded frame that tilts and shrinks with the content. |
+| 7 | FAQ (`#why-faq`) | `FaqSection` | Native `<details>` accordion, plus FAQPage JSON-LD |
+| 8 | Final CTA (dark) | `FinalCta` (`id="why-cta"`) | `RevealHeading` plus `RevealBlock` |
+
+### 8.2 Product pages (`src/app/<slug>/page.tsx`)
+Every page is wrapped by `ProductPage`, which provides the product color scope, SoftwareApplication JSON-LD and `RelatedProducts` at the end. The header switches to the product lockup and that product's section menu (§9). Pages compose shared sections in this order (✓ = used):
+
+| Section | Component | Animation | Practice | Verifi | Match | Docs |
+|---|---|---|---|---|---|---|
+| Hero (`<slug>-overview`) | `ProductHero` → `HeroShell` + `ProductShowcase` | Same shell as home: product mockup, word entrance, scroll depth | ✓ | ✓ | ✓ | ✓ |
+| Screenshot rail (`<slug>-preview`) | `ProductPreview` | `HorizontalScroll` of framed captures (`WindowFrame` chrome, one shared height). Real captures only: hand-built mockups are dropped whenever the product has at least one image. Falls back to one full-width `ClipReveal` visual when only one remains (Verifi, Match, Docs). | ✓ (5 screens) | single | single | single |
+| Highlights (`<slug>-highlights`) | `ProductHighlights` | `RevealGroup`; 3 columns, or 2 when there are 4 items | | ✓ | ✓ | ✓ |
+| Problem statement (`<slug>-problem`), first section after the hero on every product page | `ProductProblem` → `Statement` | Scrubbed word reveal with pain-point chips | ✓ | ✓ | ✓ | ✓ |
+| Spotlights (`<slug>-spotlights`) | `ProductSpotlights` | `useScene` (`count*110+40` svh). Tabs, copy crossfade, visual cards slide and scale. Mobile: alternating rows with `ClipReveal`. | | ✓ | ✓ | |
+| Feature section(s) (`<slug>-<sectionId>`) | `ProductFeatureGrid` | A single group renders as a **dark `HorizontalScroll` rail** of icon cards. Multiple groups (Practice 5, Verifi 4 engines, Match 3 modules) render as **`ProductFeatureGroups`**, a sticky `useScene` scene (`count*90+40` svh, same primitives as the homepage products scene): left, eyebrow + title + the groups as numbered tabs with a product-coloured progress line (`[data-feature-progress]` scaleY); right, one panel per group crossfading (`applySceneItems`) with icon, title, description and features that stagger in via CSS (`.feature-scene.is-ready .is-current .feature-row`, `--i` × 70ms). Tabs jump with `scrollToSceneStep`. Below 1024px / reduced motion: the editorial grouped list (`RevealGroup`) is the stacked fallback; its heading has no id (the scene heading owns `<id>-title`). | ✓ ×2 | ✓ ×2 | ✓ ×2 | ✓ |
+| Mobile app (`practice-mobile`) | `PracticeMobileSection` | `RevealBlock` and `ClipReveal` phone capture | ✓ | | | |
+| Workflow (`<slug>-workflow`) | `ProductWorkflow` | Numbered steps plus a connector line scrubbed `scaleX` (`scrub 0.5`) | | ✓ | ✓ | ✓ |
+| Audience (`<slug>-audience`) | `ProductAudience` | `RevealGroup` | ✓ | ✓ | ✓ | ✓ |
+| FAQ (`<slug>-faq`) | `FaqSection tone="product"` | `<details>` + JSON-LD | ✓ | ✓ | ✓ | ✓ |
+| CTA | `ProductCta` → `FinalCta` | Dark closing scene | ✓ | ✓ | ✓ | ✓ |
+| Related products | `RelatedProducts` (in `ProductPage`) | static | ✓ | ✓ | ✓ | ✓ |
+
+`data/product-sections.ts` lists the in-page menu per product. Its ids must equal the rendered ids above. All currently match.
+
+### 8.3 Contact (`/contact`)
+`PageHero` with `mailto:` and `tel:` buttons, the three contact items as its aside (`RevealGroup`), and a product quick-link grid. No form.
+
+### 8.4 Company pages (About, solutions, Insights, legal)
+Data-driven and built from one kit in `components/page/`, so new pages need no new layout:
+- **Content** lives in `src/data/pages/` (`about.ts`, `solutions.ts`, `insights.ts`, `legal.ts`, shared shapes in `types.ts`). Copy is from praszo.com only. Left out on purpose: the About stats (100%, 99%, 10,000+, Zero), "Join 500+ partners", the template blog posts on praszo.com/insights-resources, and the theme placeholder photo praszo.com shows for Mohammed Labinash. All four portraits were supplied directly as transparent PNGs (`labinash.png` arrived with a baked checkerboard and was converted to real alpha). `TeamGrid` falls back to an initials tile for any member without a photo.
+- **Kit:** `PageHero` (eyebrow, h1 `display-lg` or `display-md`, lede, actions, optional aside, never a demo button), `PageSection` (rule, `SectionHeader`, content; id `<id>`, heading `<id>-title`), `FeatureGrid` (EditorialItems, 2 or 3 columns), `MediaFrame`, `TeamGrid` (cut-out portraits on organic bubble shapes: transparent PNGs in `src/assets/team/` are clipped to their bubble below the shoulders and left free above, so the head breaks out; four bubble paths cycle across cards, drawn in a 100 × 125 box matching the 4/5 frame. Static by design: nothing moves on scroll and the cards share one baseline. Hover only: a hand-drawn pen loop (`.team-scribble`, the same stroke reveal as the Eyebrow underline, a larger tilted copy of the bubble) draws behind the figure so the head overlaps it, and the figure scales from its base. Touch screens show the loop drawn. Captions are name and role only. A Server Component with no JS; pass a route-specific `idPrefix` for the SVG clip ids.), `QuoteBlock` (the avatar has an `--elevated` ground for transparent portraits), `LegalDocument` (sticky "On this page" index, numbered sections, plain anchors smoothed by Lenis), `ArticleList` (rows, or an empty state while `insights.articles` is empty), `SolutionPage` (a whole solution page from one entry). Pages close with `FinalCta`.
+- **Recipes.** New solution: add an entry to `solutions.ts`, then a route folder with the three-line `page.tsx` and `opengraph-image.tsx` (copy `large-firms/`). New article: push to `insights.articles`. New legal page: add a `LegalDocument` object in `legal.ts` and render it like `privacy-policy/page.tsx`. Then add the path to `routes` in `data/company.ts` (sitemap) and, if it belongs in the footer, to `companyLinks` or `legalLinks`.
+- **Why static folders, not `[slug]`:** `dynamicParams = false` is unavailable with Cache Components, so an unknown slug could not be forced to 404 at build. Folder-per-page keeps every route statically prerendered.
+- **Unique ids:** routes stay mounted, so `TrustedBy` and `FinalCta` take an `id` prop; every page passes its own.
+
+---
+
+## 9. Components worth knowing in depth
+
+### 9.1 `HeroShell` (`sections/hero-shell.tsx`)
+- **Contract.** A 100svh section (`min-h-[36rem]`). The grid is `auto` (title row, padded `--header-h + 2.5rem`, or `+ clamp(1.5rem, 7svh, 4rem)` at lg), then `minmax(0,1fr)` for lede and visual.
+- **Guarantee.** The giant title is always visible without scrolling, and the visual shrinks first.
+- **Breakpoints.** On phones the lede stacks above a free-form visual. At lg, lede and visual sit side by side (5/7 columns).
+- **Depth wrappers.** It owns the `[data-hero-depth]` wrappers and calls `useHeroScroll`.
+- **Product hero typography.** `display-hero lg:max-w-[24ch] lg:text-[min(5.9rem,6.2vw,9.5svh)]`, and the lede is clamped to 4 lines at lg.
+- **Before changing the hero**, re-run the hero-fit check (§12) at 1440×900, 1366×768, 1280×720, 1024×768, 834×1194, 390×844 and 360×780.
+
+### 9.2 Animated product mockups (`components/mockups/`)
+
+**Liveliness layer (2026-10-15).** Every mockup gets the same playful, interactive layer through two shared pieces, so the five stay consistent:
+- **`MockupShell`** renders coloured window dots (`WindowFrame dots="color"`: accent / warning / success tokens), a product-colour wash on the desk, a pulsing **Live** chip, and the effects overlay `[data-fx]` (labelled collaborator cursor, click ripple, toast). `toastAt="left" | "right"` puts the toast in the corner that layout leaves empty (checked: it covers no card, row, step or badge).
+- **`mockup-fx.ts`**: `createMockupFx(root)` → `cursorTo(el)`, `cursorAt(x, y)`, `click()`, `toast(text, tone)`, `burst(el)` (confetti in the five product colours); `bindHoverHold(root, fx, onHold)` pauses a demo while the pointer is over it. All no-ops under reduced motion. No shadows anywhere (toast is a flat ink pill; cursor has a `--bg` stroke).
+- **Per mockup**: the cursor visits what is about to change and clicks it; milestones toast; completions burst. Each has one hands-on interaction: Practice, click a card to advance it (moves are serialised with the loop); Verifi, the score card re-runs the checks; Match, rows are buttons that match that row; Docs, click a file to re-run OCR. Clicking releases the hover hold.
+- The homepage showcase also holds its 7s product rotation while the pointer is over the mockup.
+All five share `MockupShell`: a `WindowFrame` (dots, title pill, optional `action` slot) plus a meta-chip toolbar on an `bg-elevated` desk. They take `{ paused?, className? }`, and pausing holds the loop. All are static under reduced motion.
+
+| Mockup | Product | Engine | Loop |
+|---|---|---|---|
+| `KanbanBoard` | Practice | **GSAP Flip**, transform-only (`absolute`, `scale: true`, `prune`) | 3 columns (2 on phones). Cards lift (`scale 1.02`, no shadow), fly to the top of the target column, counts update, then the moves replay in reverse. In-flight animation is finished on cleanup. |
+| `VerifiValidator` | Verifi | GSAP timeline `repeat -1` | Checks go pending, then running, then pass or flag. A score ring and counter tween. |
+| `MatchEngine` | Match | GSAP timeline | For each register row, SVG links draw to Invoice, PO and GRN, and results stamp. |
+| `DocsPipeline` | Docs | **GSAP Flip** plus a scan sweep | Files move from intake to processing (OCR sweep, tags), then route to Finance or Legal, then reset |
+
+`product-showcases.tsx` maps each slug to its component and caption label. `HeroShowcase` (home) stacks all five, and `ProductShowcase` (product hero) renders one.
+
+### 9.3 `WindowFrame`
+- **Structure.** Browser chrome (`relative isolate overflow-hidden rounded-card`, `bg-surface` bar) wraps every mockup and every rail screenshot. The `relative isolate` makes it the clipping container, so absolutely positioned Flip cards cannot escape it.
+- **Hero frames.** No shadow: `WindowFrame` itself is flat.
+
+### 9.4 Navigation (Workspace-style, 2026-10-15)
+- **One global header, every route** (`layout/site-header.tsx`): Praszo logo · Products ▾ · Solutions ▾ · Why Praszo · Resources ▾ · Contact · coral "Book a demo". It never changes per route: no product lockup, no product colour, no product sections. The GSAP nav pill (`useNavFollower`) highlights the item with `aria-current` (a menu trigger is current when the route is one of its links).
+- **Data** (`data/navigation.ts`): `productGroups` (Manage: Practice · Prepare: Docs · AI audit checks: Match, Verifi), `productMenuLinks` (Praszo OS overview `/`, See the workflow `/#workflow`, All products `/#products`), `solutionLinks`, `resourceLinks`, `globalLinks`. Desktop menus and the mobile menu read only this (plus `data/products.ts` for names, glyphs, taglines). `primaryNav` was removed.
+- **Menus** (`layout/nav-dropdown.tsx`): `NavDropdown` (hover intent on fine pointers, click/keyboard, Escape returns focus, outside click and route change close, always mounted with a CSS transition, `inert` while closed, centred under the pill with `min(width, 100vw - 2.5rem)` so it fits from 1024px). `ProductsMenu` (grouped mega menu) and `LinkMenu` (Solutions, Resources) are thin wrappers.
+- **Product hero + section pill** (Workspace product-page pattern, 2026-10-15). `ProductPage` renders both for every product, so route files no longer include the hero. `ProductHero` (`product/product-hero.tsx`) is minimal: the product identity (glyph + "Praszo X") appears once, above the headline, then the description (both **at most two lines**: short `hero.headline` and `hero.description` in `data/products.ts`, and a fluid headline size `clamp(1.85rem, 1.1rem + 3.3vw, 3.5rem)` / `min(3.6vw, 3.5rem, 7.5svh)` on desktop, verified at 1440/1280/1024/768/390), "See the features" and the workflow-step link; the live mockup sits on the right. Columns are near-equal (`1fr / 1.05fr`) on desktop. The mockup is **frameless** in product heroes: `ProductShowcase` wraps it in `MockupFrameProvider value="bare"`, so `MockupShell` drops the `WindowFrame` (no window bar, border or box) and draws a soft product-tinted wash whose edges fade out (mask on the background layer only); the title becomes the first chip and the theme toggle ends the chip row. **Dark mode (bare):** no dark fill (it read as a smudge on the light page); the dark cards sit on a faint product glow, and the toast switches to a dark pill (`dark:group-data-[frame=bare]/shell:bg-elevated`). Card-level backgrounds in hero mockups must be opaque (e.g. Verifi's flagged row is `color-mix(in srgb, var(--accent) 14%, var(--bg))`), because there is no desk behind them in this mode. The homepage showcase keeps the window frame (default `"window"`). `useHeroScroll(rootRef, { visualMedia: "(min-width: 1024px)" })` stops the mockup rising into the copy when the hero stacks. `ProductSubNav` (`product/product-sub-nav.tsx`) is a floating pill of the page's sections (data: `data/product-sections.ts`) directly under the hero, **in the page flow, not sticky**; the current tab gets the header's GSAP pill highlight (`useNavFollower`). **Header section menu** (`layout/product-section-menu.tsx`, rendered by the global header next to the logo on product routes only): no background, product glyph + "Praszo X" + current section + chevron (glyph only below `sm`), opening a **mega menu** via `NavDropdown align="start"` (36rem, two columns from `sm`): "On this page" sections on the left, and every Praszo product on the right via `ProductGroupLinks variant="compact"` (shared with the Products menu, current product marked). Two GSAP layers on the Lenis loop: the **inner layer is scrubbed to the in-page pill** (ScrollTrigger on `[data-product-subnav]`, `top top+=170` → `top top+=8`, scrub 0.6): as the pill rises toward the header it shrinks, lifts and fades while the menu grows in from the left, reversing on the way back, and the menu is inert below 60% progress. The **outer layer follows the header**: on `HEADER_EVENT` it eases its x into the logo's place (0.7s `power3.inOut`) while cancelling the header's vertical slide every frame (reads the header's `yPercent`/`y`), so it stays on screen when the header hides (measured 0px vertical drift) and glides back beside the logo when the header returns. `useHeaderReveal` dispatches `HEADER_EVENT` after creating its tween, so listeners see the new transform immediately under reduced motion. Both use `useSectionSpy` (the header one against the visible `<main>`, `keepLast`) and `scrollToSection` (offset 88px).
+- **Scroll choreography.** `useHeaderReveal` hides and shows the header (and fires `HEADER_EVENT`); nothing else on product pages is sticky. An open section menu keeps the header shown (it reports `aria-expanded`). Verified at 1440/1280/1024/768/390.
+- **Scroll spy** (`motion/use-section-spy.ts`): one ScrollTrigger per section on the Lenis loop, "top 40%" to "bottom 20%", ids resolved inside the route's own `<main>` (routes stay mounted). The homepage no longer has a header spy.
+- **Mobile menu** (`layout/mobile-menu.tsx`): one hierarchy on every route: Products (accordion with the three groups + Praszo OS links), Solutions (accordion), Why Praszo, Resources (accordion), Contact, coral CTA, phone. Native `<details>`. Product sections are not here; they are in the product bar's tab strip.
+- **Logos.** Kept in the Products menu, the product bar, the hero showcase selector, the workflow and related products; removed from the footer product list (plain links).
+
+### 9.5 Screenshot rail (`product/product-preview.tsx`)
+- **Verifi** (2026-10-28): seven real desktop-app captures supplied by Praszo (`src/assets/products/verifi-app-dashboard.png`, `-engagements`, `-summary`, `-math-accuracy`, `-sum-check`, `-internal-consistency`, `-prior-year`, resized to 1900px wide) via `hero.visual` plus `screens` in `data/products.ts`. The old `verifi-dashboard.png` is no longer referenced.
+`screensFor(product)` collects the hero visual, then the spotlight visuals, then `product.screens`, dropping duplicates.
+- Each card is a `WindowFrame` titled "Praszo ⟨screen⟩".
+- Its body is `h-[var(--screen-h)]` with `object-cover object-top`, and the card width comes from the aspect ratio.
+- Captions show the number, title and a description clamped to 2 lines.
+- **Desktop density (2026-10-15):** `--screen-h` shrinks from 1024px (≈2.6 cards visible) and 1280px (≈3.3: three full plus the next peeking), assuming ~1.6:1 captures, and the viewport fades out at the right edge (`mask-image`), so the rail reads as "there is more". Phones and tablets are unchanged.
+- **Closing card** (`MoreCard`): "And more inside · There is more to Praszo X than these screens · See the full application in a live demo" with a product-coloured "Book a demo". The header line is "A first look at the application. Scroll to explore, and see everything in a live demo." (no screen count).
+
+### 9.6 Local mockup theme (`mockups/mockup-theme.tsx`)
+- **Scope.** `MockupThemeProvider` (in `HeroShowcase` and `ProductShowcase`) holds `"dark" | "light"`, light by default (changed 2026-10-15); dark is optional via the window-bar toggle.
+- **Applying it.** The hero `figure.fit-frame` gets `data-theme={theme} data-theme-local`. Tokens flip inside it, and `ThemeObserver` ignores it (`[data-theme]:not([data-theme-local])`).
+- **Toggle.** `MockupThemeToggle` renders in each window bar via `WindowFrame action` and returns nothing outside a provider. One state covers all five rotating home mockups.
+- **Dark-mode tags.** In dark mode, product tags use `dark:text-product` for contrast.
+- **Persistence.** None. Each load starts dark.
+
+---
+
+## 10. SEO and metadata
+- **Per-route metadata.** `buildMetadata({ title, description, path })` on every page gives a unique title and description, canonical, Open Graph and Twitter.
+- **Structured data.** Organization JSON-LD in `layout.tsx`, SoftwareApplication per product (`ProductPage`) and FAQPage (`FaqSection`).
+- **OG images.** Route-level `opengraph-image.tsx` files call `renderOg()`.
+- **Crawl files.** `sitemap.ts` covers every route with a fixed `lastModified`. `robots.ts` is the default.
+- **Icons.** `icon.png` and `apple-icon.png` come from the Praszo mark.
+
+---
+
+## 11. Rules and recipes for agents
+
+**Hard rules**
+1. Import GSAP only from `@/components/motion/gsap`. Wrap every animation in `useGSAP({ scope })` or `gsap.matchMedia()` and clean up (kill tweens and triggers, restore moved DOM, `clearProps`).
+2. Never add a second smooth-scroll or RAF loop. Scroll-linked motion is ScrollTrigger on Lenis. Use `scrollToTarget()` for jumps.
+3. Every scroll scene needs a static fallback (`.scene-stack`, native rail) for mobile, reduced motion and no-JS. The animated layout is opted into by JS.
+4. Keep entrance targets (`[data-hero]`) and scroll targets (`[data-hero-depth]`, scene items) on different elements. GSAP tweens on the same property of the same element fight.
+5. When tweening from a CSS-gated transform, set `y: 0` (or `x`) explicitly, or GSAP converts the CSS offset to pixels and keeps it.
+6. Product section ids are `${slug}-${name}`, and `data/product-sections.ts` must list the same ids.
+7. React Compiler lint:
+   - Never create components during render. Use `<Icon name>`, not `getIcon()`.
+   - No synchronous `setState` in effects. Derive the value, or defer it to rAF or an event.
+8. Scene `onUpdate` writes go through the provided `set` (change-only). Plain `gsap.set` every frame on parked items re-invalidates style for their subtree.
+9. Pin horizontal rails with `pinType: "transform"`. Hold Lenis with `holdScroll`/`releaseScroll`, never `lenis.start()` directly.
+10. Never transition inherited properties (`color`) on `html`/`body`.
+11. Looping visuals accept `paused` and are paused off screen (`useOnScreen`).
+12. Implicit grid tracks must be `minmax(0,1fr)` (or `grid-cols-1`). An `auto` track grows to nowrap text and causes horizontal page overflow at 360px.
+13. Tints that depend on `--product` must be mixed per element, never on `:root`.
+14. Any local dark area must carry `data-theme-local`. Header marks the splash may land on must carry `data-logo-mark`.
+15. Content stays sourced from praszo.com, with no stats, pricing or fake forms.
+
+**Recipes**
+- **New sticky step section.** Markup is `section.scene` > `[data-scene-track]` (height in svh) > `[data-scene-stage].scene-stage` with `[data-scene-item]` and `[data-scene-tab]`, plus a `.scene-stack` fallback. Drive it with `useScene(rootRef, { count, onUpdate })`. For holds and crossfade windows, copy the `SWITCH` mapping from `segments.tsx`.
+- **New horizontal rail.** Use `<HorizontalScroll label header theme?>` with `<HorizontalCard className="w-[…]">` children. Cards need explicit widths.
+- **New animated mockup.** Build it on `MockupShell`, accept `paused`, run a GSAP timeline or Flip inside `useGSAP`, and register it in `product-showcases.tsx`. Use tokens only, no borders, and tint for state.
+- **New product capture.** Resize to about 2000px wide with `sharp`, add it to `src/assets/products/`, then add `{ title, visual }` to `product.screens`.
+
+---
+
+## 11b. Performance notes (2026-10-15)
+
+Lighthouse 12.8, home page. "Deployed" was praszo-three.vercel.app before these changes; "local" is the production build.
+
+| Run | Score | FCP | LCP | Speed Index | JS transfer |
+|---|---|---|---|---|---|
+| Desktop, deployed before | 95 | 0.3 s | 0.8 s | 2.2 s | 395 KiB |
+| Desktop, local after | 97–98 | 0.3 s | 0.7 s | 1.6 s | 340 KiB |
+| Mobile (simulated), deployed before | 82 | 2.3 s | 3.7 s | 5.7 s | 348 KiB |
+| Mobile (simulated), local after | 89 | 1.2 s | 3.4 s | 4.3 s | 295 KiB |
+| Mobile (applied throttling), local after | 87 | 1.7 s | **1.7 s** | 5.8 s | |
+
+- With real throttling the LCP (hero copy) paints with the first paint. Lighthouse's default *simulated* mobile LCP stays ~3.4 s because its model counts all JS seen before LCP in the unthrottled trace; PageSpeed Insights uses the same model, so it improves mainly by shipping less JS.
+- The remaining Speed Index cost is the splash itself (a full coral screen until it contracts). Options, not yet taken: show it once per session, or skip it on touch/mobile.
+- Next candidates: mount only the visible hero mockup (DOM was 1,836 nodes; GSAP setup ~800 ms of mobile CPU), load the mobile menu (Radix Dialog) on first open, batch load-time layout reads (~100 ms forced reflow), right-size client logo images.
+
+## 12. Verification and QA
+
+- **Gates.** `npm run lint`, `npx tsc --noEmit` and `npm run build` must all pass. All 7 routes must prerender static.
+- **Browser QA.** Use headless Chrome via the DevTools Protocol (Node 22 `WebSocket` scripts). Run `npx next start -p 3100`, and never touch the developer's own server on port 3000. Checks used so far:
+  - **Hero fit:** title visible, frame inside viewport, section equals the viewport height, `overflowX = 0` across the 7 sizes in §9.1. Wait about 5 s for the splash and entrance before measuring.
+  - **Page overflow** at 390 and 360px on every route.
+  - **Scene scrubbing:** step to fractions of the track, then assert tab state, item opacities and no clipping.
+  - **Carousel:** pin start and end, release, re-entry and fit (`stageH ≤ vh`).
+  - **Frame timing:** rAF deltas while animating; the target is about 16.7 ms average with none over 25 ms.
+  - **Splash:** sample `data-splash` over time and screenshot each phase.
+  - **Reduced motion:** run with `Emulation.setEmulatedMedia` `prefers-reduced-motion: reduce`.
+- **Screenshots.** Clip coordinates in `Page.captureScreenshot` are page coordinates, not viewport coordinates.
+
+---
+
+## 13. Audit findings and remediation (2026-10-14)
+
+Measured on a `NEXT_PUBLIC_QA_HOOKS=1` production build served by `next start`, headless Chrome, homepage wheel-scrolled top to bottom (120 px steps every 16 ms). Desktop is 1440×900 unthrottled; mobile is 390×844 with 4× CPU throttle. Lab numbers, not field data.
+
+| Metric | Before | After |
+|---|---|---|
+| Desktop CLS during scroll | 3.997 | 0.010 |
+| Desktop style recalculation | 5,206 ms | 535 ms |
+| Desktop script time | 1,892 ms | 272 ms |
+| Desktop avg / p99 frame | 21.4 / 50 ms | 16.7 / 16.8 ms |
+| Desktop frames over 33 ms / long tasks | 50 / 12 | 0 / 0 |
+| Mobile 4× style / layout | 6,653 / 604 ms | 1,940 / 16 ms |
+| Mobile 4× long tasks (count, total) | 53, 5,472 ms | 5, 459 ms |
+| Page scrolled behind splash by wheel | about 2,360 px | 0 |
+| Splash done (desktop) | 3.51 s | 2.79 s |
+| Splash done (reduced motion) | 1.95 s | 0.46 s |
+| Splash in dev (Strict Mode) | ended at 0.4 s | full sequence |
+
+**Fixed**
+- Lenis restarted under the splash by the mobile menu's mount effect; replaced with keyed scroll holds.
+- Splash killed by Strict Mode cleanup in development; outro scheduling hardened; 7 s watchdog.
+- Theme-flip style storm from inherited `color` transitions on `html`/`body`.
+- Pinned-rail CLS (transform pinning).
+- Scroll scenes rewriting unchanged styles each frame (change-only setter).
+- Hero mockups animating while off screen (paused via `useOnScreen`).
+- Modifi poster contrast (4.17 → 5.73) and poster text opacity/badge contrast on all products.
+- Modifi document-hub capture contained its own browser chrome; cropped to the app area (`modifi-hub.png`, 1496×940) and flagged `frame: "browser"`.
+- Phone rails loaded scrolled 20 px (first card flush to the screen edge); snap now respects the gutter.
+- Removed `getIcon`, `showcaseAspect`; `productForPath` no longer exported. Kept `productOrder`, `buttonClasses` and the data-model types (used internally; part of the typed data API). README `Tilt` reference removed.
+
+**Verified unchanged / healthy**
+- 21 client navigations: ScrollTrigger counts identical per route every round, one Lenis instance, no console errors, history back works.
+- All 7 routes at 1440 and 390: no console errors, failed requests, broken images or horizontal overflow; one h1, description, canonical and OG image each.
+
+- **Route change during wheel momentum.** Clicking a link while Lenis was still easing landed the next page mid-scroll, because Lenis kept animating toward the old target. A `useLayoutEffect` on pathname in `smooth-scroll.tsx` now stops (resets) Lenis before Next applies the new route's scroll, then re-applies the scroll holds.
+
+- **Stale build cache.** One CSS edit was not picked up by `next build` until `.next/cache/turbopack` was cleared. If a style change does not show after a build, clear that folder and rebuild.
+
+**Remaining risks**
+- Verifi (#0f8f5c, 4.11:1) and Match (#c4640a, 4.06:1) deep shades with white text, used by product buttons and `text-product-deep` on white, are below 4.5:1 for normal text. Needs a brand decision on darker deep shades.
+- No unit, component or browser test suite exists in the repo; QA is scripted headless Chrome.
+- Lighthouse and field Core Web Vitals not measured here.

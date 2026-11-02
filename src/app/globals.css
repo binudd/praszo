@@ -1,0 +1,822 @@
+@import "tailwindcss";
+@import "./tokens.css";
+
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-elevated: var(--elevated);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-ink-3: var(--ink-3);
+  --color-line: var(--line);
+  --color-line-strong: var(--line-strong);
+  --color-brand: var(--brand);
+  --color-brand-strong: var(--brand-strong);
+  --color-brand-soft: var(--brand-soft);
+  --color-brand-hover: var(--brand-hover);
+  --color-brand-ink: var(--brand-ink);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-product: var(--product);
+  --color-product-deep: var(--product-deep);
+  /* Mixed per element (not on :root), so the tint follows wherever --product is overridden. */
+  --color-product-soft: color-mix(in srgb, var(--product) 10%, var(--bg));
+  /* Product-colored text on dark scenes (--product-deep is too dark there); 7:1 or better on --bg for every product. */
+  --color-product-bright: color-mix(in srgb, var(--product) 55%, white);
+  --color-product-ink: var(--product-ink);
+  --font-sans: var(--font-manrope), "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --radius-sm: var(--radius-sm);
+  --radius-card: var(--radius-card);
+  --radius-panel: var(--radius-panel);
+  --radius-media: var(--radius-media);
+  --shadow-card: var(--shadow-card);
+  --shadow-float: var(--shadow-float);
+  --shadow-stage: var(--shadow-stage);
+  --shadow-menu: var(--shadow-menu);
+  --color-menu: var(--menu-bg);
+  --ease-out: var(--ease-out);
+  --ease-expo: var(--ease-expo);
+  --container-wide: 86rem;
+}
+
+@layer base {
+  html {
+    background: var(--bg);
+    color: var(--ink);
+    scroll-padding-top: 6rem;
+    overflow-x: clip;
+    /* Only the page background crossfades between scenes. Transitioning `color` here (or on body)
+       made every descendant re-resolve its inherited colour each frame for 0.6s on every theme
+       flip (~800ms of style work per flip on the homepage). Text switches with the tokens. */
+    transition: background-color 0.6s ease;
+  }
+
+  body {
+    background: transparent;
+    color: var(--ink);
+    color-scheme: light;
+    font-family: var(--font-manrope), "Manrope", ui-sans-serif, system-ui, sans-serif;
+    font-weight: 500;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  [data-theme="dark"] body,
+  section[data-theme="dark"] {
+    color: var(--ink);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4 {
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  ::selection {
+    background: color-mix(in srgb, var(--brand) 28%, transparent);
+    color: var(--ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 3px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Touch targets: grows a small control's hit area to at least 44px without changing its layout.
+   For isolated controls; stacked lists get real 44px rows instead, so neighbouring hit areas never overlap. */
+@utility tap-target {
+  position: relative;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: max(100%, 2.75rem);
+    height: max(100%, 2.75rem);
+    transform: translate(-50%, -50%);
+  }
+}
+
+/* Type scale (display sizes borrow the "type as graphic" scale) ------------- */
+
+@layer components {
+
+  .display-xl {
+    font-size: clamp(3.4rem, 10.5vw, 9rem);
+    line-height: 0.88;
+    letter-spacing: -0.035em;
+    font-weight: 600;
+  }
+
+  .display-lg {
+    font-size: clamp(2.9rem, 8.2vw, 7.25rem);
+    line-height: 0.9;
+    letter-spacing: -0.035em;
+    font-weight: 600;
+  }
+
+  .display-hero {
+    font-size: clamp(2.7rem, 6.6vw, 5.9rem);
+    line-height: 0.92;
+    letter-spacing: -0.035em;
+    font-weight: 600;
+  }
+
+  .display-md {
+    font-size: clamp(2.2rem, 5vw, 4.25rem);
+    line-height: 0.96;
+    letter-spacing: -0.03em;
+    font-weight: 600;
+  }
+
+  .display-sm {
+    font-size: clamp(1.7rem, 3.2vw, 2.6rem);
+    line-height: 1.04;
+    letter-spacing: -0.025em;
+    font-weight: 600;
+  }
+
+  .lede {
+    font-size: clamp(1.1rem, 1.7vw, 1.45rem);
+    line-height: 1.22;
+    letter-spacing: -0.012em;
+    font-weight: 500;
+    color: var(--ink-2);
+  }
+
+  /* Section kicker with a hand-drawn underline (Eyebrow). The pen stroke draws itself while the
+     kicker's block (its parent: kicker + heading + intro) is hovered, using a stroke-reveal,
+     and retracts on leave. CSS only. */
+  .eyebrow {
+    position: relative;
+  }
+
+  .eyebrow-scribble {
+    position: absolute;
+    left: -0.15em;
+    width: calc(100% + 0.5em);
+    bottom: -0.7em;
+    height: 0.6em;
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  .eyebrow-scribble path {
+    fill: none;
+    stroke: currentColor;
+    /* User units: the 10-unit viewBox maps to 0.6em, so this renders about 1.6px thick. */
+    stroke-width: 2.2;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    /* Gap longer than the path: with an equal gap the round cap of the next dash shows as a dot at rest. */
+    stroke-dasharray: 1 2;
+    /* Drawn by default (was 1: hidden until hover). */
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 0.35s var(--ease-out);
+  }
+
+  :where(*:has(> .eyebrow)) > .eyebrow .eyebrow-scribble path,
+  .eyebrow:hover .eyebrow-scribble path {
+    stroke-dashoffset: 0;
+    transition: stroke-dashoffset 0.8s cubic-bezier(0.65, 0, 0.35, 1);
+  }
+
+  /* No hover on touch screens: show the underline drawn. */
+  @media (hover: none) {
+    .eyebrow-scribble path {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  /* Team cut-out cards (TeamGrid): the same pen stroke as .eyebrow-scribble, drawn as a loose loop
+     round the bubble while the card is hovered. Touch screens have no hover, so it is shown drawn. */
+  .team-scribble {
+    overflow: visible;
+    pointer-events: none;
+  }
+
+  .team-scribble path {
+    fill: none;
+    stroke: currentColor;
+    /* User units: 100 units span ~106% of the card width, so this renders about 2px on desktop. */
+    stroke-width: 0.62;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1 2;
+    stroke-dashoffset: 1;
+    transition: stroke-dashoffset 0.45s var(--ease-out);
+  }
+
+  @media (hover: hover) {
+    [data-team-card]:hover .team-scribble path {
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset 1.1s cubic-bezier(0.65, 0, 0.35, 1);
+    }
+  }
+
+  @media (hover: none) {
+    .team-scribble path {
+      stroke-dashoffset: 0;
+      transition: none;
+    }
+  }
+
+  /* Item titles in rails, lists and dense grids: the tier below .display-sm. */
+  .heading {
+    font-size: clamp(1.2rem, 1rem + 0.55vw, 1.5rem);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    font-weight: 600;
+  }
+
+  /* Running text: the tier below .lede, for multi-sentence bodies and lists. */
+  .copy {
+    font-size: clamp(1rem, 0.85rem + 0.35vw, 1.125rem);
+    line-height: 1.55;
+    letter-spacing: -0.005em;
+    font-weight: 500;
+    color: var(--ink-2);
+  }
+
+  .lede strong,
+  .lede b {
+    font-weight: 600;
+    color: var(--ink);
+  }
+
+  .label {
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  /* Menu surface: the header nav pill and menu button. Flat glass: background only, no border or shadow. */
+  .menu-surface {
+    @apply backdrop-blur-xl backdrop-saturate-150;
+    background: color-mix(in srgb, var(--menu-bg) 82%, transparent);
+    border: 0;
+  }
+
+  /* Denser variant for text-heavy panels (dropdowns). */
+  .menu-panel {
+    @apply backdrop-blur-2xl backdrop-saturate-150;
+    background: color-mix(in srgb, var(--menu-bg) 94%, transparent);
+    box-shadow: var(--shadow-menu);
+    border: 0;
+  }
+}
+
+/* Fixed ambient layers --------------------------------------------------------- */
+
+.background-grid {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.background-grid__layer {
+  position: absolute;
+  inset: 0;
+  transition: opacity 0.6s ease;
+}
+
+.background-grid__layer::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(to right, var(--grid-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--grid-line) 1px, transparent 1px);
+  background-size: 100px 150px;
+  background-position: center top;
+}
+
+.background-grid__layer::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--grid-wash);
+}
+
+.background-grid__light {
+  --grid-line: rgba(18, 19, 23, 0.06);
+  --grid-wash: linear-gradient(67deg, rgba(255, 255, 255, 0.82) 15%, rgba(255, 255, 255, 0.2));
+  background: #ffffff;
+  opacity: 1;
+}
+
+.background-grid__dark {
+  --grid-line: rgba(255, 255, 255, 0.07);
+  --grid-wash: radial-gradient(ellipse at top right, rgba(15, 19, 22, 0) 0%, rgba(15, 19, 22, 0.6) 60%, #0f1316 100%);
+  background: #0f1316;
+  opacity: 0;
+}
+
+[data-theme="dark"] .background-grid__light {
+  opacity: 0;
+}
+
+[data-theme="dark"] .background-grid__dark {
+  opacity: 1;
+}
+
+.pointer-field {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1;
+  background: radial-gradient(
+    560px circle at var(--mx) var(--my),
+    color-mix(in srgb, var(--brand) 10%, transparent),
+    transparent 42%
+  );
+}
+
+@media (prefers-reduced-motion: reduce), (hover: none) {
+  .pointer-field {
+    display: none;
+  }
+}
+
+/* Scenes --------------------------------------------------------------------- */
+
+section[data-theme="dark"] {
+  background: var(--bg);
+}
+
+.glass {
+  background: color-mix(in srgb, var(--bg) 55%, transparent);
+  border: 1px solid var(--line);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+.glass-dark {
+  background: rgba(15, 19, 22, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #fff;
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+}
+
+/* No CSS entrance gating: the hero is painted from the first frame so the browser can count it for LCP.
+   The entrance timeline (useHeroEntrance) applies its own from-state when it is created, which happens
+   under the splash on a first load and before paint on client navigation, so nothing visibly flashes. */
+
+.mask-reveal {
+  overflow: hidden;
+}
+
+/* Word reveal (scroll-scrubbed statement) ------------------------------------- */
+
+.word-reveal {
+  position: relative;
+  display: block;
+}
+
+.word-reveal .word {
+  display: inline-block;
+  color: color-mix(in srgb, var(--ink) 28%, transparent);
+  transition: color 0.25s var(--ease-out);
+}
+
+.word-reveal .word.is-on {
+  color: var(--ink);
+}
+
+.word-reveal .word.is-on[data-highlight] {
+  color: var(--brand-strong);
+}
+
+.word-reveal.is-static .word {
+  color: var(--ink);
+}
+
+.word-reveal.is-static .word[data-highlight] {
+  color: var(--brand-strong);
+}
+
+/* Native accordion ---------------------------------------------------------- */
+
+details summary {
+  outline-offset: 4px;
+}
+
+details summary::-webkit-details-marker {
+  display: none;
+}
+
+details[open] .faq-chevron {
+  transform: rotate(45deg);
+}
+
+/* Logo marquee ---------------------------------------------------------------- */
+
+.marquee {
+  mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+.marquee-track {
+  animation: marquee 42s linear infinite;
+}
+
+.marquee:hover .marquee-track {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .marquee {
+    mask-image: none;
+  }
+  .marquee-track {
+    animation: none;
+    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 1.5rem;
+  }
+}
+
+/* Sticky scenes (scroll-scrubbed step switching) ------------------------------ */
+
+.scene-track {
+  height: 300svh;
+}
+
+.scene-stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.scene-item {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.scene-item:first-child {
+  opacity: 1;
+  visibility: visible;
+}
+
+.scene-track,
+.scene-stage {
+  display: none;
+}
+
+.scene.is-ready .scene-track {
+  display: block;
+}
+
+.scene.is-ready .scene-stage {
+  display: flex;
+}
+
+.scene.is-ready .scene-stack {
+  display: none;
+}
+
+/* Feature group scene (ProductFeatureGroups): the current panel's features stagger in. Scoped to an
+   active scene, so the stacked fallback is never hidden. */
+.feature-scene.is-ready .feature-row {
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.45s var(--ease-out),
+    transform 0.6s var(--ease-expo);
+  transition-delay: calc(var(--i, 0) * 70ms);
+}
+
+.feature-scene.is-ready .is-current .feature-row {
+  opacity: 1;
+  transform: none;
+}
+
+/* Dialog sheet ---------------------------------------------------------------- */
+
+@keyframes sheet-in {
+  from {
+    transform: translateX(100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+@keyframes sheet-out {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Statement scene backdrop ---------------------------------------------------- */
+
+.dot-field {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: radial-gradient(color-mix(in srgb, var(--ink) 22%, transparent) 1px, transparent 1.6px);
+  background-size: 26px 26px;
+  mask-image: radial-gradient(ellipse 70% 60% at 50% 55%, black 10%, transparent 72%);
+}
+
+.dot-field::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(42% 34% at 50% 62%, color-mix(in srgb, var(--brand) 28%, transparent), transparent 70%);
+}
+
+/* Scene tabs (pill) ------------------------------------------------------------- */
+
+.scene-tabs {
+  display: inline-flex;
+  gap: 0.25rem;
+  padding: 0.375rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--menu-bg) 82%, transparent);
+  box-shadow: var(--shadow-menu);
+  @apply backdrop-blur-xl backdrop-saturate-150;
+}
+
+.scene-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  height: 2.25rem;
+  padding: 0 0.9rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--ink-3);
+  transition: color 0.3s var(--ease-out), background-color 0.3s var(--ease-out);
+  white-space: nowrap;
+}
+
+.scene-tab.is-current {
+  color: var(--ink);
+  background: var(--bg);
+}
+
+[data-theme="dark"] .scene-tab.is-current {
+  background: var(--elevated);
+}
+
+/* Horizontal scroll carousel ----------------------------------------------- */
+
+.hscroll {
+  overflow-x: clip;
+}
+
+.hscroll-stage {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 2rem;
+  padding-block: 5rem;
+}
+
+.hscroll.is-pinned .hscroll-stage {
+  min-height: 100svh;
+  padding-block: 4.5rem 2.5rem;
+}
+
+/* Short laptop screens: tighten the pinned stage so header + rail fit in one viewport. */
+@media (max-height: 820px) {
+  .hscroll.is-pinned .hscroll-stage {
+    padding-block: 3.5rem 1.5rem;
+    gap: 1.5rem;
+  }
+}
+
+.hscroll-header {
+  padding-inline: var(--hscroll-inset);
+}
+
+/* Native horizontal scrolling (mobile, reduced motion, no JS) */
+.hscroll-viewport {
+  overflow-x: auto;
+  overflow-y: hidden;
+  overscroll-behavior-x: contain;
+  /* Snap cards to the page gutter, not the screen edge (otherwise the first card loads flush left). */
+  scroll-padding-inline: var(--hscroll-inset);
+  scrollbar-width: none;
+  outline-offset: -2px;
+}
+
+.hscroll-viewport::-webkit-scrollbar {
+  display: none;
+}
+
+.hscroll-track {
+  display: flex;
+  align-items: stretch;
+  width: max-content;
+  padding-inline: var(--hscroll-inset) 0;
+  will-change: transform;
+}
+
+.hscroll-card {
+  scroll-snap-align: start;
+  flex-shrink: 0;
+}
+
+/* Snap one card at a time only on phones, where a card fills most of the screen. On tablets several
+   cards are visible and proximity snapping pulled any drag shorter than half a card back to the start,
+   so wider screens scroll freely. */
+@media (max-width: 639px) {
+  .hscroll-viewport {
+    scroll-snap-type: x proximity;
+  }
+}
+
+.hscroll-end {
+  flex: 0 0 var(--hscroll-inset);
+}
+
+/* Pinned + scrubbed (desktop/tablet): the track is translated, not scrolled */
+.hscroll.is-pinned .hscroll-viewport {
+  overflow: visible;
+  scroll-snap-type: none;
+}
+
+.hscroll-footer {
+  padding-inline: var(--hscroll-inset);
+}
+
+/* Screenshot rail: every capture shares one height (so captions line up) and
+   takes its width from its own aspect ratio. Capped so the widest capture
+   (about 2:1) plus its window bar still fits the viewport while pinned. */
+.screen-rail {
+  --screen-h: min(20rem, 55svh);
+}
+
+@media (min-width: 768px) {
+  .screen-rail {
+    --screen-h: min(32rem, calc(100svh - 29rem), calc(86vw / 2.1));
+  }
+}
+
+/* Desktop: smaller cards so more screens show at once (≈2.6 from 1024px, ≈3.3 from 1280px, assuming
+   the ~1.6:1 captures), with the next card peeking in and a soft fade at the right edge, so the rail
+   reads as "there is more". */
+@media (min-width: 1024px) {
+  .screen-rail {
+    --screen-h: min(16rem, calc((100vw - 6rem) / 2.6 / 1.6), calc(100svh - 29rem));
+  }
+
+  .screen-rail .hscroll-viewport {
+    mask-image: linear-gradient(to right, #000 86%, transparent);
+  }
+}
+
+@media (min-width: 1280px) {
+  .screen-rail {
+    --screen-h: min(17rem, calc((100vw - 6rem) / 3.3 / 1.6), calc(100svh - 29rem));
+  }
+}
+
+/* Hero frame that fills the space it is given. The box hands the frame its
+   full width and height; from 640px up the height is capped to a 720:520
+   window, centred in the slack, so wide layouts never turn the frame into a
+   tall slab. Below that the frame is free-form, so phones use
+   every pixel left between the lede and the headline. */
+.fit-box {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+/* Variant for frames with a caption row underneath: keep the frame on the row. */
+.fit-box-end {
+  justify-content: flex-end;
+}
+
+.fit-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+}
+
+@media (min-width: 640px) {
+  .fit-frame {
+    height: auto;
+    max-height: 100%;
+    aspect-ratio: 720 / 520;
+  }
+}
+
+/* First-load splash ------------------------------------------------------------
+   <html data-splash> is set before first paint by the boot script in the root
+   layout on every full load. "on": coral screen, page locked. "landing": the
+   mark is shrinking/flying while the page runs underneath. "landed": the mark
+   sits on the header logo and fades. "done": gone. */
+.splash {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+  display: none;
+}
+
+[data-splash="on"] .splash,
+[data-splash="landing"] .splash,
+[data-splash="landed"] .splash {
+  display: block;
+}
+
+[data-splash="on"] .splash {
+  pointer-events: auto;
+}
+
+[data-splash="on"],
+[data-splash="on"] body {
+  overflow: hidden;
+}
+
+/* The coral mark, scaled to cover the screen and then contracted into the logo. */
+.splash-art {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+/* Until the script places the vector, a solid coral screen guarantees full coverage. */
+[data-splash="on"] .splash:not(:has(.splash-art g[transform])) {
+  background: #f46a4a;
+}
+
+/* The header mark stays hidden until the coral mark lands on it. */
+[data-splash="on"] header [data-logo-mark],
+[data-splash="landing"] header [data-logo-mark] {
+  visibility: hidden;
+}

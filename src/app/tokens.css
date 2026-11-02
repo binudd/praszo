@@ -1,0 +1,128 @@
+/* Praszo design tokens — single source of truth for colors, radii, shadows and easing. */
+:root {
+  --bg: #ffffff;
+  --surface: #f6f8fa;
+  --elevated: #eef2f5;
+  --ink: #121317;
+  --ink-2: #4b5563;
+  --ink-3: #6b7280;
+  --line: #e3e8ee;
+  --line-strong: #cbd5e1;
+
+  /*
+   * Brand: the coral of the Praszo logo mark is the primary color.
+   * --brand is the exact logo color, for fills, rules, icons and large display text
+   * (3.0:1 on white, enough for graphics and large text).
+   * --brand-strong is the coral used for small text (kickers, badges, links). On 2026-10-27 the user chose
+   * the exact logo color for it so every coral matches the logo, accepting 3.0:1 on white (below AA
+   * 4.5:1 for normal-size text); it was #b04c35 (5.3:1) before.
+   * --brand-ink is the label color on --brand fills: white, matching the product page buttons
+   * (chosen by the user on 2026-10-15; 3.0:1, below AA 4.5:1 for normal-size text).
+   */
+  --brand: #f46a4a;
+  --brand-strong: #f46a4a;
+  --brand-hover: #e2583a;
+  --brand-soft: #fef0ed;
+  --brand-ink: #ffffff;
+  --accent: #f55d48;
+  --accent-soft: #ffe4df;
+  --success: #16a34a;
+  --warning: #d97706;
+
+  /* Product color set. Overridden per product via inline style on the page wrapper. */
+  --product: var(--brand);
+  --product-deep: var(--brand-strong);
+  --product-soft: color-mix(in srgb, var(--product) 10%, var(--bg));
+  --product-ink: #ffffff;
+
+  --radius-sm: 0.75rem;
+  --radius-card: 1.5rem;
+  --radius-panel: 2rem;
+  --radius-media: 3rem;
+  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 12px 32px -16px rgba(15, 23, 42, 0.16);
+  --shadow-float: 0 24px 64px -24px rgba(15, 23, 42, 0.28), 0 2px 8px rgba(15, 23, 42, 0.06);
+  --shadow-stage:
+    -1.5rem 1.125rem 2.5rem rgba(0, 0, 0, 0.1),
+    -2rem 4.5rem 4.5rem rgba(0, 0, 0, 0.08),
+    -2.5rem 10rem 6rem rgba(0, 0, 0, 0.05);
+
+  /* Menu surfaces (nav pill, dropdown panels, tab pills): background + soft shadow, no border. */
+  --menu-bg: #f3f5f8;
+  /* The sliding highlight in nav pills (header, section pill). */
+  --nav-pill: #ffffff;
+  --shadow-menu: 0 1px 2px rgba(15, 23, 42, 0.05), 0 10px 28px -14px rgba(15, 23, 42, 0.18);
+
+  --ease-out: cubic-bezier(0.4, 1, 0.7, 1);
+  --ease-expo: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-nav: cubic-bezier(0.22, 0.31, 0, 1);
+
+  --header-h: 4.5rem;
+
+  /* Pointer-field coordinates (set by PointerField). */
+  --mx: 50%;
+  --my: 30%;
+}
+
+/*
+ * Dark scenes. Any section (or the document root, driven by ThemeObserver)
+ * with data-theme="dark" flips the token set, so every component restyles itself.
+ */
+[data-theme="dark"] {
+  --bg: #0f1316;
+  --surface: #161c20;
+  --elevated: #1d2529;
+  --ink: #ffffff;
+  --ink-2: #b4bec6;
+  --ink-3: #8b969f;
+  --line: rgba(255, 255, 255, 0.1);
+  --line-strong: rgba(255, 255, 255, 0.2);
+  /* Logo coral reads at 6.2:1 on the dark background, so text can use it too. */
+  --brand: #f46a4a;
+  --brand-strong: #f46a4a;
+  --brand-hover: #e2583a;
+  --brand-soft: rgba(244, 106, 74, 0.14);
+  --accent: #ff7d68;
+  --accent-soft: rgba(255, 125, 104, 0.16);
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 32px -16px rgba(0, 0, 0, 0.6);
+  --shadow-float: 0 24px 64px -24px rgba(0, 0, 0, 0.7), 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-stage:
+    -1.5rem 1.125rem 2.5rem rgba(0, 0, 0, 0.35),
+    -2rem 4.5rem 4.5rem rgba(0, 0, 0, 0.3),
+    -2.5rem 10rem 6rem rgba(0, 0, 0, 0.2);
+  --menu-bg: #1d2529;
+  --nav-pill: #161c20;
+  --shadow-menu: 0 1px 2px rgba(0, 0, 0, 0.4), 0 12px 32px -14px rgba(0, 0, 0, 0.65);
+  color-scheme: dark;
+}
+
+/*
+ * Light scenes inside a dark context (e.g. the header over light content while the page is dark,
+ * or a light mockup in a dark section): the colour tokens re-declared, so the nearest data-theme wins.
+ */
+[data-theme="light"] {
+  --bg: #ffffff;
+  --surface: #f6f8fa;
+  --elevated: #eef2f5;
+  --ink: #121317;
+  --ink-2: #4b5563;
+  --ink-3: #6b7280;
+  --line: #e3e8ee;
+  --line-strong: #cbd5e1;
+  --brand: #f46a4a;
+  --brand-strong: #f46a4a;
+  --brand-hover: #e2583a;
+  --brand-soft: #fef0ed;
+  --accent: #f55d48;
+  --accent-soft: #ffe4df;
+  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 12px 32px -16px rgba(15, 23, 42, 0.16);
+  --shadow-float: 0 24px 64px -24px rgba(15, 23, 42, 0.28), 0 2px 8px rgba(15, 23, 42, 0.06);
+  --shadow-stage:
+    -1.5rem 1.125rem 2.5rem rgba(0, 0, 0, 0.1),
+    -2rem 4.5rem 4.5rem rgba(0, 0, 0, 0.08),
+    -2.5rem 10rem 6rem rgba(0, 0, 0, 0.05);
+  --menu-bg: #f3f5f8;
+  --shadow-menu: 0 1px 2px rgba(15, 23, 42, 0.05), 0 10px 28px -14px rgba(15, 23, 42, 0.18);
+  --nav-pill: #ffffff;
+  color-scheme: light;
+}
+

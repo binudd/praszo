@@ -1,0 +1,205 @@
+"use client";
+
+import { FileText, Scale, Wallet } from "lucide-react";
+import { useEffect, useRef } from "react";
+
+import { bindHoverHold, createMockupFx } from "@/components/mockups/mockup-fx";
+import { MockupShell, type MockupProps } from "@/components/mockups/mockup-shell";
+import { Flip, gsap, useGSAP } from "@/components/motion/gsap";
+import { docsShowcase as data } from "@/data/showcases";
+import { prefersReducedMotion } from "@/lib/motion";
+
+/** Transform-only Flip: `scale` avoids width/height tweens, `absolute` lets files cross clipped lanes. */
+const FLIP = { duration: 0.75, ease: "power3.inOut", absolute: true, scale: true, prune: true } as const;
+
+/**
+ * Praszo Docs: files arrive, get OCR-scanned and tagged, then route to Finance or Legal. The
+ * collaborator cursor picks each incoming file, a toast reports each routing and a finished batch pops.
+ * Hovering pauses the loop; clicking a file re-runs OCR on it (serialised with the loop's moves).
+ */
+export function DocsPipeline({ paused, className }: MockupProps) {
+  const rootRef = useRef<HTMLDivElement | null>(null);
+  const pausedRef = useRef(Boolean(paused));
+  const heldRef = useRef(false);
+
+  useEffect(() => {
+    pausedRef.current = Boolean(paused);
+  }, [paused]);
+
+  useGSAP(
+    () => {
+      const root = rootRef.current;
+      if (!root) return;
+      const files = () => Array.from(root.querySelectorAll<HTMLElement>("[data-file]"));
+      const lane = (id: string) => root.querySelector<HTMLElement>(`[data-lane="${id}"] [data-items]`);
+      const origin = new Map(files().map((file) => [file, file.parentElement as HTMLElement]));
+      const scan = root.querySelector<HTMLElement>("[data-scan]");
+
+      if (prefersReducedMotion()) {
+        files().forEach((file) => (file.dataset.state = "tagged"));
+        return;
+      }
+
+      const fx = createMockupFx(root);
+      const unbind = bindHoverHold(root, fx, (held) => {
+        heldRef.current = held;
+      });
+      let alive = true;
+      let chain: Promise<void> = Promise.resolve();
+      const exclusive = (task: () => Promise<void>) => (chain = chain.then(task, task));
+      let active: gsap.core.Animation | null = null;
+      const wait = (seconds: number) =>
+        new Promise<void>((resolve) => {
+          gsap.delayedCall(seconds, () => resolve());
+        });
+      const untilResumed = async () => {
+        while (alive && (pausedRef.current || heldRef.current)) await wait(0.25);
+      };
+      const play = (animation: gsap.core.Animation) => {
+        active = animation;
+        return animation.then(() => {
+          if (active === animation) active = null;
+        });
+      };
+      const flipTo = async (file: HTMLElement, laneId: string) => {
+        const target = lane(laneId);
+        if (!target) return;
+        const state = Flip.getState(files());
+        target.appendChild(file);
+        await play(Flip.from(state, FLIP));
+      };
+
+      const run = async () => {
+        await wait(0.8);
+        while (alive) {
+          for (const item of data.files) {
+            if (!alive) return;
+            await untilResumed();
+            const file = root.querySelector<HTMLElement>(`[data-file="${item.id}"]`);
+            if (!file) continue;
+            file.dataset.state = "raw";
+            const glide = fx.cursorTo(file, { x: 0.25 });
+            if (glide) await play(glide);
+            if (!alive) return;
+            fx.click();
+            await exclusive(() => flipTo(file, "processing"));
+            if (!alive) return;
+            if (scan) {
+              gsap.set(scan, { opacity: 1, yPercent: -100 });
+              await play(gsap.to(scan, { yPercent: 400, duration: 0.9, ease: "power1.inOut" }));
+              gsap.set(scan, { opacity: 0 });
+            }
+            file.dataset.state = "tagged";
+            await wait(0.9);
+            if (!alive) return;
+            await untilResumed();
+            await exclusive(() => flipTo(file, item.route.toLowerCase()));
+            fx.toast(`${item.type} · ${item.correspondent} → ${item.route}`, "product");
+            await wait(0.6);
+          }
+          fx.toast(`${data.files.length} files OCR-indexed and filed`, "success");
+          fx.burst(root.querySelector('[data-lane="finance"]'));
+          await wait(1.4);
+          if (!alive) return;
+          const state = Flip.getState(files());
+          files().forEach((file) => {
+            file.dataset.state = "raw";
+            origin.get(file)?.appendChild(file);
+          });
+          await play(Flip.from(state, { ...FLIP, duration: 0.6 }));
+          await wait(0.6);
+        }
+      };
+      void run();
+
+      // Click a file: re-run OCR on it (a quick scan flash and a bounce), serialised with the loop.
+      const onClick = (event: MouseEvent) => {
+        const file = (event.target as HTMLElement).closest<HTMLElement>("[data-file]");
+        const item = data.files.find((entry) => entry.id === file?.dataset.file);
+        if (!file || !item) return;
+        void exclusive(async () => {
+          file.dataset.state = "tagged";
+          await play(
+            gsap.fromTo(file, { scale: 0.96 }, { scale: 1, duration: 0.45, ease: "back.out(3)", clearProps: "scale" }),
+          );
+          fx.toast(`OCR re-indexed · ${item.name}`, "product");
+        });
+      };
+      root.addEventListener("click", onClick);
+
+      return () => {
+        alive = false;
+        unbind();
+        root.removeEventListener("click", onClick);
+        active?.progress(1).kill();
+        const all = files();
+        gsap.set(all, { clearProps: "transform" });
+        if (scan) gsap.set(scan, { clearProps: "all" });
+        origin.forEach((parent, file) => parent.appendChild(file));
+      };
+    },
+    { scope: rootRef },
+  );
+
+  return (
+    <div ref={rootRef} className={className}>
+      <MockupShell title={data.title} meta={data.meta}>
+        <div className="grid h-full min-h-0 grid-cols-3 grid-rows-[minmax(0,1fr)] gap-3 p-3">
+          <section data-lane="intake" aria-label={data.lanes[0]} className="flex min-h-0 flex-col">
+            <h3 className="label px-1 pb-2 text-[9px] text-ink-3">{data.lanes[0]}</h3>
+            <ul data-items className="flex min-h-0 flex-col gap-2 overflow-hidden">
+              {data.files.map((file) => (
+                <li
+                  key={file.id}
+                  data-file={file.id}
+                  data-state="raw"
+                  className="group cursor-pointer rounded-sm bg-bg p-2 transition-colors duration-300 hover:bg-product-soft"
+                >
+                  <p className="flex items-center gap-1.5 text-[10px] font-semibold text-ink">
+                    <FileText size={11} className="shrink-0 text-product" aria-hidden />
+                    <span className="truncate">{file.name}</span>
+                  </p>
+                  <p className="mt-1.5 hidden flex-wrap gap-1 group-data-[state=tagged]:flex">
+                    <span className="rounded-full bg-product-soft px-1.5 py-0.5 text-[8px] font-bold text-product-deep dark:text-product">
+                      {file.type}
+                    </span>
+                    <span className="rounded-full bg-elevated px-1.5 py-0.5 text-[8px] font-bold text-ink-2">
+                      {file.correspondent}
+                    </span>
+                  </p>
+                </li>
+              ))}
+            </ul>
+          </section>
+          <section
+            data-lane="processing"
+            aria-label={data.lanes[1]}
+            className="relative flex min-h-0 flex-col overflow-hidden rounded-sm bg-product-soft p-2"
+          >
+            <h3 className="label px-1 pb-2 text-[9px] text-product-deep dark:text-product">{data.lanes[1]}</h3>
+            <ul data-items className="relative flex min-h-0 flex-col gap-2" />
+            <span
+              data-scan
+              aria-hidden
+              className="pointer-events-none absolute inset-x-2 top-8 h-6 rounded bg-gradient-to-b from-transparent via-product/30 to-transparent opacity-0"
+            />
+          </section>
+          <section aria-label={data.lanes[2]} className="flex min-h-0 flex-col gap-3">
+            <div data-lane="finance" className="flex min-h-0 flex-1 flex-col">
+              <h3 className="label flex items-center gap-1 px-1 pb-2 text-[9px] text-ink-3">
+                <Wallet size={10} aria-hidden /> Finance
+              </h3>
+              <ul data-items className="flex min-h-0 flex-col gap-2 overflow-hidden" />
+            </div>
+            <div data-lane="legal" className="flex min-h-0 flex-1 flex-col">
+              <h3 className="label flex items-center gap-1 px-1 pb-2 text-[9px] text-ink-3">
+                <Scale size={10} aria-hidden /> Legal
+              </h3>
+              <ul data-items className="flex min-h-0 flex-col gap-2 overflow-hidden" />
+            </div>
+          </section>
+        </div>
+      </MockupShell>
+    </div>
+  );
+}
